@@ -1,0 +1,16 @@
+# x-, y-, and z-dimensions of the data region, in voxels
+[REGION DIMENSIONS]
+1 1 1
+
+# x-, y-, and z-coordinates of the origin of the data region (in meters)
+[ORIGIN]
+-1 -1 -1
+
+# x-, y-, and z-dimensions of a voxel, in meters
+[VOXEL SIZE]
+2 2 2
+
+# material index corresponding to each voxel
+# voxels are ordered so that the x-position increases, then y-position, then the z-position
+[MATERIAL DATA]
+0

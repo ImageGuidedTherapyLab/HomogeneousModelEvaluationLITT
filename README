@@ -1,0 +1,104 @@
+all registration parameters are WRT workdir/meshTemplateFull1.e
+
+------------------------- Running with MATLAB ------------------------------------
+
+1. Make sure 'brainsearch.py' has MATLAB = True . Make sure DAKMATLAB isn't running and the pipes are absent.  pkill -9 dakmatlab
+2. ./analytic/dakmatlab setup workspace
+3. ./exe.heathing.txt           Or whatever script you want to run
+
+------------------------- accumulate stats ---------------------------------------
+
+
+python accumulatehistory.py
+R
+source('datasummary.R')
+
+
+----------------------------------------------------------------------------------
+parallel direct search in Dakota
+http://dakota.sandia.gov/docs/dakota/5.2/html-ref/MethodCommands.html#MethodOPTPP
+
+
+Example usage:
+
+$ dakota workdir/Patient0006/007/opt/dakota_opt.in
+.
+.
+.
+
+python ./brainsearch.py --param_file  ./workdir/Patient0006/007/opt/optpp_pds.in.117 ./workdir/Patient0006/007/opt/optpp_pds.out.117
+
+>>>>> optpp_pds: post-run phase.
+********************************************************
+             OPT++ TERMINATION CRITERION
+          FAILURE - optpp_pdsterminated
+pdsdone: Function tolerance test passed
+********************************************************
+<<<<< Function evaluation summary: 129 total (129 new, 0 duplicate)
+         obj_fn: 129 val (129 n, 0 d), 0 grad (0 n, 0 d), 0 Hess (0 n, 0 d)
+<<<<< Best parameters          =
+                      1.8559756376e-01 robin_coeff
+                      2.1075112129e+01 probe_init
+                      9.7511212920e-01 anfact_healthy
+                      5.0207694651e+01 mu_a_healthy
+                      8.0000000000e+03 mu_s_healthy
+                      5.0000000000e-01 k_0_healthy
+                      6.0000000000e+00 w_0_healthy
+                      1.1135000000e-01 x_displace
+                      1.3872000000e-01 y_displace
+                      0.0000000000e+00 z_displace
+                      0.0000000000e+00 x_rotate
+                      9.0000000000e+01 y_rotate
+                      0.0000000000e+00 z_rotate
+<<<<< Best objective function  =
+                      9.2298168750e+05
+<<<<< Best data captured at function evaluation 117
+
+
+-------------------------------------------------------------------------------------------
+$ cat ./workdir/Patient0006/007/opt/optpp_pds.in.1                            $ cat ./workdir/Patient0006/007/opt/optpp_pds.in.117
+                                         13 variables                                                                  13 variables
+                      0.000000000000000e+00 robin_coeff                                             1.855975637625393e-01 robin_coeff
+                      2.100000000000000e+01 probe_init                                              2.107511212920215e+01 probe_init
+                      9.000000000000000e-01 anfact_healthy                                          9.751121292021412e-01 anfact_healthy
+                      5.000000000000000e+01 mu_a_healthy                                            5.020769465067461e+01 mu_a_healthy
+                      8.000000000000000e+03 mu_s_healthy                                            8.000000000000000e+03 mu_s_healthy
+                      5.000000000000000e-01 k_0_healthy                                             5.000000000000000e-01 k_0_healthy
+                      6.000000000000000e+00 w_0_healthy                                             6.000000000000000e+00 w_0_healthy
+                      1.113500000000000e-01 x_displace                                              1.113500000000000e-01 x_displace
+                      1.387200000000000e-01 y_displace                                              1.387200000000000e-01 y_displace
+                      0.000000000000000e+00 z_displace                                              0.000000000000000e+00 z_displace
+                      0.000000000000000e+00 x_rotate                                                0.000000000000000e+00 x_rotate
+                      9.000000000000000e+01 y_rotate                                                9.000000000000000e+01 y_rotate
+                      0.000000000000000e+00 z_rotate                                                0.000000000000000e+00 z_rotate
+                                          1 functions                                                                   1 functions
+                                          1 ASV_1:obj_fn                                                                1 ASV_1:obj_fn
+                                          4 derivative_variables                                                        4 derivative_variables
+                                          1 DVV_1:robin_coeff                                                           1 DVV_1:robin_coeff
+                                          2 DVV_2:probe_init                                                            2 DVV_2:probe_init
+                                          3 DVV_3:anfact_healthy                                                        3 DVV_3:anfact_healthy
+                                          4 DVV_4:mu_a_healthy                                                          4 DVV_4:mu_a_healthy
+                                          0 analysis_components                                                         0 analysis_components
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

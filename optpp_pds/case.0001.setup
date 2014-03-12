@@ -1,0 +1,77 @@
+
+# case setup file
+# all physical quantities should be in MKS units and degrees Celsius
+
+# Data is for porcine liver (Roggan and Muller 1994)
+
+[FUNCTION FILE]
+optpp_pds/casefunctions.0001.occa
+
+[HAS EXACT SOLUTION]
+0
+
+# first row is center of probe, second row specifies direction
+[PROBE POSITION]
+0 0 0
+0 0 1
+
+[LASER MAXIMUM POWER]
+15
+
+[BODY TEMPERATURE]
+3.700000000000000e+01
+
+[BLOOD TEMPERATURE]
+3.700000000000000e+01
+
+[COOLANT TEMPERATURE]
+2.100000000000000e+01
+
+[BLOOD SPECIFIC HEAT]
+ 3.84000e+03
+
+[DAMAGE FREQUENCY FACTOR]
+1e70
+
+[DAMAGE ACTIVATION ENERGY]
+4e5
+
+[GAS CONSTANT]
+8.314
+
+[PROBE HEAT TRANSFER COEFFICIENT]
+0
+
+[MESH BLOCKS - COMPUTATIONAL DOMAIN]
+brain
+
+[MESH BLOCKS - LASER TIP]
+laserTip
+
+[MESH BLOCKS - DIRICHLET (BODY TEMPERATURE)]
+
+[MESH BLOCKS - DIRICHLET (COOLANT TEMPERATURE)]
+
+[MESH SIDE SETS - DIRICHLET (BODY TEMPERATURE)]
+regionBoundary
+
+[MESH SIDE SETS - DIRICHLET (COOLANT TEMPERATURE)]
+
+[MESH SIDE SETS - NEUMANN]
+probeSurface
+
+[MESH SIDE SETS - ROBIN]
+
+[BRAIN TYPES - DIRICHLET (BODY TEMPERATURE)]
+
+[BRAIN MATERIAL DATA FILE]
+./material_data.setup
+
+[BRAIN MATERIAL PROPERTIES FILE]
+optpp_pds/material_types.0001.setup
+
+# Currently has material properties of water
+[PROBE MATERIAL PROPERTIES]
+# Name,   Density, Specific Heat, Conductivity, Absorption, Scattering, Anisotropy
+catheter  1.0      4180           0.5985        500         14000       0.88
+laserTip  1.0      4180           0.5985        500         14000       0.88

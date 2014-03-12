@@ -1,0 +1,10 @@
+optpp_pds/case.*.setup
+optpp_pds/setuprc.*
+optpp_pds/run.*.log
+optpp_pds/optpp_pds.out.*
+optpp_pds/optpp_pds.in.*
+optpp_pds/material_types.*.setup
+optpp_pds/casefunctions.*.occa
+workdir/Patient0006/007/opt/optpp_pds.out.*
+workdir/Patient0006/007/opt/optpp_pds.in.*
+
