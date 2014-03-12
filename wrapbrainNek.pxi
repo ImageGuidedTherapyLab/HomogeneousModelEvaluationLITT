@@ -42,6 +42,7 @@ cdef extern from "wrapbrainNek.h":
         void setDeviceTemperature(size_t , void *)
         void getHostForcing(  size_t , void *)
         void setDeviceForcing(size_t , void *)
+        void PrintSelf( )
 #        # http://documen.tician.de/pyopencl/misc.html#interoperability-with-other-opencl-software
 #        intptr_t getTemperaturePointer()
 #        intptr_t setTemperaturePointer(intptr_t)

@@ -67,6 +67,18 @@ public:
     brain_u.clMem = reinterpret_cast< cl_mem >(NewData);
     return reinterpret_cast<intptr_t>(oldData);
   }
+  // echo for debugging
+  void PrintSelf(std::ostream& os = std::cout)
+  {
+    os << "brainNek: hasSolution_f=" << hasSolution_f << std::endl;
+    os << "brainNek: dt           =" << dt            << std::endl;
+    os << "brainNek: dtinv        =" << dtinv         << std::endl;
+    os << "brainNek: finalTime    =" << finalTime     << std::endl;
+    os << "brainNek: pcg_tol      =" << pcg_tol       << std::endl;
+    os << "brainNek: frameCount   =" << frameCount    << std::endl;
+    return;
+  }
+  
   #endif
 
 };

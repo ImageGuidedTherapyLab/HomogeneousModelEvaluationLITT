@@ -903,6 +903,9 @@ def ComputeObjective(**kwargs):
   AffineTransform.RotateX( float(variableDictionary['x_rotate'  ] ) )
   AffineTransform.Scale([1.e0,1.e0,1.e0])
 
+  # FIXME  should this be different ?  
+  SEMDataDirectory = outputDirectory % kwargs['UID']
+
   ## vtkSEMReader = vtk.vtkXMLUnstructuredGridReader()
   ## SEMDataDirectory = outputDirectory % kwargs['UID']
   ## SEMtimeID = 0 
@@ -914,13 +917,10 @@ def ComputeObjective(**kwargs):
   ## fem_point_data= vtkSEMReader.GetOutput().GetPointData() 
   ## tmparray = vtkNumPy.vtk_to_numpy(fem_point_data.GetArray('Temperature')) 
 
-  # loop over time steps
-  tstep = 0
-  currentTime = 0.0
 
   # setup MRTI data read
-  MRTItimeID  = 0
-  MRTIInterval = 5.0
+  MRTIInterval = fem_params['mrtideltat'] 
+  MRTItimeID   = fem_params['timeinterval'][0]
 
   # initialize image dose
   semDose  = ImageDoseHelper(  kwargs['voi'], MRTIInterval ,'%s/temperature.0001.vtk' % (kwargs['mrti']))
@@ -931,10 +931,69 @@ def ComputeObjective(**kwargs):
   screenshotTol = 1e-10;
   screenshotInterval = MRTIInterval ;
 
+  # initialize temperature field with MRTI for cooling optimization
+  if(kwargs['opttype'] == 'cooling'): 
+    # load mrti for initial condition 
+    mrtifilename = '%s/temperature.%04d.vtk' % ( kwargs['mrti'], MRTItimeID ) 
+    print 'initial condition opening' , mrtifilename 
+    vtkICImageReader = vtk.vtkDataSetReader() 
+    vtkICImageReader.SetFileName(mrtifilename )
+    vtkICImageReader.Update() 
+    vtkICVOIExtract = vtk.vtkExtractVOI() 
+    vtkICVOIExtract.SetInput( vtkICImageReader.GetOutput() ) 
+    vtkICVOIExtract.SetVOI( kwargs['voi'] ) 
+    vtkICVOIExtract.Update()
+    # register and resample the MRTI onto the SEM mesh
+    ICSEMRegister = vtk.vtkTransformFilter()
+    ICSEMRegister.SetInput( hexahedronGrid )
+    ICSEMRegister.SetTransform(AffineTransform)
+    ICSEMRegister.Update()
+    vtkICResample = vtk.vtkProbeFilter()
+    vtkICResample.SetSource( vtkICVOIExtract.GetOutput() )
+    vtkICResample.SetInput( ICSEMRegister.GetOutput() ) 
+    vtkICResample.Update()
+    mrti_ic_point_data= vtkICResample.GetUnstructuredGridOutput().GetPointData() 
+    mrti_ic_array = vtkNumPy.vtk_to_numpy(mrti_ic_point_data.GetArray('image_data')) 
+    brainNek.setDeviceTemperature( mrti_ic_array )
+    # write output
+    if ( DebugObjective ):
+      vtkSEMWriter = vtk.vtkXMLUnstructuredGridWriter()
+      semfileName = "%s/semtransform.%04d.vtu" % (SEMDataDirectory,MRTItimeID)
+      print "writing ", semfileName 
+      vtkSEMWriter.SetFileName( semfileName )
+      vtkSEMWriter.SetInput(vtkICResample.GetUnstructuredGridOutput())
+      #vtkSEMWriter.SetDataModeToAscii()
+      vtkSEMWriter.Update()
+
+      # verify temperature on  brainNek data structures 
+      brainNek.getHostTemperature( bNekSoln )
+      vtkScalarArray = vtkNumPy.numpy_to_vtk( bNekSoln, DeepCopy) 
+      vtkScalarArray.SetName("bioheat") 
+      hexahedronGrid.GetPointData().SetScalars(vtkScalarArray);
+      verifSEMRegister = vtk.vtkTransformFilter()
+      verifSEMRegister.SetInput( hexahedronGrid )
+      verifSEMRegister.SetTransform(AffineTransform)
+      verifSEMRegister.Update()
+
+      verifSEMWriter = vtk.vtkXMLUnstructuredGridWriter()
+      semfileName = "%s/verifysemtransform.%04d.vtu" % (SEMDataDirectory,MRTItimeID)
+      print "writing ", semfileName 
+      verifSEMWriter.SetFileName( semfileName )
+      verifSEMWriter.SetInput(verifSEMRegister.GetUnstructuredGridOutput())
+      verifSEMWriter.Update()
+
+    # update counter
+    MRTItimeID = MRTItimeID + 1;
+
+  # debugging info
+  brainNek.PrintSelf()
+
   ## loop over time
-  while( brainNek.timeStep(tstep * .25 ) ) :
+  tstep = 0
+  currentTime = fem_params['initialtime'] 
+  while( brainNek.timeStep( currentTime ) ) :
     tstep = tstep + 1
-    currentTime = tstep * .25
+    currentTime = fem_params['initialtime'] +  tstep * .25
     ## if(currentTime+screenshotTol >= screenshotNum*screenshotInterval):
     ##    brainNek.getHostTemperature( bNekSoln )
     ##    screenshotNum = screenshotNum + 1;
@@ -990,14 +1049,12 @@ def ComputeObjective(**kwargs):
       #print fem_array 
       #print type(fem_array )
 
-      # FIXME  should this be different ?  
-      SEMDataDirectory = outputDirectory % kwargs['UID']
 
       # write output
       ## if ( DebugObjective ):
       ##   vtkSEMWriter = vtk.vtkXMLUnstructuredGridWriter()
       ##   semfileName = "%s/semtransform.%04d.vtu" % (SEMDataDirectory,MRTItimeID)
-      ##   print "writing ", semfileName 
+      ##   print "writing ", semfileName
       ##   vtkSEMWriter.SetFileName( semfileName )
       ##   vtkSEMWriter.SetInput(SEMRegister.GetOutput())
       ##   #vtkSEMWriter.SetDataModeToAscii()
@@ -1236,17 +1293,24 @@ def ParseInput(paramfilename,VisualizeOutput):
   config.read(inisetupfile)
   fem_params['ccode']        = config.get('power','ccode')
   fem_params['powerhistory'] = config.get('power','history')
-  # FIXME : need to automate time interval selection
   fulltimeinterval               = eval(config.get('mrti','fulltime') )
   cooltimeinterval               = eval(config.get('mrti','cooling')  )
   heattimeinterval               = eval(config.get('mrti','heating')  )
-  timeinterval = heattimeinterval             
+  # select time interval selection from optimization type
+  if(fem_params['opttype'] == 'heating'):
+    timeinterval = heattimeinterval
+  elif(fem_params['opttype'] == 'cooling'):
+    timeinterval = cooltimeinterval
+  else:
+    timeinterval = fulltimeinterval
+  fem_params['timeinterval'] = timeinterval
+  fem_params['mrtideltat']   = config.getfloat('mrti','deltat') 
   fem_params['initialtime']  = timeinterval[0] * config.getfloat('mrti','deltat') 
   fem_params['finaltime']    = timeinterval[1] * config.getfloat('mrti','deltat') 
   fem_params['maxheatid']    = heattimeinterval[1]
   fem_params['voi']          = eval(config.get('mrti','voi'))
 
-  print 'mrti data from' , fem_params['mrti'] , 'setupfile', inisetupfile  
+  print 'opttype',fem_params['opttype'],timeinterval ,'mrti data from' , fem_params['mrti'] , 'setupfile', inisetupfile  
 
   return fem_params
   ## ----------------------------
@@ -1311,8 +1375,8 @@ if (options.param_file != None):
   # parse the dakota input file
   fem_params = ParseInput(options.param_file,options.vis_out)
 
-  MatlabDriver = False
   MatlabDriver = True
+  MatlabDriver = False
   if(MatlabDriver):
 
     # write out for debug

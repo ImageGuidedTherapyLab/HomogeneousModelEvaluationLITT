@@ -88,4 +88,9 @@ cdef class PyBrain3d:
         transfer element connectivity as 1-d array
         """
         self.thisptr.GetElements(&elementarray[0])
+    def PrintSelf(self):
+        """
+        print class infor
+        """
+        self.thisptr.PrintSelf()
 
