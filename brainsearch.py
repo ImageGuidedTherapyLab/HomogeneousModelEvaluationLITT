@@ -945,16 +945,25 @@ def ComputeObjective(**kwargs):
     vtkICVOIExtract.Update()
     # blur out of plane for physical temperature field
     imagevoiextents = list(vtkICVOIExtract.GetOutput().GetExtent())
-    imagevoiextents [4] = imagevoiextents [4] - 2 
-    imagevoiextents [5] = imagevoiextents [5] + 2 
+    imagevoiextents [4] = imagevoiextents [4] - 1 
+    imagevoiextents [5] = imagevoiextents [5] + 1 
+    # NOTE to keep the same MRTI values in plane
+    # NOTE   1. mirror pad out of plane in one pixel
+    # NOTE   2. constant pad out of plane in one pixel
+    # NOTE   3. gauss blur with 1 pixel std dev
+    vtkMirrorPad = vtk.vtkImageMirrorPad() 
+    vtkMirrorPad.SetOutputWholeExtent( imagevoiextents ) 
+    vtkMirrorPad.SetInput( vtkICVOIExtract.GetOutput() ) 
+    imagevoiextents [4] = imagevoiextents [4] - 1 
+    imagevoiextents [5] = imagevoiextents [5] + 1 
     vtkImagePad = vtk.vtkImageConstantPad() 
     vtkImagePad.SetOutputWholeExtent( imagevoiextents ) 
-    vtkImagePad.SetInput( vtkICVOIExtract.GetOutput() ) 
+    vtkImagePad.SetInput( vtkMirrorPad.GetOutput() ) 
     body_temp = float(kwargs['cv']['body_temp']) 
     vtkImagePad.SetConstant( body_temp ) 
     GaussSmooth = vtk.vtkImageGaussianSmooth()
     GaussSmooth.SetInput( vtkImagePad.GetOutput() ) 
-    #GaussSmooth.SetStandardDeviations( 1,1,2 ) 
+    GaussSmooth.SetStandardDeviations( 1.e-6,1.e-6,1 ) 
     #GaussSmooth.SetRadiusFactors( 1,1,1.5 )
     # register and resample the MRTI onto the SEM mesh
     ICSEMRegister = vtk.vtkTransformFilter()
