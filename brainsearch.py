@@ -943,20 +943,38 @@ def ComputeObjective(**kwargs):
     vtkICVOIExtract.SetInput( vtkICImageReader.GetOutput() ) 
     vtkICVOIExtract.SetVOI( kwargs['voi'] ) 
     vtkICVOIExtract.Update()
+    # blur out of plane for physical temperature field
+    imagevoiextents = list(vtkICVOIExtract.GetOutput().GetExtent())
+    imagevoiextents [4] = imagevoiextents [4] - 2 
+    imagevoiextents [5] = imagevoiextents [5] + 2 
+    vtkImagePad = vtk.vtkImageConstantPad() 
+    vtkImagePad.SetOutputWholeExtent( imagevoiextents ) 
+    vtkImagePad.SetInput( vtkICVOIExtract.GetOutput() ) 
+    body_temp = float(kwargs['cv']['body_temp']) 
+    vtkImagePad.SetConstant( body_temp ) 
+    GaussSmooth = vtk.vtkImageGaussianSmooth()
+    GaussSmooth.SetInput( vtkImagePad.GetOutput() ) 
+    #GaussSmooth.SetStandardDeviations( 1,1,2 ) 
+    #GaussSmooth.SetRadiusFactors( 1,1,1.5 )
     # register and resample the MRTI onto the SEM mesh
     ICSEMRegister = vtk.vtkTransformFilter()
     ICSEMRegister.SetInput( hexahedronGrid )
     ICSEMRegister.SetTransform(AffineTransform)
     ICSEMRegister.Update()
     vtkICResample = vtk.vtkProbeFilter()
-    vtkICResample.SetSource( vtkICVOIExtract.GetOutput() )
+    vtkICResample.SetSource( GaussSmooth.GetOutput() )
     vtkICResample.SetInput( ICSEMRegister.GetOutput() ) 
     vtkICResample.Update()
     mrti_ic_point_data= vtkICResample.GetUnstructuredGridOutput().GetPointData() 
     mrti_ic_array = vtkNumPy.vtk_to_numpy(mrti_ic_point_data.GetArray('image_data')) 
+    # threshold by body temp
+    mrti_ic_array[ mrti_ic_array < body_temp ] = body_temp  
     brainNek.setDeviceTemperature( mrti_ic_array )
     # write output
     if ( DebugObjective ):
+      # check gauss image
+      WriteVTKOutputFile ( GaussSmooth.GetOutput()   ,"%s/gauss.%s.%04d.vtk"   % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
+
       vtkSEMWriter = vtk.vtkXMLUnstructuredGridWriter()
       semfileName = "%s/semtransform.%04d.vtu" % (SEMDataDirectory,MRTItimeID)
       print "writing ", semfileName 
