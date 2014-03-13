@@ -23,7 +23,7 @@ inputdatavars = load('./TmpDataInput.mat')
 % vtk_index = vtk_times ( patient_index );
 
 % [metric] =  fast_temperature_obj_fxn ( path22, pathpt, index, vtk_index );
-[metric,~,~] =  fast_temperature_obj_fxn22 ( inputdatavars );
+[metric,~,~] =  fast_temperature_obj_fxn ( inputdatavars );
 
 % index = index + 1;
 % csvwrite ('index.txt' , index);
