@@ -8,14 +8,18 @@ strategy,
 method,
         optpp_q_newton
         #optpp_pds
-        output verbose
+        #output verbose
+        scaling				
+        output debug
           max_iterations = 1000
           max_function_evaluations = 2000
-#         solution_accuracy = 1e-4
-#         initial_delta = 0.5
-#         threshold_delta = 1e-4
-#         exploratory_moves basic_pattern
-#         contraction_factor = 0.75
+          gradient_tolerance = 1.e-6
+          convergence_tolerance = 1.e-6
+        # solution_accuracy = 1e-4
+        # initial_delta = 0.5
+        # threshold_delta = 1e-4
+        # exploratory_moves basic_pattern
+        # contraction_factor = 0.75
 
 model,
         single
@@ -45,6 +49,7 @@ variables,
           lower_bounds  =   8.00000e-01 
           upper_bounds  =   5.30000e+03 
           descriptors  =  'mu_eff_healthy' 
+          scale_types  =  'auto' 
         continuous_state = 11
           initial_state  =  -9.00000e+01   2.28733e-05   9.64450e-02   1.19600e-01   0.00000e+00   3.70000e+01   0.00000e+00   1.38546e-07  -1.50000e+01   2.10000e+01   0.00000e+00 
           #lower_bounds  =  -9.50000e+01   1.37787e-05   9.54450e-02   1.18600e-01  -1.00000e-03   3.40000e+01  -5.00000e+00   1.19227e-07  -2.00000e+01   2.00000e+01   0.00000e+00 

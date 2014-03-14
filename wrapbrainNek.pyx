@@ -30,6 +30,11 @@ cdef class PyBrain3d:
          advance solution 1 timestep
         """
         return self.thisptr.timeStep(currentTime)
+    def heatStep( self,currentTime):
+        """
+         advance solution 
+        """
+        self.thisptr.heatStep(currentTime)
     def GetNumberOfNodes( self):
         """
          get vtu number of nodes

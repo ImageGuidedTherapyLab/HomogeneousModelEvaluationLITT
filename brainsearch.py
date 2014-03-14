@@ -1011,121 +1011,115 @@ def ComputeObjective(**kwargs):
       verifSEMWriter.SetInput(verifSEMRegister.GetUnstructuredGridOutput())
       verifSEMWriter.Update()
 
-    # update counter
-    MRTItimeID = MRTItimeID + 1;
-
   # debugging info
   brainNek.PrintSelf()
 
   ## loop over time
-  tstep = 0
   currentTime = fem_params['initialtime'] 
-  while( brainNek.timeStep( currentTime ) ) :
-    tstep = tstep + 1
-    currentTime = fem_params['initialtime'] +  tstep * brainNek.dt()
-    ## if(currentTime+screenshotTol >= screenshotNum*screenshotInterval):
-    ##    brainNek.getHostTemperature( bNekSoln )
-    ##    screenshotNum = screenshotNum + 1;
-    ##    print "get host data",bNekSoln 
+  for MRTItimeID in range(fem_params['timeinterval'][0]+1,fem_params['timeinterval'][1]+1):
 
-    if(currentTime+screenshotTol >= MRTItimeID * MRTIInterval):
-      # load image 
-      mrtifilename = '%s/temperature.%04d.vtk' % (kwargs['mrti'], MRTItimeID) 
-      print 'opening' , mrtifilename 
-      vtkImageReader = vtk.vtkDataSetReader() 
-      vtkImageReader.SetFileName(mrtifilename )
-      vtkImageReader.Update() 
-      ## image_cells = vtkImageReader.GetOutput().GetPointData() 
-      ## data_array = vtkNumPy.vtk_to_numpy(image_cells.GetArray('scalars')) 
-      
-      # extract voi for QOI
-      vtkVOIExtract = vtk.vtkExtractVOI() 
-      vtkVOIExtract.SetInput( vtkImageReader.GetOutput() ) 
-      vtkVOIExtract.SetVOI( kwargs['voi'] ) 
-      vtkVOIExtract.Update()
-      mrti_point_data= vtkVOIExtract.GetOutput().GetPointData() 
-      mrti_array = vtkNumPy.vtk_to_numpy(mrti_point_data.GetArray('image_data')) 
-      # update dose
-      vtkmrtiDose = mrtiDose.UpdateDoseMap(mrti_array)
-      # x = vtkNumPy.vtk_to_numpy(vtkmrtiDose.GetPointData().GetArray('scalars')) 
-      
-      #print mrti_array
-      #print type(mrti_array)
+    while( currentTime  < (MRTItimeID +1)*MRTIInterval ) :
+      currentTime = currentTime + brainNek.dt()
+      brainNek.heatStep( currentTime )
+      ## if(currentTime+screenshotTol >= screenshotNum*screenshotInterval):
+      ##    brainNek.getHostTemperature( bNekSoln )
+      ##    screenshotNum = screenshotNum + 1;
+      ##    print "get host data",bNekSoln 
 
-      # get brainNek solution 
-      brainNek.getHostTemperature( bNekSoln )
-      vtkScalarArray = vtkNumPy.numpy_to_vtk( bNekSoln, DeepCopy) 
-      vtkScalarArray.SetName("bioheat") 
-      hexahedronGrid.GetPointData().SetScalars(vtkScalarArray);
-      hexahedronGrid.Update()
+    # load image 
+    mrtifilename = '%s/temperature.%04d.vtk' % (kwargs['mrti'], MRTItimeID) 
+    print 'opening' , mrtifilename , currentTime
+    vtkImageReader = vtk.vtkDataSetReader() 
+    vtkImageReader.SetFileName(mrtifilename )
+    vtkImageReader.Update() 
+    ## image_cells = vtkImageReader.GetOutput().GetPointData() 
+    ## data_array = vtkNumPy.vtk_to_numpy(image_cells.GetArray('scalars')) 
+    
+    # extract voi for QOI
+    vtkVOIExtract = vtk.vtkExtractVOI() 
+    vtkVOIExtract.SetInput( vtkImageReader.GetOutput() ) 
+    vtkVOIExtract.SetVOI( kwargs['voi'] ) 
+    vtkVOIExtract.Update()
+    mrti_point_data= vtkVOIExtract.GetOutput().GetPointData() 
+    mrti_array = vtkNumPy.vtk_to_numpy(mrti_point_data.GetArray('image_data')) 
+    # update dose
+    vtkmrtiDose = mrtiDose.UpdateDoseMap(mrti_array)
+    # x = vtkNumPy.vtk_to_numpy(vtkmrtiDose.GetPointData().GetArray('scalars')) 
+    
+    #print mrti_array
+    #print type(mrti_array)
 
-      # project SEM onto MRTI for comparison
-      print 'resampling' 
-      SEMRegister = vtk.vtkTransformFilter()
-      SEMRegister.SetInput( hexahedronGrid )
-      SEMRegister.SetTransform(AffineTransform)
-      SEMRegister.Update()
-      vtkResample = vtk.vtkCompositeDataProbeFilter()
-      vtkResample.SetSource( SEMRegister.GetOutput() )
-      vtkResample.SetInput( vtkVOIExtract.GetOutput() ) 
-      vtkResample.Update()
+    # get brainNek solution 
+    brainNek.getHostTemperature( bNekSoln )
+    vtkScalarArray = vtkNumPy.numpy_to_vtk( bNekSoln, DeepCopy) 
+    vtkScalarArray.SetName("bioheat") 
+    hexahedronGrid.GetPointData().SetScalars(vtkScalarArray);
+    hexahedronGrid.Update()
 
-      fem_point_data= vtkResample.GetOutput().GetPointData() 
-      fem_array = vtkNumPy.vtk_to_numpy(fem_point_data.GetArray('bioheat')) 
-      # update dose
-      vtksemDose  = semDose.UpdateDoseMap(  fem_array)
-      print 'resampled' 
-      #print fem_array 
-      #print type(fem_array )
+    # project SEM onto MRTI for comparison
+    print 'resampling' 
+    SEMRegister = vtk.vtkTransformFilter()
+    SEMRegister.SetInput( hexahedronGrid )
+    SEMRegister.SetTransform(AffineTransform)
+    SEMRegister.Update()
+    vtkResample = vtk.vtkCompositeDataProbeFilter()
+    vtkResample.SetSource( SEMRegister.GetOutput() )
+    vtkResample.SetInput( vtkVOIExtract.GetOutput() ) 
+    vtkResample.Update()
+
+    fem_point_data= vtkResample.GetOutput().GetPointData() 
+    fem_array = vtkNumPy.vtk_to_numpy(fem_point_data.GetArray('bioheat')) 
+    # update dose
+    vtksemDose  = semDose.UpdateDoseMap(  fem_array)
+    print 'resampled' 
+    #print fem_array 
+    #print type(fem_array )
 
 
-      # write output
-      if ( False ):
-        vtkSEMWriter = vtk.vtkXMLUnstructuredGridWriter()
-        semfileName = "%s/semtransform.%04d.vtu" % (SEMDataDirectory,MRTItimeID)
-        print "writing ", semfileName
-        vtkSEMWriter.SetFileName( semfileName )
-        vtkSEMWriter.SetInput(SEMRegister.GetOutput())
-        #vtkSEMWriter.SetDataModeToAscii()
-        vtkSEMWriter.Update()
+    # write output
+    if ( False ):
+      vtkSEMWriter = vtk.vtkXMLUnstructuredGridWriter()
+      semfileName = "%s/semtransform.%04d.vtu" % (SEMDataDirectory,MRTItimeID)
+      print "writing ", semfileName
+      vtkSEMWriter.SetFileName( semfileName )
+      vtkSEMWriter.SetInput(SEMRegister.GetOutput())
+      #vtkSEMWriter.SetDataModeToAscii()
+      vtkSEMWriter.Update()
 
-      # write output
-      # FIXME auto read ??
-      if ( DebugObjective ):
-         # write temperature
-         WriteVTKOutputFile ( vtkResample.GetOutput()   ,"%s/roisem.%s.%04d.vtk"   % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
-         WriteVTKOutputFile ( vtkVOIExtract.GetOutput() ,"%s/roimrti.%s.%04d.vtk"  % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
-         # write dose
-         WriteVTKOutputFile ( vtksemDose  ,"%s/roisemdose.%s.%04d.vtk"   % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
-         WriteVTKOutputFile ( vtkmrtiDose ,"%s/roimrtidose.%s.%04d.vtk"  % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
+    # write output
+    # FIXME auto read ??
+    if ( DebugObjective ):
+       # write temperature
+       WriteVTKOutputFile ( vtkResample.GetOutput()   ,"%s/roisem.%s.%04d.vtk"   % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
+       WriteVTKOutputFile ( vtkVOIExtract.GetOutput() ,"%s/roimrti.%s.%04d.vtk"  % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
+       # write dose
+       WriteVTKOutputFile ( vtksemDose  ,"%s/roisemdose.%s.%04d.vtk"   % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
+       WriteVTKOutputFile ( vtkmrtiDose ,"%s/roimrtidose.%s.%04d.vtk"  % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
 
-         # write dice coefficient
-         dicecmd = "%s -verbose %s/roisemdose.%s.%04d.vtk -thresh 1 inf 1 0 -type uchar -as SEM %s/roimrtidose.%s.%04d.vtk -thresh 1 inf 1 0 -type uchar -push SEM -overlap 1 > %s/dice.%s.%04d.txt  2>&1" % (c3dexe,SEMDataDirectory,kwargs['opttype'],MRTItimeID,SEMDataDirectory,kwargs['opttype'],MRTItimeID,SEMDataDirectory,kwargs['opttype'],MRTItimeID)
-         print dicecmd
-         os.system(dicecmd)
-         ##if (MRTItimeID > 20):
-         ##  raise 
+       # write dice coefficient
+       dicecmd = "%s -verbose %s/roisemdose.%s.%04d.vtk -thresh 1 inf 1 0 -type uchar -as SEM %s/roimrtidose.%s.%04d.vtk -thresh 1 inf 1 0 -type uchar -push SEM -overlap 1 > %s/dice.%s.%04d.txt  2>&1" % (c3dexe,SEMDataDirectory,kwargs['opttype'],MRTItimeID,SEMDataDirectory,kwargs['opttype'],MRTItimeID,SEMDataDirectory,kwargs['opttype'],MRTItimeID)
+       print dicecmd
+       os.system(dicecmd)
+       ##if (MRTItimeID > 20):
+       ##  raise 
 
-      # Write JPG's for tex
-      if ( kwargs['VisualizeOutput'] and MRTItimeID == fem_params['maxheatid'] ):
-      #if ( kwargs['VisualizeOutput'] ):
-         VisDictionary = {'voi'    :  kwargs['voi'] ,
-                          'roisem' : vtkResample.GetOutput()   ,
-                          'roimrti': vtkVOIExtract.GetOutput() ,
-                      'roisemdose' : vtksemDose  ,
-                      'roimrtidose': vtkmrtiDose ,
-                'magnitudefilename':'%s/magnitude.%04d.vtk' % (kwargs['mrti'], MRTItimeID) ,
-                 'jpgoutnameformat':"%s/%%s%s%04d.jpg"  % (SEMDataDirectory,kwargs['opttype'],MRTItimeID)
-                         }
-         WriteJPGOutputFiles(**VisDictionary)
+    # Write JPG's for tex
+    if ( kwargs['VisualizeOutput'] and MRTItimeID == fem_params['maxheatid'] ):
+    #if ( kwargs['VisualizeOutput'] ):
+       VisDictionary = {'voi'    :  kwargs['voi'] ,
+                        'roisem' : vtkResample.GetOutput()   ,
+                        'roimrti': vtkVOIExtract.GetOutput() ,
+                    'roisemdose' : vtksemDose  ,
+                    'roimrtidose': vtkmrtiDose ,
+              'magnitudefilename':'%s/magnitude.%04d.vtk' % (kwargs['mrti'], MRTItimeID) ,
+               'jpgoutnameformat':"%s/%%s%s%04d.jpg"  % (SEMDataDirectory,kwargs['opttype'],MRTItimeID)
+                       }
+       WriteJPGOutputFiles(**VisDictionary)
 
-      # accumulate objective function
-      diff =  numpy.abs(mrti_array-fem_array)
-      diffsq =  diff**2
-      ObjectiveFunction = ObjectiveFunction + diff.sum()
-
-      # update counter
-      MRTItimeID = MRTItimeID + 1;
+    # accumulate objective function
+    diff =  numpy.abs(mrti_array-fem_array)
+    diffsq =  diff**2
+    ObjectiveFunction = ObjectiveFunction + diff.sum()
 
   return ObjectiveFunction 
 # end def ComputeObjective:
