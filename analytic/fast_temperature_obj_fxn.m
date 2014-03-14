@@ -11,7 +11,7 @@ patientID = strcat ( inputdatavars.patientID, '/', inputdatavars.UID, '/');
 patient_opt_path = strcat ( path22, '/workdir/', patientID, 'opt/' ); % The '/workdir/' needs the first backslash coz it uses absolute path
 
 % Make the path to the VTK
-patient_MRTI_path = strcat ( 'new_database/', patientID, 'vtk/referenceBased/' );
+patient_MRTI_path = strcat ( 'StudyDatabase/', patientID, 'vtk/referenceBased/' );
 
 % Read in the power and identify the max power moment.
 pwr_hist = str2num(inputdatavars.powerhistory); % Gets just the numbers. (Al a "Just the facts, ma'am.")

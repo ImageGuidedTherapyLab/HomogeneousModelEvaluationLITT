@@ -5,7 +5,7 @@ import ConfigParser
 resultfileList = [
 './workdir/Study0035/0530/',
 './workdir/Study0030/0495/',
-'./workdir/Study0023/0433/',
+##'./workdir/Study0023/0433/',
 './workdir/Study0030/0497/',
 './workdir/Study0030/0491/',
 './workdir/Study0030/0496/',

@@ -1,5 +1,5 @@
 echo 530; dakota ./workdir/Study0035/0530/opt/dakota_q_newton_heating.in > ./workdir/Study0035/0530/opt/dakota_q_newton_heating.in.log 2>&1 
-echo 433; dakota ./workdir/Study0023/0433/opt/dakota_q_newton_heating.in > ./workdir/Study0023/0433/opt/dakota_q_newton_heating.in.log 2>&1 
+#echo 433; dakota ./workdir/Study0023/0433/opt/dakota_q_newton_heating.in > ./workdir/Study0023/0433/opt/dakota_q_newton_heating.in.log 2>&1 
 echo 495; dakota ./workdir/Study0030/0495/opt/dakota_q_newton_heating.in > ./workdir/Study0030/0495/opt/dakota_q_newton_heating.in.log 2>&1 
 echo 497; dakota ./workdir/Study0030/0497/opt/dakota_q_newton_heating.in > ./workdir/Study0030/0497/opt/dakota_q_newton_heating.in.log 2>&1 
 echo 491; dakota ./workdir/Study0030/0491/opt/dakota_q_newton_heating.in > ./workdir/Study0030/0491/opt/dakota_q_newton_heating.in.log 2>&1 
