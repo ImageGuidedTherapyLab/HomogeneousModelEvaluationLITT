@@ -654,9 +654,9 @@ def ForwardSolve(**kwargs):
   screenshotInterval = MRTIInterval ;
 
   ## loop over time
-  while( brainNek.timeStep(tstep * .25 ) ) :
+  while( brainNek.timeStep(tstep * brainNek.dt() ) ) :
     tstep = tstep + 1
-    currentTime = tstep * .25
+    currentTime = tstep * brainNek.dt()
     ## if(currentTime+screenshotTol >= screenshotNum*screenshotInterval):
     ##    brainNek.getHostTemperature( bNekSoln )
     ##    screenshotNum = screenshotNum + 1;
@@ -917,6 +917,7 @@ def ComputeObjective(**kwargs):
   ## fem_point_data= vtkSEMReader.GetOutput().GetPointData() 
   ## tmparray = vtkNumPy.vtk_to_numpy(fem_point_data.GetArray('Temperature')) 
 
+  print " brainNek deltat:", brainNek.dt()
 
   # setup MRTI data read
   MRTIInterval = fem_params['mrtideltat'] 
@@ -988,6 +989,7 @@ def ComputeObjective(**kwargs):
       semfileName = "%s/semtransform.%04d.vtu" % (SEMDataDirectory,MRTItimeID)
       print "writing ", semfileName 
       vtkSEMWriter.SetFileName( semfileName )
+      #vtkSEMWriter.SetInput(hexahedronGrid )
       vtkSEMWriter.SetInput(vtkICResample.GetUnstructuredGridOutput())
       #vtkSEMWriter.SetDataModeToAscii()
       vtkSEMWriter.Update()
@@ -1020,7 +1022,7 @@ def ComputeObjective(**kwargs):
   currentTime = fem_params['initialtime'] 
   while( brainNek.timeStep( currentTime ) ) :
     tstep = tstep + 1
-    currentTime = fem_params['initialtime'] +  tstep * .25
+    currentTime = fem_params['initialtime'] +  tstep * brainNek.dt()
     ## if(currentTime+screenshotTol >= screenshotNum*screenshotInterval):
     ##    brainNek.getHostTemperature( bNekSoln )
     ##    screenshotNum = screenshotNum + 1;
@@ -1078,14 +1080,14 @@ def ComputeObjective(**kwargs):
 
 
       # write output
-      ## if ( DebugObjective ):
-      ##   vtkSEMWriter = vtk.vtkXMLUnstructuredGridWriter()
-      ##   semfileName = "%s/semtransform.%04d.vtu" % (SEMDataDirectory,MRTItimeID)
-      ##   print "writing ", semfileName
-      ##   vtkSEMWriter.SetFileName( semfileName )
-      ##   vtkSEMWriter.SetInput(SEMRegister.GetOutput())
-      ##   #vtkSEMWriter.SetDataModeToAscii()
-      ##   vtkSEMWriter.Update()
+      if ( False ):
+        vtkSEMWriter = vtk.vtkXMLUnstructuredGridWriter()
+        semfileName = "%s/semtransform.%04d.vtu" % (SEMDataDirectory,MRTItimeID)
+        print "writing ", semfileName
+        vtkSEMWriter.SetFileName( semfileName )
+        vtkSEMWriter.SetInput(SEMRegister.GetOutput())
+        #vtkSEMWriter.SetDataModeToAscii()
+        vtkSEMWriter.Update()
 
       # write output
       # FIXME auto read ??

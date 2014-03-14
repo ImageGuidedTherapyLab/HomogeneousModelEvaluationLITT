@@ -1,3 +1,4 @@
+
 echo 530; dakota ./workdir/Study0035/0530/opt/dakota_q_newton_heating.in > ./workdir/Study0035/0530/opt/dakota_q_newton_heating.in.log 2>&1 
 echo 433; dakota ./workdir/Study0023/0433/opt/dakota_q_newton_heating.in > ./workdir/Study0023/0433/opt/dakota_q_newton_heating.in.log 2>&1 
 echo 495; dakota ./workdir/Study0030/0495/opt/dakota_q_newton_heating.in > ./workdir/Study0030/0495/opt/dakota_q_newton_heating.in.log 2>&1 
@@ -5,6 +6,7 @@ echo 497; dakota ./workdir/Study0030/0497/opt/dakota_q_newton_heating.in > ./wor
 echo 491; dakota ./workdir/Study0030/0491/opt/dakota_q_newton_heating.in > ./workdir/Study0030/0491/opt/dakota_q_newton_heating.in.log 2>&1 
 echo 496; dakota ./workdir/Study0030/0496/opt/dakota_q_newton_heating.in > ./workdir/Study0030/0496/opt/dakota_q_newton_heating.in.log 2>&1 
 echo 490; dakota ./workdir/Study0030/0490/opt/dakota_q_newton_heating.in > ./workdir/Study0030/0490/opt/dakota_q_newton_heating.in.log 2>&1 
+echo 377; dakota ./workdir/Study0017/0377/opt/dakota_q_newton_heating.in > ./workdir/Study0017/0377/opt/dakota_q_newton_heating.in.log 2>&1 
 echo 378; dakota ./workdir/Study0017/0378/opt/dakota_q_newton_heating.in > ./workdir/Study0017/0378/opt/dakota_q_newton_heating.in.log 2>&1 
 echo 438; dakota ./workdir/Study0025/0438/opt/dakota_q_newton_heating.in > ./workdir/Study0025/0438/opt/dakota_q_newton_heating.in.log 2>&1 
 echo 435; dakota ./workdir/Study0025/0435/opt/dakota_q_newton_heating.in > ./workdir/Study0025/0435/opt/dakota_q_newton_heating.in.log 2>&1 
@@ -24,3 +26,4 @@ echo 417; dakota ./workdir/Study0022/0417/opt/dakota_q_newton_heating.in > ./wor
 echo 409; dakota ./workdir/Study0021/0409/opt/dakota_q_newton_heating.in > ./workdir/Study0021/0409/opt/dakota_q_newton_heating.in.log 2>&1 
 echo 414; dakota ./workdir/Study0021/0414/opt/dakota_q_newton_heating.in > ./workdir/Study0021/0414/opt/dakota_q_newton_heating.in.log 2>&1 
 echo 415; dakota ./workdir/Study0021/0415/opt/dakota_q_newton_heating.in > ./workdir/Study0021/0415/opt/dakota_q_newton_heating.in.log 2>&1 
+echo 183; dakota ./workdir/Study0006/0183/opt/dakota_q_newton_heating.in > ./workdir/Study0006/0183/opt/dakota_q_newton_heating.in.log 2>&1 
