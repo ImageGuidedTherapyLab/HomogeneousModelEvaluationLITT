@@ -16,15 +16,15 @@
 
 % H0 is null hypothesis
 % H1 is alternative hypothesis
-% Patient_paths is the paths to the ablations that are being run through
+% Study_paths is the paths to the ablations that are being run through
 %   the LOOCV algorithm
 % mu_eff_opt is a vector of the inverse problem optimized mu_eff values in
 %   1/m units
 
-function [ H0, H1 ] = LOOCV_t_test ( Patient_paths, mu_eff_opt );
+function [ H0, H1 ] = Check_ablation ( Study_paths, mu_eff_opt );
 
 % Make the LOOCV iteration system
-n_patients = size( Patient_paths,1); % This is the number of patients
+n_patients = size( Study_paths,1); % This is the number of patients
 % n_patients = 1;
 dice_values = zeros( n_patients,1); % Initialize the number of DSC (dice) values
 for ii = 1:n_patients
@@ -32,14 +32,14 @@ for ii = 1:n_patients
     % thermal code to run
     
     params_iter = load( 'TmpDataInput.mat' ); % Read in one dakota.in file to find the constant parameters
-    single_path = strcat( 'workdir/', Patient_paths{ii,1}, '/', Patient_paths{ii,2}, '/opt/');
+    single_path = strcat( 'workdir/', Study_paths{ii,1}, '/', Study_paths{ii,2}, '/opt/');
     load ( strcat(single_path, 'VOI.mat'));
     mu_eff_iter = mu_eff_opt; % Make a copy of both the mu_eff values and the paths
     mu_eff_iter ( ii ) = 0; % Set one of the mu_eff values to 0
     mu_eff_iter ( mu_eff_iter == 0 ) = []; % Remove the 0
     params_iter.cv.mu_eff_healthy = num2str( mean ( mu_eff_iter )); % Average the training datasets' mu_eff; also make it a string coz the thermal code needs that format.
-    params_iter.patientID = Patient_paths{ii,1}; % Write the patient path information into the params_iter structure
-    params_iter.UID = Patient_paths{ii,2};
+    params_iter.patientID = Study_paths{ii,1}; % Write the patient path information into the params_iter structure
+    params_iter.UID = Study_paths{ii,2};
     params_iter.voi(1:2) = VOI.x;
     params_iter.voi(1) = 80;
     params_iter.voi(3:4) = VOI.y;
