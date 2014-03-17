@@ -28,21 +28,27 @@ n_patients = size( Study_paths,1); % This is the number of patients
 % n_patients = 1;
 dice_values = zeros( n_patients,1); % Initialize the number of DSC (dice) values
 for ii = 1:n_patients
+    % This section writes a new TmpDataInput.mat file for later reading.
+    param_file = strcat( 'workdir/', Study_paths{ii,1}, '/', Study_paths{ii,2}, '/opt/optpp_pds.heating.in.1');
+    python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ''')');   % unix(''python test_saveFile.py'')
+    evalc(python_command);
+    
     % This section prepares the varied parameters into a .mat file for the
     % thermal code to run
-    
+    % Sample:  'python ./brainsearch.py --param_file '
     params_iter = load( 'TmpDataInput.mat' ); % Read in one dakota.in file to find the constant parameters
-    single_path = strcat( 'workdir/', Study_paths{ii,1}, '/', Study_paths{ii,2}, '/opt/');
-    load ( strcat(single_path, 'VOI.mat'));
-    mu_eff_iter = mu_eff_opt; % Make a copy of both the mu_eff values and the paths
-    mu_eff_iter ( ii ) = 0; % Set one of the mu_eff values to 0
-    mu_eff_iter ( mu_eff_iter == 0 ) = []; % Remove the 0
-    params_iter.cv.mu_eff_healthy = num2str( mean ( mu_eff_iter )); % Average the training datasets' mu_eff; also make it a string coz the thermal code needs that format.
-    params_iter.patientID = Study_paths{ii,1}; % Write the patient path information into the params_iter structure
-    params_iter.UID = Study_paths{ii,2};
-    params_iter.voi(1:2) = VOI.x;
-    params_iter.voi(1) = 80;
-    params_iter.voi(3:4) = VOI.y;
+    params_iter.cv.mu_eff_heatlthy = mu_eff_opt(ii);
+%     single_path = strcat( 'workdir/', Study_paths{ii,1}, '/', Study_paths{ii,2}, '/opt/');
+%     load ( strcat(single_path, 'VOI.mat'));
+%     mu_eff_iter = mu_eff_opt; % Make a copy of both the mu_eff values and the paths
+%     mu_eff_iter ( ii ) = 0; % Set one of the mu_eff values to 0
+%     mu_eff_iter ( mu_eff_iter == 0 ) = []; % Remove the 0
+%     params_iter.cv.mu_eff_healthy = num2str( mean ( mu_eff_iter )); % Average the training datasets' mu_eff; also make it a string coz the thermal code needs that format.
+%     params_iter.patientID = Study_paths{ii,1}; % Write the patient path information into the params_iter structure
+%     params_iter.UID = Study_paths{ii,2};
+%     params_iter.voi(1:2) = VOI.x;
+%     params_iter.voi(1) = 80;
+%     params_iter.voi(3:4) = VOI.y;
    
     % This section runs the thermal code
     [metric, thermal_model, MRTI_crop] = fast_temperature_obj_fxn ( params_iter );
@@ -52,10 +58,13 @@ for ii = 1:n_patients
     MRTI_deg57 = MRTI_crop >= 57;
     n_model = sum(sum( model_deg57 ));
     n_MRTI = sum(sum( MRTI_deg57 ));
-    union = model_deg57 + MRTI_deg57;
-    union = union > 1;
-    n_union = sum(sum( union ));
-    dice_values (ii) = 2*n_union / (n_model + n_MRTI) ;
+    intersection = model_deg57 + MRTI_deg57;
+    intersection = intersection > 1;
+    n_intersection = sum(sum( intersection ));
+    dice_values (ii) = 2*n_intersection / (n_model + n_MRTI) ;
+    figure(1); imagesc(MRTI_crop,[30 80]);
+    figure(2);imagesc(thermal_model, [30 80]);
+    figure(3);imagesc(intersection);
 end
 
 H0 = 1;
