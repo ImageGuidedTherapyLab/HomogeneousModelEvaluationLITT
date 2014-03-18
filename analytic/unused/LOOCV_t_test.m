@@ -56,13 +56,10 @@ for ii = 1:n_patients
     clear mu_eff_iter;
 end
 
-% H0 = 1;
-% H1 = 2;
-
-mean_dice = mean ( dice_values ); % Average Dice values
-std_dice = std ( dice_values ); % Stardard deviation of Dice values.
-test_statistic = ( mean_dice - 0.7 ) ./ ( std_dice ./ sqrt ( n_patients )); % Calculate the test_statistic
-[hh, ptest] = ttest( dice_values, 0.7, 0.05, 'right');
+[hh.H, hh.ptest] = ttest( dice_values, 0.7, 0.05, 'right');
+% mean_dice = mean ( dice_values ); % Average Dice values
+% std_dice = std ( dice_values ); % Stardard deviation of Dice values.
+%test_statistic = ( mean_dice - 0.7 ) ./ ( std_dice ./ sqrt ( n_patients )); % Calculate the test_statistic
 %p_value = tcdf ( test_statistic , n_patients , 'lower' );
 % H0.p_value = p_value;
 % H0.result = 1;
