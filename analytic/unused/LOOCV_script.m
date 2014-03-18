@@ -14,29 +14,44 @@
 % 
 % The output: The output is a binary acceptance/rejection of the null and alternative hypotheses.
 
-Patient_paths     = cell (5,2);
-Patient_paths {1,1} = 'Patient0002';
-Patient_paths {1,2} = '000';
-Patient_paths {2,1} = 'Patient0002';
-Patient_paths {2,2} = '001';
-Patient_paths {3,1} = 'Patient0002';
-Patient_paths {3,2} = '021';
-Patient_paths {4,1} = 'Patient0006';
-Patient_paths {4,2} = '007';
-Patient_paths {5,1} = 'Patient0006';
-Patient_paths {5,2} = '009';
+% This script finds the best mu_eff for the different studies.
+cell_data = csvimport('datasummary.txt');
+headers = cell_data(1,1:3);
+mu_eff_data = cell2mat(cell_data(2:end,:));
 
-mu_eff_opt = zeros (5,1); % Initialize a couple looped variables
-min_obj_fxn_indices = zeros (5,1);
-% for ii = 1:5 % This loop finds the optimized mu_eff values from datasets that have already been optimized
-for ii = 1:5
-    single_path = strcat( 'workdir/', Patient_paths{ii,1}, '/', Patient_paths{ii,2}, '/opt/');
-    tab_dat = load (strcat( single_path,'dakota_q_newton_heating.in.tabular.dat') );
-    [~,min_obj_fxn_indices(ii)] = min( tab_dat(:,3) );
-    mu_eff_opt (ii) = tab_dat( min_obj_fxn_indices(ii),2);
+% Identify the studies to be examined.
+Study_paths = cell (1,2);
+Study_paths {1,1} = 'Study0035';
+Study_paths {1,2} = '0530';
+Study_paths {2,1} = 'Study0030';
+Study_paths {2,2} = '0495';
+Study_paths {3,1} = 'Study0030';
+Study_paths {3,2} = '0497';
+Study_paths {4,1} = 'Study0030';
+Study_paths {4,2} = '0491';
+Study_paths {5,1} = 'Study0030';
+Study_paths {5,2} = '0496';
+Study_paths {6,1} = 'Study0030';
+Study_paths {6,2} = '0490';
+Study_paths {7,1} = 'Study0017';
+Study_paths {7,2} = '0378';
+Study_paths {8,1} = 'Study0025';
+Study_paths {8,2} = '0438';
+Study_paths {9,1} = 'Study0025';
+Study_paths {9,2} = '0435';
+Study_paths {10,1} = 'Study0025';
+Study_paths {10,2} = '0440';
+
+num_studies = size(Study_paths,1);
+matching_num = zeros(1,num_studies);
+mu_eff_index = zeros(1,num_studies);
+mu_eff_opt   = zeros(1,num_studies);
+for ii = 1:num_studies
+    matching_num(ii) = str2num(Study_paths{(ii),2});
+    mu_eff_index(ii) = find( mu_eff_data(:,1) == matching_num(ii));
+    mu_eff_opt(ii) = mu_eff_data(mu_eff_index(ii),2);
 end
 
-[ H0, H1 ] = LOOCV_t_test ( Patient_paths, mu_eff_opt );
+[ hh ] = LOOCV_t_test ( Study_paths, mu_eff_opt );
 
-H0
-H1
+hh
