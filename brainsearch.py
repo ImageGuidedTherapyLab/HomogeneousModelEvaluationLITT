@@ -887,6 +887,10 @@ def ComputeObjective(**kwargs):
   # get registration parameters
   variableDictionary = kwargs['cv']
 
+  # FIXME quick hack for 180deg flip 
+  FIXMEHackTransform = vtk.vtkTransform()
+  FIXMEHackTransform.RotateY( 180. )
+
   # register the SEM data to MRTI
   AffineTransform = vtk.vtkTransform()
   AffineTransform.Translate([ 
@@ -1058,8 +1062,12 @@ def ComputeObjective(**kwargs):
 
     # project SEM onto MRTI for comparison
     print 'resampling' 
+    FixmeHackSEMRegister = vtk.vtkTransformFilter()
+    FixmeHackSEMRegister.SetInput( hexahedronGrid )
+    FixmeHackSEMRegister.SetTransform(FIXMEHackTransform)
+    FixmeHackSEMRegister.Update()
     SEMRegister = vtk.vtkTransformFilter()
-    SEMRegister.SetInput( hexahedronGrid )
+    SEMRegister.SetInput( FixmeHackSEMRegister.GetOutput() )
     SEMRegister.SetTransform(AffineTransform)
     SEMRegister.Update()
     vtkResample = vtk.vtkCompositeDataProbeFilter()
