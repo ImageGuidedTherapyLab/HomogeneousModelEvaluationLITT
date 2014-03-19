@@ -1020,7 +1020,8 @@ def ComputeObjective(**kwargs):
 
   ## loop over time
   currentTime = fem_params['initialtime'] 
-  for MRTItimeID in range(fem_params['timeinterval'][0]+1,fem_params['timeinterval'][1]+1):
+  ## FIXME timing errors
+  for MRTItimeID in range(fem_params['timeinterval'][0]+1,fem_params['timeinterval'][1]):
 
     while( currentTime  < (MRTItimeID +1)*MRTIInterval ) :
       currentTime = currentTime + brainNek.dt()
@@ -1491,7 +1492,7 @@ elif (options.accum_history != None):
   texHandle  = open('datasummary.tex' , 'w') 
   fileHandle = open('datasummary.txt' , 'w') 
   # write header
-  fileHandle.write("iddata,mu_eff,alpha,robin,obj\n")
+  fileHandle.write("iddata,idmin,mu_eff,alpha,robin,gamma,obj\n")
   # loop over files and extract optimal value
   opttype = 'bestfit'
   for filenamebase in resultfileList:
@@ -1500,51 +1501,50 @@ elif (options.accum_history != None):
     inisetupfile = '%s/opt/setup.ini' % (filenamebase)
     config.read(inisetupfile)
   
-    filename = '%s/opt/dakota_q_newton_%s.in.tabular.dat' % (filenamebase,opttype)
-    dataid = int(filename.split('/')[3])
+    iterfile  = 1  
+    idmin     = 1  
+    minobjval = 1.e99
+    outputfilenametemplate = '%s/opt/optpp_pds.%s.out.%d' 
+    while ( os.path.isfile( outputfilenametemplate  % (filenamebase,opttype,iterfile) ) ):
+      obj_fn_data = numpy.loadtxt(outputfilenametemplate  % (filenamebase,opttype,iterfile))
+      if(obj_fn_data < minobjval ): 
+        minobjval = obj_fn_data
+        idmin     = iterfile 
+      iterfile  = iterfile + 1  
+    print idmin,minobjval 
+    
+    dataid = int(filenamebase.split('/')[3])
     # count the file lines
-    filelines = len(open(filename).readlines(  ))
-    if(filelines > 1):
-      # the objective function value should be the last row
-      obj_fn_data = numpy.loadtxt(filename,skiprows=1,usecols=(0,-1))
-      if(filelines > 2):
-        idmin = int(obj_fn_data[numpy.argmin(obj_fn_data,0)[1]][0])
-        minobjval =  numpy.min(obj_fn_data,0)[1]
-      else:
-        print "single entry ??", mu_eff, obj_fn
-        idmin = 1
-        minobjval =  obj_fn 
-      print idmin,minobjval 
-      dakotafilename = '%s/opt/optpp_pds.%s.in.%d' % (filenamebase,opttype,idmin)
-      opt_fem_params = ParseInput(dakotafilename,False)
-      simvariable = opt_fem_params['cv']     
-      #dataarray = numpy.loadtxt(filename,skiprows=1,usecols=(0,1,2,3,4,6)
-      fileHandle.write("%05d,%s,%s,%s,%s,%12.5e\n" %( dataid, 
-                                                                      simvariable['mu_eff_healthy'],
-                                                                      simvariable['alpha_healthy'],
-                                                                      simvariable['robin_coeff'],
-                                                                      simvariable['gamma_healthy'],
-                                                                      minobjval))
-      # FIXME
-      runcmd = "vglrun python ./brainsearch.py --param_file  %s/opt/optpp_pds.%s.in.%d %s/opt/optpp_pds.%s.out.%d --vis_out" % (filenamebase,opttype,idmin,filenamebase,opttype,idmin)
-      print runcmd
-      #os.system( runcmd )
+    dakotafilename = '%s/opt/optpp_pds.%s.in.%d' % (filenamebase,opttype,idmin)
+    opt_fem_params = ParseInput(dakotafilename,False)
+    simvariable = opt_fem_params['cv']     
+    #dataarray = numpy.loadtxt(filename,skiprows=1,usecols=(0,1,2,3,4,6)
+    fileHandle.write("%05d,%05d,%s,%s,%s,%s,%12.5e\n" %( dataid, idmin     ,
+                                                                    simvariable['mu_eff_healthy'],
+                                                                    simvariable['alpha_healthy'],
+                                                                    simvariable['robin_coeff'],
+                                                                    simvariable['gamma_healthy'],
+                                                                    minobjval))
+    # FIXME
+    runcmd = "vglrun python ./brainsearch.py --param_file  %s/opt/optpp_pds.%s.in.%d %s/opt/optpp_pds.%s.out.%d --vis_out" % (filenamebase,opttype,idmin,filenamebase,opttype,idmin)
+    print runcmd
+    #os.system( runcmd )
   
-      # get arrhenius dice value
-      heattimeinterval               = eval(config.get('mrti','heating')  )
-      SEMDataDirectory               = outputDirectory % int(filenamebase.split('/')[-2]) 
-      dicefilename = "%s/dice.%s.%04d.txt" % (SEMDataDirectory,opttype,heattimeinterval[1])
-      print dicefilename 
-      dicevalue = DiceTxtFileParse(dicefilename)
+    # get arrhenius dice value
+    heattimeinterval               = eval(config.get('mrti','heating')  )
+    SEMDataDirectory               = outputDirectory % int(filenamebase.split('/')[-2]) 
+    dicefilename = "%s/dice.%s.%04d.txt" % (SEMDataDirectory,opttype,heattimeinterval[1])
+    print dicefilename 
+    dicevalue = DiceTxtFileParse(dicefilename)
   
-      # format latex ouput
-      outputformat                   = config.get('latex','heating')
-      texFormat = outputformat % (minobjval,dicevalue)
-      print texFormat 
-      texHandle.write("%s\n" %(texFormat))
-    else:
-      print "############# %s error ???" % filename
+    # format latex ouput
+    outputformat                   = config.get('latex','heating')
+    texFormat = outputformat % (minobjval,dicevalue)
+    print texFormat 
+    texHandle.write("%s\n" %(texFormat))
 
+  texHandle.close() 
+  fileHandle.close()
 
 # run planning solver w/ default options from ini file
 elif (options.config_ini != None):
