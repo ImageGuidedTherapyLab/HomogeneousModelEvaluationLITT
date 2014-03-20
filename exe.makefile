@@ -11,8 +11,8 @@ UPPERCOUNT := $(NUMGPU)
 %.gpu: 
 	@echo "$@ $(words $(LOWERCOUNT)) $(words $(UPPERCOUNT)) "
 	@for job in $(wordlist  $(words $(LOWERCOUNT)), $(words $(UPPERCOUNT)),$(JOBLIST)) ;do\
-		echo "$$job gpu $(@:.gpu=)";\
-		echo "dakota ./workdir/$$job/opt/dakota_q_newton_$(OPTTYPE).in ./workdir/$$job/opt/dakota_q_newton_$(OPTTYPE).in.log";\
+		echo "$$job gpu $(@:.gpu=) ./workdir/$$job/opt/dakota_q_newton_$(OPTTYPE).in.log ";\
+		export GPUWORKDIR="optpp_pds/$(@:.gpu=)"; dakota ./workdir/$$job/opt/dakota_q_newton_$(OPTTYPE).in > ./workdir/$$job/opt/dakota_q_newton_$(OPTTYPE).in.log 2>&1;\
 	done
 	$(eval LOWERCOUNT += $(NUMGPU) )
 	$(eval UPPERCOUNT += $(NUMGPU) )

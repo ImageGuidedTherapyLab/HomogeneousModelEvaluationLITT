@@ -18,7 +18,12 @@ import vtk.util.numpy_support as vtkNumPy
 print "using vtk version", vtk.vtkVersion.GetVTKVersion()
 
 brainNekDIR     = '/workarea/fuentes/braincode/tym1' 
-workDirectory   = 'optpp_pds'
+if( os.getenv("GPUWORKDIR") ) :
+  workDirectory   = os.getenv("GPUWORKDIR") 
+else:
+  workDirectory   = 'optpp_pds/0'
+os.system('mkdir -p %s' % workDirectory )
+
 outputDirectory = '/dev/shm/outputs/dakota/%04d'
 outputDirectory = '/tmp/outputs/dakota/%04d'
 
@@ -239,7 +244,7 @@ meshes/cooledConformMesh.inp
 0
 
 [GPU DEVICE]
-1
+%d
 
 [SCREENSHOT OUTPUT]
 %s
@@ -1149,7 +1154,8 @@ def brainNekWrapper(**kwargs):
   semfinaltime = kwargs['finaltime']
   # make sure write directory exists
   os.system('mkdir -p %s' % outputDirectory % kwargs['UID'] )
-  fileHandle.write(setuprcTemplate % (workDirectory,kwargs['fileID'] ,semfinaltime , outputDirectory % kwargs['UID'] ,semfinaltime ) )
+  GPUDeviceID = int(workDirectory.split('/').pop())
+  fileHandle.write(setuprcTemplate % (workDirectory,kwargs['fileID'] ,semfinaltime ,GPUDeviceID  ,  outputDirectory % kwargs['UID'] ,semfinaltime ) )
   fileHandle.flush(); fileHandle.close()
 
   # get variables
