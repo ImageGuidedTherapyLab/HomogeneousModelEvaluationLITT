@@ -30,6 +30,10 @@ outputDirectory = '/tmp/outputs/dakota/%04d'
 # image processing tool
 c3dexe = '/opt/apps/itksnap/c3d-1.0.0-Linux-x86_64/bin/c3d'
 
+# FIXME quick hack for 180deg flip 
+FIXMEHackTransform = vtk.vtkTransform()
+FIXMEHackTransform.RotateY( 180. )
+
 # database and run directory have the same structure
 databaseDIR     = 'database/'
 databaseDIR     = 'StudyDatabase/'
@@ -640,22 +644,6 @@ def ForwardSolve(**kwargs):
   # get registration parameters
   variableDictionary = kwargs['cv']
 
-  # register the SEM data to MRTI
-  AffineTransform = vtk.vtkTransform()
-  AffineTransform.Translate([ 
-    float(variableDictionary['x_displace']),
-    float(variableDictionary['y_displace']),
-    float(variableDictionary['z_displace'])
-                            ])
-  # FIXME  notice that order of operations is IMPORTANT
-  # FIXME   translation followed by rotation will give different results
-  # FIXME   than rotation followed by translation
-  # FIXME  Translate -> RotateZ -> RotateY -> RotateX -> Scale seems to be the order of paraview
-  AffineTransform.RotateZ( float(variableDictionary['z_rotate'  ] ) ) 
-  AffineTransform.RotateY( float(variableDictionary['y_rotate'  ] ) )
-  AffineTransform.RotateX( float(variableDictionary['x_rotate'  ] ) )
-  AffineTransform.Scale([1.e0,1.e0,1.e0])
-
   ## vtkSEMReader = vtk.vtkXMLUnstructuredGridReader()
   ## SEMDataDirectory = outputDirectory % kwargs['UID']
   ## SEMtimeID = 0 
@@ -735,8 +723,8 @@ def ForwardSolve(**kwargs):
   slicerOrientation   = vtk.vtkPoints()
   slicerOrientation.SetNumberOfPoints(2)
   # TODO Verify correct orientation info
-  pointtip   = numpy.array((newIni.getfloat('probe','x_0'),newIni.getfloat('probe','y_0'),newIni.getfloat('probe','z_0')))
-  pointentry = numpy.array((newIni.getfloat('probe','x_1'),newIni.getfloat('probe','y_1'),newIni.getfloat('probe','z_1')))
+  pointentry = numpy.array((newIni.getfloat('probe','x_0'),newIni.getfloat('probe','y_0'),newIni.getfloat('probe','z_0')))
+  pointtip   = numpy.array((newIni.getfloat('probe','x_1'),newIni.getfloat('probe','y_1'),newIni.getfloat('probe','z_1')))
   slicerLength   = numpy.linalg.norm( pointentry - pointtip)
   unitdirection  = 1./slicerLength * (pointentry - pointtip) 
   pointscaled = pointentry  + originalLength * unitdirection
@@ -755,9 +743,14 @@ def ForwardSolve(**kwargs):
   ScaleAffineTransform.RotateX( 0.0  )
   ScaleAffineTransform.Scale([1000.,1000.,1000.])
 
+  FixmeHackSEMRegister = vtk.vtkTransformFilter()
+  FixmeHackSEMRegister.SetInput( hexahedronGrid )
+  FixmeHackSEMRegister.SetTransform(FIXMEHackTransform)
+  FixmeHackSEMRegister.Update()
+
   slicertransformFilter = vtk.vtkTransformFilter()
-  slicertransformFilter.SetInput(hexahedronGrid) 
-  slicertransformFilter.SetTransform(LaserLineTransform ) 
+  slicertransformFilter.SetInput(FixmeHackSEMRegister.GetOutput() ) 
+  slicertransformFilter.SetTransform( LaserLineTransform ) 
   slicertransformFilter.Update()
 
   scaletransformFilter = vtk.vtkTransformFilter()
@@ -913,10 +906,6 @@ def ComputeObjective(**kwargs):
 
   # get registration parameters
   variableDictionary = kwargs['cv']
-
-  # FIXME quick hack for 180deg flip 
-  FIXMEHackTransform = vtk.vtkTransform()
-  FIXMEHackTransform.RotateY( 180. )
 
   # register the SEM data to MRTI
   AffineTransform = vtk.vtkTransform()
