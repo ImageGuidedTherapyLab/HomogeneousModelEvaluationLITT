@@ -1537,12 +1537,12 @@ elif (options.accum_history ):
     heattimeinterval               = eval(config.get('mrti','heating')  )
     SEMDataDirectory               = outputDirectory % int(filenamebase.split('/')[-2]) 
     dicefilename = "%s/dice.%s.%04d.txt" % (SEMDataDirectory,opttype,heattimeinterval[1])
-    #print dicefilename 
+    print dicefilename 
     dicevalue = DiceTxtFileParse(dicefilename)
   
     # format latex ouput
-    outputformat                   = config.get('latex','heating')
-    texFormat = outputformat % (minobjval,dicevalue)
+    outputformat                   = config.get('latex','opttype')
+    texFormat = outputformat % (opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],minobjval,dicevalue)
     #print texFormat 
     texHandle.write("%s\n" %(texFormat))
 
