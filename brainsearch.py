@@ -334,24 +334,19 @@ laserTip  1.0      4180           0.5985        500         14000       0.88
 """
 # Convenience Routine
 def GetMinJobID(FileNameTemplate):
-    iterfile  = 1  
     MinID     = 1  
     MinObjVal = 1.e99
-    #FIXME need to fix duplicates
-    # ------------------------------
-    # Begin Function Evaluation   10
-    # ------------------------------
-    # Parameters for function evaluation 10:
-    # 
-    # Duplication detected: analysis_drivers not invoked.
-    # 
-    while ( os.path.isfile( '%s.out.%d'  % (FileNameTemplate,iterfile) ) ):
-      obj_fn_data = numpy.loadtxt('%s.out.%d'  % (FileNameTemplate,iterfile) )
-      print '%s.out.%d'  % (FileNameTemplate,iterfile) ,iterfile, obj_fn_data 
+    # get a list of all output files in the directory 
+    DirectoryLocation = FileNameTemplate.split('/')
+    FileTypeID = DirectoryLocation.pop() 
+    DirectoryLocation = '/'.join(DirectoryLocation)
+    DirectoryOutList = filter(lambda x: len( x.split("%s.out" % FileTypeID) ) == 2 , os.listdir(DirectoryLocation ))
+    for dakotaoutfile in DirectoryOutList:
+      obj_fn_data = numpy.loadtxt('%s/%s'  % (DirectoryLocation ,dakotaoutfile ) )
+      #print '%s/%s'  % (DirectoryLocation, dakotaoutfile), obj_fn_data 
       if(obj_fn_data < MinObjVal ): 
         MinObjVal = obj_fn_data
-        MinID     = iterfile 
-      iterfile  = iterfile + 1  
+        MinID     = int(dakotaoutfile.split(".").pop()) 
     return (MinID,MinObjVal)
 
 # Convenience Routine
@@ -1434,6 +1429,9 @@ parser.add_option( "--vis_out",
 parser.add_option( "--accum_history", 
                   action="store_true", dest="accum_history", default=False,
                   help="accumulate output", metavar="bool")
+parser.add_option( "--run_min", 
+                  action="store", dest="run_min", default=None,
+                  help="re-run the optimum", metavar="FILE")
 parser.add_option( "--ini", 
                   action="store", dest="config_ini", default=None,
                   help="ini FILE containing setup info", metavar="FILE")
@@ -1483,7 +1481,7 @@ if (options.param_file != None):
     fileHandle.flush(); fileHandle.close();
 
 # find the best point for each run
-elif (options.accum_history != None):
+elif (options.accum_history ):
   resultfileList = [
   './workdir/Study0035/0530/',
   './workdir/Study0030/0495/',
@@ -1513,10 +1511,10 @@ elif (options.accum_history != None):
   './workdir/Study0021/0415/',
   ]
   
-  resultfileList = [
+  ## resultfileList = [
   ## './workdir/Study0035/0530/',
-  './workdir/Study0030/0491/',
-  ]
+  ## './workdir/Study0030/0491/',
+  ## ]
   
   texHandle  = open('datasummary.tex' , 'w') 
   fileHandle = open('datasummary.txt' , 'w') 
@@ -1546,11 +1544,6 @@ elif (options.accum_history != None):
                                                                     simvariable['robin_coeff'],
                                                                     simvariable['gamma_healthy'],
                                                                     minobjval))
-    # FIXME
-    runcmd = "vglrun python ./brainsearch.py --param_file  %s/opt/optpp_pds.%s.in.%d %s/opt/optpp_pds.%s.out.%d --vis_out" % (filenamebase,opttype,idmin,filenamebase,opttype,idmin)
-    print runcmd
-    #os.system( runcmd )
-  
     # get arrhenius dice value
     heattimeinterval               = eval(config.get('mrti','heating')  )
     SEMDataDirectory               = outputDirectory % int(filenamebase.split('/')[-2]) 
@@ -1566,6 +1559,20 @@ elif (options.accum_history != None):
 
   texHandle.close() 
   fileHandle.close()
+
+# rerun the optimizer at the minimum
+elif (options.run_min != None):
+
+  templatefilename = options.run_min
+  # get min value
+  (idmin,minobjval) = GetMinJobID( templatefilename )
+  print (idmin,minobjval) 
+
+  # build execution command
+  runcmd = "vglrun python ./brainsearch.py --param_file  %s.in.%d %s.out.%d --vis_out" % (templatefilename,idmin,templatefilename,idmin)
+  print runcmd
+  os.system( runcmd )
+  
 
 # run planning solver w/ default options from ini file
 elif (options.config_ini != None):
