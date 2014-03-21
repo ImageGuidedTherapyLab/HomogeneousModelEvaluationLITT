@@ -332,7 +332,34 @@ probeSurface
 catheter  1.0      4180           0.5985        500         14000       0.88
 laserTip  1.0      4180           0.5985        500         14000       0.88
 """
+# Convenience Routine
+def GetMinJobID(FileNameTemplate):
+    iterfile  = 1  
+    MinID     = 1  
+    MinObjVal = 1.e99
+    #FIXME need to fix duplicates
+    # ------------------------------
+    # Begin Function Evaluation   10
+    # ------------------------------
+    # Parameters for function evaluation 10:
+    # 
+    # Duplication detected: analysis_drivers not invoked.
+    # 
+    while ( os.path.isfile( '%s.out.%d'  % (FileNameTemplate,iterfile) ) ):
+      obj_fn_data = numpy.loadtxt('%s.out.%d'  % (FileNameTemplate,iterfile) )
+      print '%s.out.%d'  % (FileNameTemplate,iterfile) ,iterfile, obj_fn_data 
+      if(obj_fn_data < MinObjVal ): 
+        MinObjVal = obj_fn_data
+        MinID     = iterfile 
+      iterfile  = iterfile + 1  
+    return (MinID,MinObjVal)
 
+# Convenience Routine
+def DiceTxtFileParse(DiceInputFilename):
+  # (1) split on ':' (2)  filter lists > 1 (3) convert to dictionary
+  c3doutput = dict(filter( lambda x: len(x) > 1,[line.strip().split(':') for line in open(DiceInputFilename) ] ))
+  return float(c3doutput['Dice similarity coefficient'])
+  
 # Convenience Routine
 def WriteVTKOutputFile(vtkImageData,VTKOutputFilename):
     vtkImageDataWriter = vtk.vtkDataSetWriter()
@@ -1486,14 +1513,10 @@ elif (options.accum_history != None):
   './workdir/Study0021/0415/',
   ]
   
-  ## resultfileList = [
+  resultfileList = [
   ## './workdir/Study0035/0530/',
-  ## ]
-  
-  def DiceTxtFileParse(DiceInputFilename):
-    # (1) split on ':' (2)  filter lists > 1 (3) convert to dictionary
-    c3doutput = dict(filter( lambda x: len(x) > 1,[line.strip().split(':') for line in open(DiceInputFilename) ] ))
-    return float(c3doutput['Dice similarity coefficient'])
+  './workdir/Study0030/0491/',
+  ]
   
   texHandle  = open('datasummary.tex' , 'w') 
   fileHandle = open('datasummary.txt' , 'w') 
@@ -1507,17 +1530,9 @@ elif (options.accum_history != None):
     inisetupfile = '%s/opt/setup.ini' % (filenamebase)
     config.read(inisetupfile)
   
-    iterfile  = 1  
-    idmin     = 1  
-    minobjval = 1.e99
-    outputfilenametemplate = '%s/opt/optpp_pds.%s.out.%d' 
-    while ( os.path.isfile( outputfilenametemplate  % (filenamebase,opttype,iterfile) ) ):
-      obj_fn_data = numpy.loadtxt(outputfilenametemplate  % (filenamebase,opttype,iterfile))
-      if(obj_fn_data < minobjval ): 
-        minobjval = obj_fn_data
-        idmin     = iterfile 
-      iterfile  = iterfile + 1  
-    print idmin,minobjval 
+    # get min value
+    (idmin,minobjval) = GetMinJobID( '%s/opt/optpp_pds.%s' % (filenamebase,opttype))
+    print (idmin,minobjval) 
     
     dataid = int(filenamebase.split('/')[3])
     # count the file lines
@@ -1540,13 +1555,13 @@ elif (options.accum_history != None):
     heattimeinterval               = eval(config.get('mrti','heating')  )
     SEMDataDirectory               = outputDirectory % int(filenamebase.split('/')[-2]) 
     dicefilename = "%s/dice.%s.%04d.txt" % (SEMDataDirectory,opttype,heattimeinterval[1])
-    print dicefilename 
+    #print dicefilename 
     dicevalue = DiceTxtFileParse(dicefilename)
   
     # format latex ouput
     outputformat                   = config.get('latex','heating')
     texFormat = outputformat % (minobjval,dicevalue)
-    print texFormat 
+    #print texFormat 
     texHandle.write("%s\n" %(texFormat))
 
   texHandle.close() 
