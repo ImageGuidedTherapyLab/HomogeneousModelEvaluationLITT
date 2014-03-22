@@ -21,7 +21,7 @@
 % mu_eff_opt is a vector of the inverse problem optimized mu_eff values in
 %   1/m units
 
-function [ H0, H1 ] = Check_ablation ( Study_paths, mu_eff_opt );
+function [ H0, H1, dice_values ] = Check_ablation ( Study_paths, mu_eff_opt );
 
 % Make the LOOCV iteration system
 n_patients = size( Study_paths,1); % This is the number of patients

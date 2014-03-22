@@ -21,7 +21,7 @@
 % mu_eff_opt is a vector of the inverse problem optimized mu_eff values in
 %   1/m units
 
-function [ hh ] = LOOCV_t_test ( Study_paths, mu_eff_opt );
+function [ hh, dice_values ] = LOOCV_t_test ( Study_paths, mu_eff_opt, opt_type );
 
 % Make the LOOCV iteration system
 n_patients = size( Study_paths,1); % This is the number of patients
@@ -30,7 +30,7 @@ dice_values = zeros( n_patients,1); % Initialize the number of DSC (dice) values
 for ii = 1:n_patients
     % This section prepares the varied parameters into a .mat file for the
     % thermal code to run
-    param_file = strcat( 'workdir/', Study_paths{ii,1}, '/', Study_paths{ii,2}, '/opt/optpp_pds.heating.in.1');
+    param_file = strcat( 'workdir/', Study_paths{ii,1}, '/', Study_paths{ii,2}, '/opt/optpp_pds.', opt_type, '.in.1');
     python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ''')');   % unix(''python test_saveFile.py'')
     evalc(python_command);
     
@@ -57,6 +57,7 @@ for ii = 1:n_patients
 end
 
 [hh.H, hh.ptest] = ttest( dice_values, 0.7, 0.05, 'right');
+
 % mean_dice = mean ( dice_values ); % Average Dice values
 % std_dice = std ( dice_values ); % Stardard deviation of Dice values.
 %test_statistic = ( mean_dice - 0.7 ) ./ ( std_dice ./ sqrt ( n_patients )); % Calculate the test_statistic

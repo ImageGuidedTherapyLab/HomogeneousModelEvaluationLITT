@@ -37,4 +37,4 @@ for ii = 1:num_studies
     mu_eff_opt(ii) = mu_eff_data(mu_eff_index(ii),2);
 end
 
-[ H0, H1 ] = Check_ablation ( Study_paths, mu_eff_opt );
+[ H0, H1, dice_values ] = Check_ablation ( Study_paths, mu_eff_opt );
