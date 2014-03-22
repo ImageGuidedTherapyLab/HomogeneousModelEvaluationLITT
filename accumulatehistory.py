@@ -31,9 +31,9 @@ resultfileList = [
 './workdir/Study0021/0415/',
 ]
 
-## resultfileList = [
-## './workdir/Study0035/0530/',
-## ]
+resultfileList = [
+'./workdir/Study0035/0530/',
+]
 
 outputDirectory = '/tmp/outputs/dakota/%04d'
 
@@ -47,7 +47,7 @@ with file('datasummary.tex' , 'w') as texHandle:
     # write header
     fileHandle.write("iddata,mu_eff,obj\n")
     # loop over files and extract optimal value
-    opttype = 'heating'
+    opttype = 'bestfit'
     for filenamebase in resultfileList:
       # get latex command
       config = ConfigParser.SafeConfigParser({})
