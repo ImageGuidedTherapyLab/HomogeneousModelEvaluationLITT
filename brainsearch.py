@@ -18,12 +18,21 @@ import vtk.util.numpy_support as vtkNumPy
 print "using vtk version", vtk.vtkVersion.GetVTKVersion()
 
 brainNekDIR     = '/workarea/fuentes/braincode/tym1' 
-workDirectory   = 'optpp_pds'
+if( os.getenv("GPUWORKDIR") ) :
+  workDirectory   = os.getenv("GPUWORKDIR") 
+else:
+  workDirectory   = 'optpp_pds/0'
+os.system('mkdir -p %s' % workDirectory )
+
 outputDirectory = '/dev/shm/outputs/dakota/%04d'
 outputDirectory = '/tmp/outputs/dakota/%04d'
 
 # image processing tool
 c3dexe = '/opt/apps/itksnap/c3d-1.0.0-Linux-x86_64/bin/c3d'
+
+# FIXME quick hack for 180deg flip 
+FIXMEHackTransform = vtk.vtkTransform()
+FIXMEHackTransform.RotateY( 180. )
 
 # database and run directory have the same structure
 databaseDIR     = 'database/'
@@ -239,7 +248,7 @@ meshes/cooledConformMesh.inp
 0
 
 [GPU DEVICE]
-1
+%d
 
 [SCREENSHOT OUTPUT]
 %s
@@ -327,7 +336,29 @@ probeSurface
 catheter  1.0      4180           0.5985        500         14000       0.88
 laserTip  1.0      4180           0.5985        500         14000       0.88
 """
+# Convenience Routine
+def GetMinJobID(FileNameTemplate):
+    MinID     = 1  
+    MinObjVal = 1.e99
+    # get a list of all output files in the directory 
+    DirectoryLocation = FileNameTemplate.split('/')
+    FileTypeID = DirectoryLocation.pop() 
+    DirectoryLocation = '/'.join(DirectoryLocation)
+    DirectoryOutList = filter(lambda x: len( x.split("%s.out" % FileTypeID) ) == 2 , os.listdir(DirectoryLocation ))
+    for dakotaoutfile in DirectoryOutList:
+      obj_fn_data = numpy.loadtxt('%s/%s'  % (DirectoryLocation ,dakotaoutfile ) )
+      #print '%s/%s'  % (DirectoryLocation, dakotaoutfile), obj_fn_data 
+      if(obj_fn_data < MinObjVal ): 
+        MinObjVal = obj_fn_data
+        MinID     = int(dakotaoutfile.split(".").pop()) 
+    return (MinID,MinObjVal)
 
+# Convenience Routine
+def DiceTxtFileParse(DiceInputFilename):
+  # (1) split on ':' (2)  filter lists > 1 (3) convert to dictionary
+  c3doutput = dict(filter( lambda x: len(x) > 1,[line.strip().split(':') for line in open(DiceInputFilename) ] ))
+  return float(c3doutput['Dice similarity coefficient'])
+  
 # Convenience Routine
 def WriteVTKOutputFile(vtkImageData,VTKOutputFilename):
     vtkImageDataWriter = vtk.vtkDataSetWriter()
@@ -613,22 +644,6 @@ def ForwardSolve(**kwargs):
   # get registration parameters
   variableDictionary = kwargs['cv']
 
-  # register the SEM data to MRTI
-  AffineTransform = vtk.vtkTransform()
-  AffineTransform.Translate([ 
-    float(variableDictionary['x_displace']),
-    float(variableDictionary['y_displace']),
-    float(variableDictionary['z_displace'])
-                            ])
-  # FIXME  notice that order of operations is IMPORTANT
-  # FIXME   translation followed by rotation will give different results
-  # FIXME   than rotation followed by translation
-  # FIXME  Translate -> RotateZ -> RotateY -> RotateX -> Scale seems to be the order of paraview
-  AffineTransform.RotateZ( float(variableDictionary['z_rotate'  ] ) ) 
-  AffineTransform.RotateY( float(variableDictionary['y_rotate'  ] ) )
-  AffineTransform.RotateX( float(variableDictionary['x_rotate'  ] ) )
-  AffineTransform.Scale([1.e0,1.e0,1.e0])
-
   ## vtkSEMReader = vtk.vtkXMLUnstructuredGridReader()
   ## SEMDataDirectory = outputDirectory % kwargs['UID']
   ## SEMtimeID = 0 
@@ -654,9 +669,9 @@ def ForwardSolve(**kwargs):
   screenshotInterval = MRTIInterval ;
 
   ## loop over time
-  while( brainNek.timeStep(tstep * .25 ) ) :
+  while( brainNek.timeStep(tstep * brainNek.dt() ) ) :
     tstep = tstep + 1
-    currentTime = tstep * .25
+    currentTime = tstep * brainNek.dt()
     ## if(currentTime+screenshotTol >= screenshotNum*screenshotInterval):
     ##    brainNek.getHostTemperature( bNekSoln )
     ##    screenshotNum = screenshotNum + 1;
@@ -708,8 +723,8 @@ def ForwardSolve(**kwargs):
   slicerOrientation   = vtk.vtkPoints()
   slicerOrientation.SetNumberOfPoints(2)
   # TODO Verify correct orientation info
-  pointtip   = numpy.array((newIni.getfloat('probe','x_0'),newIni.getfloat('probe','y_0'),newIni.getfloat('probe','z_0')))
-  pointentry = numpy.array((newIni.getfloat('probe','x_1'),newIni.getfloat('probe','y_1'),newIni.getfloat('probe','z_1')))
+  pointentry = numpy.array((newIni.getfloat('probe','x_0'),newIni.getfloat('probe','y_0'),newIni.getfloat('probe','z_0')))
+  pointtip   = numpy.array((newIni.getfloat('probe','x_1'),newIni.getfloat('probe','y_1'),newIni.getfloat('probe','z_1')))
   slicerLength   = numpy.linalg.norm( pointentry - pointtip)
   unitdirection  = 1./slicerLength * (pointentry - pointtip) 
   pointscaled = pointentry  + originalLength * unitdirection
@@ -728,9 +743,14 @@ def ForwardSolve(**kwargs):
   ScaleAffineTransform.RotateX( 0.0  )
   ScaleAffineTransform.Scale([1000.,1000.,1000.])
 
+  FixmeHackSEMRegister = vtk.vtkTransformFilter()
+  FixmeHackSEMRegister.SetInput( hexahedronGrid )
+  FixmeHackSEMRegister.SetTransform(FIXMEHackTransform)
+  FixmeHackSEMRegister.Update()
+
   slicertransformFilter = vtk.vtkTransformFilter()
-  slicertransformFilter.SetInput(hexahedronGrid) 
-  slicertransformFilter.SetTransform(LaserLineTransform ) 
+  slicertransformFilter.SetInput(FixmeHackSEMRegister.GetOutput() ) 
+  slicertransformFilter.SetTransform( LaserLineTransform ) 
   slicertransformFilter.Update()
 
   scaletransformFilter = vtk.vtkTransformFilter()
@@ -917,6 +937,7 @@ def ComputeObjective(**kwargs):
   ## fem_point_data= vtkSEMReader.GetOutput().GetPointData() 
   ## tmparray = vtkNumPy.vtk_to_numpy(fem_point_data.GetArray('Temperature')) 
 
+  print " brainNek deltat:", brainNek.dt()
 
   # setup MRTI data read
   MRTIInterval = fem_params['mrtideltat'] 
@@ -988,6 +1009,7 @@ def ComputeObjective(**kwargs):
       semfileName = "%s/semtransform.%04d.vtu" % (SEMDataDirectory,MRTItimeID)
       print "writing ", semfileName 
       vtkSEMWriter.SetFileName( semfileName )
+      #vtkSEMWriter.SetInput(hexahedronGrid )
       vtkSEMWriter.SetInput(vtkICResample.GetUnstructuredGridOutput())
       #vtkSEMWriter.SetDataModeToAscii()
       vtkSEMWriter.Update()
@@ -1009,121 +1031,120 @@ def ComputeObjective(**kwargs):
       verifSEMWriter.SetInput(verifSEMRegister.GetUnstructuredGridOutput())
       verifSEMWriter.Update()
 
-    # update counter
-    MRTItimeID = MRTItimeID + 1;
-
   # debugging info
   brainNek.PrintSelf()
 
   ## loop over time
-  tstep = 0
   currentTime = fem_params['initialtime'] 
-  while( brainNek.timeStep( currentTime ) ) :
-    tstep = tstep + 1
-    currentTime = fem_params['initialtime'] +  tstep * .25
-    ## if(currentTime+screenshotTol >= screenshotNum*screenshotInterval):
-    ##    brainNek.getHostTemperature( bNekSoln )
-    ##    screenshotNum = screenshotNum + 1;
-    ##    print "get host data",bNekSoln 
+  ## FIXME timing errors
+  for MRTItimeID in range(fem_params['timeinterval'][0]+1,fem_params['timeinterval'][1]):
 
-    if(currentTime+screenshotTol >= MRTItimeID * MRTIInterval):
-      # load image 
-      mrtifilename = '%s/temperature.%04d.vtk' % (kwargs['mrti'], MRTItimeID) 
-      print 'opening' , mrtifilename 
-      vtkImageReader = vtk.vtkDataSetReader() 
-      vtkImageReader.SetFileName(mrtifilename )
-      vtkImageReader.Update() 
-      ## image_cells = vtkImageReader.GetOutput().GetPointData() 
-      ## data_array = vtkNumPy.vtk_to_numpy(image_cells.GetArray('scalars')) 
-      
-      # extract voi for QOI
-      vtkVOIExtract = vtk.vtkExtractVOI() 
-      vtkVOIExtract.SetInput( vtkImageReader.GetOutput() ) 
-      vtkVOIExtract.SetVOI( kwargs['voi'] ) 
-      vtkVOIExtract.Update()
-      mrti_point_data= vtkVOIExtract.GetOutput().GetPointData() 
-      mrti_array = vtkNumPy.vtk_to_numpy(mrti_point_data.GetArray('image_data')) 
-      # update dose
-      vtkmrtiDose = mrtiDose.UpdateDoseMap(mrti_array)
-      # x = vtkNumPy.vtk_to_numpy(vtkmrtiDose.GetPointData().GetArray('scalars')) 
-      
-      #print mrti_array
-      #print type(mrti_array)
+    while( currentTime  < (MRTItimeID +1)*MRTIInterval ) :
+      currentTime = currentTime + brainNek.dt()
+      brainNek.heatStep( currentTime )
+      ## if(currentTime+screenshotTol >= screenshotNum*screenshotInterval):
+      ##    brainNek.getHostTemperature( bNekSoln )
+      ##    screenshotNum = screenshotNum + 1;
+      ##    print "get host data",bNekSoln 
 
-      # get brainNek solution 
-      brainNek.getHostTemperature( bNekSoln )
-      vtkScalarArray = vtkNumPy.numpy_to_vtk( bNekSoln, DeepCopy) 
-      vtkScalarArray.SetName("bioheat") 
-      hexahedronGrid.GetPointData().SetScalars(vtkScalarArray);
-      hexahedronGrid.Update()
+    # load image 
+    mrtifilename = '%s/temperature.%04d.vtk' % (kwargs['mrti'], MRTItimeID) 
+    print 'opening' , mrtifilename , currentTime
+    vtkImageReader = vtk.vtkDataSetReader() 
+    vtkImageReader.SetFileName(mrtifilename )
+    vtkImageReader.Update() 
+    ## image_cells = vtkImageReader.GetOutput().GetPointData() 
+    ## data_array = vtkNumPy.vtk_to_numpy(image_cells.GetArray('scalars')) 
+    
+    # extract voi for QOI
+    vtkVOIExtract = vtk.vtkExtractVOI() 
+    vtkVOIExtract.SetInput( vtkImageReader.GetOutput() ) 
+    vtkVOIExtract.SetVOI( kwargs['voi'] ) 
+    vtkVOIExtract.Update()
+    mrti_point_data= vtkVOIExtract.GetOutput().GetPointData() 
+    mrti_array = vtkNumPy.vtk_to_numpy(mrti_point_data.GetArray('image_data')) 
+    # update dose
+    vtkmrtiDose = mrtiDose.UpdateDoseMap(mrti_array)
+    # x = vtkNumPy.vtk_to_numpy(vtkmrtiDose.GetPointData().GetArray('scalars')) 
+    
+    #print mrti_array
+    #print type(mrti_array)
 
-      # project SEM onto MRTI for comparison
-      print 'resampling' 
-      SEMRegister = vtk.vtkTransformFilter()
-      SEMRegister.SetInput( hexahedronGrid )
-      SEMRegister.SetTransform(AffineTransform)
-      SEMRegister.Update()
-      vtkResample = vtk.vtkCompositeDataProbeFilter()
-      vtkResample.SetSource( SEMRegister.GetOutput() )
-      vtkResample.SetInput( vtkVOIExtract.GetOutput() ) 
-      vtkResample.Update()
+    # get brainNek solution 
+    brainNek.getHostTemperature( bNekSoln )
+    vtkScalarArray = vtkNumPy.numpy_to_vtk( bNekSoln, DeepCopy) 
+    vtkScalarArray.SetName("bioheat") 
+    hexahedronGrid.GetPointData().SetScalars(vtkScalarArray);
+    hexahedronGrid.Update()
 
-      fem_point_data= vtkResample.GetOutput().GetPointData() 
-      fem_array = vtkNumPy.vtk_to_numpy(fem_point_data.GetArray('bioheat')) 
-      # update dose
-      vtksemDose  = semDose.UpdateDoseMap(  fem_array)
-      print 'resampled' 
-      #print fem_array 
-      #print type(fem_array )
+    # project SEM onto MRTI for comparison
+    print 'resampling' 
+    FixmeHackSEMRegister = vtk.vtkTransformFilter()
+    FixmeHackSEMRegister.SetInput( hexahedronGrid )
+    FixmeHackSEMRegister.SetTransform(FIXMEHackTransform)
+    FixmeHackSEMRegister.Update()
+    SEMRegister = vtk.vtkTransformFilter()
+    SEMRegister.SetInput( FixmeHackSEMRegister.GetOutput() )
+    SEMRegister.SetTransform(AffineTransform)
+    SEMRegister.Update()
+    vtkResample = vtk.vtkCompositeDataProbeFilter()
+    vtkResample.SetSource( SEMRegister.GetOutput() )
+    vtkResample.SetInput( vtkVOIExtract.GetOutput() ) 
+    vtkResample.Update()
+
+    fem_point_data= vtkResample.GetOutput().GetPointData() 
+    fem_array = vtkNumPy.vtk_to_numpy(fem_point_data.GetArray('bioheat')) 
+    # update dose
+    vtksemDose  = semDose.UpdateDoseMap(  fem_array)
+    print 'resampled' 
+    #print fem_array 
+    #print type(fem_array )
 
 
-      # write output
-      ## if ( DebugObjective ):
-      ##   vtkSEMWriter = vtk.vtkXMLUnstructuredGridWriter()
-      ##   semfileName = "%s/semtransform.%04d.vtu" % (SEMDataDirectory,MRTItimeID)
-      ##   print "writing ", semfileName
-      ##   vtkSEMWriter.SetFileName( semfileName )
-      ##   vtkSEMWriter.SetInput(SEMRegister.GetOutput())
-      ##   #vtkSEMWriter.SetDataModeToAscii()
-      ##   vtkSEMWriter.Update()
+    # write output
+    if ( False ):
+      vtkSEMWriter = vtk.vtkXMLUnstructuredGridWriter()
+      semfileName = "%s/semtransform.%04d.vtu" % (SEMDataDirectory,MRTItimeID)
+      print "writing ", semfileName
+      vtkSEMWriter.SetFileName( semfileName )
+      vtkSEMWriter.SetInput(SEMRegister.GetOutput())
+      #vtkSEMWriter.SetDataModeToAscii()
+      vtkSEMWriter.Update()
 
-      # write output
-      # FIXME auto read ??
-      if ( DebugObjective ):
-         # write temperature
-         WriteVTKOutputFile ( vtkResample.GetOutput()   ,"%s/roisem.%s.%04d.vtk"   % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
-         WriteVTKOutputFile ( vtkVOIExtract.GetOutput() ,"%s/roimrti.%s.%04d.vtk"  % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
-         # write dose
-         WriteVTKOutputFile ( vtksemDose  ,"%s/roisemdose.%s.%04d.vtk"   % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
-         WriteVTKOutputFile ( vtkmrtiDose ,"%s/roimrtidose.%s.%04d.vtk"  % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
+    # write output
+    # FIXME auto read ??
+    if ( DebugObjective ):
+       # write temperature
+       WriteVTKOutputFile ( vtkResample.GetOutput()   ,"%s/roisem.%s.%04d.vtk"   % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
+       WriteVTKOutputFile ( vtkVOIExtract.GetOutput() ,"%s/roimrti.%s.%04d.vtk"  % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
+       # write dose
+       WriteVTKOutputFile ( vtksemDose  ,"%s/roisemdose.%s.%04d.vtk"   % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
+       WriteVTKOutputFile ( vtkmrtiDose ,"%s/roimrtidose.%s.%04d.vtk"  % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
 
-         # write dice coefficient
-         dicecmd = "%s -verbose %s/roisemdose.%s.%04d.vtk -thresh 1 inf 1 0 -type uchar -as SEM %s/roimrtidose.%s.%04d.vtk -thresh 1 inf 1 0 -type uchar -push SEM -overlap 1 > %s/dice.%s.%04d.txt  2>&1" % (c3dexe,SEMDataDirectory,kwargs['opttype'],MRTItimeID,SEMDataDirectory,kwargs['opttype'],MRTItimeID,SEMDataDirectory,kwargs['opttype'],MRTItimeID)
-         print dicecmd
-         os.system(dicecmd)
-         ##if (MRTItimeID > 20):
-         ##  raise 
+       # write dice coefficient
+       dicecmd = "%s -verbose %s/roisemdose.%s.%04d.vtk -thresh 1 inf 1 0 -type uchar -as SEM %s/roimrtidose.%s.%04d.vtk -thresh 1 inf 1 0 -type uchar -push SEM -overlap 1 > %s/dice.%s.%04d.txt  2>&1" % (c3dexe,SEMDataDirectory,kwargs['opttype'],MRTItimeID,SEMDataDirectory,kwargs['opttype'],MRTItimeID,SEMDataDirectory,kwargs['opttype'],MRTItimeID)
+       print dicecmd
+       os.system(dicecmd)
+       ##if (MRTItimeID > 20):
+       ##  raise 
 
-      # Write JPG's for tex
-      if ( kwargs['VisualizeOutput'] and MRTItimeID == fem_params['maxheatid'] ):
-      #if ( kwargs['VisualizeOutput'] ):
-         VisDictionary = {'voi'    :  kwargs['voi'] ,
-                          'roisem' : vtkResample.GetOutput()   ,
-                          'roimrti': vtkVOIExtract.GetOutput() ,
-                      'roisemdose' : vtksemDose  ,
-                      'roimrtidose': vtkmrtiDose ,
-                'magnitudefilename':'%s/magnitude.%04d.vtk' % (kwargs['mrti'], MRTItimeID) ,
-                 'jpgoutnameformat':"%s/%%s%s%04d.jpg"  % (SEMDataDirectory,kwargs['opttype'],MRTItimeID)
-                         }
-         WriteJPGOutputFiles(**VisDictionary)
+    # Write JPG's for tex
+    if ( kwargs['VisualizeOutput'] and MRTItimeID == fem_params['maxheatid'] ):
+    #if ( kwargs['VisualizeOutput'] ):
+       VisDictionary = {'voi'    :  kwargs['voi'] ,
+                        'roisem' : vtkResample.GetOutput()   ,
+                        'roimrti': vtkVOIExtract.GetOutput() ,
+                    'roisemdose' : vtksemDose  ,
+                    'roimrtidose': vtkmrtiDose ,
+              'magnitudefilename':'%s/magnitude.%04d.vtk' % (kwargs['mrti'], MRTItimeID) ,
+               'jpgoutnameformat':"%s/%%s%s%04d.jpg"  % (SEMDataDirectory,kwargs['opttype'],MRTItimeID)
+                       }
+       WriteJPGOutputFiles(**VisDictionary)
 
-      # accumulate objective function
-      diff =  numpy.abs(mrti_array-fem_array)
-      diffsq =  diff**2
-      ObjectiveFunction = ObjectiveFunction + diff.sum()
-
-      # update counter
-      MRTItimeID = MRTItimeID + 1;
+    # accumulate objective function
+    diff =  numpy.abs(mrti_array-fem_array)
+    diffsq =  diff**2
+    ObjectiveFunction = ObjectiveFunction + diff.sum()
 
   return ObjectiveFunction 
 # end def ComputeObjective:
@@ -1144,7 +1165,8 @@ def brainNekWrapper(**kwargs):
   semfinaltime = kwargs['finaltime']
   # make sure write directory exists
   os.system('mkdir -p %s' % outputDirectory % kwargs['UID'] )
-  fileHandle.write(setuprcTemplate % (workDirectory,kwargs['fileID'] ,semfinaltime , outputDirectory % kwargs['UID'] ,semfinaltime ) )
+  GPUDeviceID = int(workDirectory.split('/').pop())
+  fileHandle.write(setuprcTemplate % (workDirectory,kwargs['fileID'] ,semfinaltime ,GPUDeviceID  ,  outputDirectory % kwargs['UID'] ,semfinaltime ) )
   fileHandle.flush(); fileHandle.close()
 
   # get variables
@@ -1393,6 +1415,12 @@ parser.add_option( "--run_fem","--param_file",
 parser.add_option( "--vis_out", 
                   action="store_true", dest="vis_out", default=False,
                   help="visualise output", metavar="bool")
+parser.add_option( "--accum_history", 
+                  action="store_true", dest="accum_history", default=False,
+                  help="accumulate output", metavar="bool")
+parser.add_option( "--run_min", 
+                  action="store", dest="run_min", default=None,
+                  help="re-run the optimum", metavar="FILE")
 parser.add_option( "--ini", 
                   action="store", dest="config_ini", default=None,
                   help="ini FILE containing setup info", metavar="FILE")
@@ -1440,6 +1468,100 @@ if (options.param_file != None):
     fileHandle = file(sys.argv[3],'w')
     fileHandle.write('%f\n' % objfunction )
     fileHandle.flush(); fileHandle.close();
+
+# find the best point for each run
+elif (options.accum_history ):
+  resultfileList = [
+  './workdir/Study0035/0530/',
+  './workdir/Study0030/0495/',
+  './workdir/Study0023/0433/',
+  './workdir/Study0030/0497/',
+  './workdir/Study0030/0491/',
+  './workdir/Study0030/0496/',
+  './workdir/Study0030/0490/',
+  './workdir/Study0017/0378/',
+  './workdir/Study0025/0438/',
+  './workdir/Study0025/0435/',
+  './workdir/Study0025/0440/',
+  './workdir/Study0025/0436/',
+  './workdir/Study0028/0466/',
+  './workdir/Study0028/0468/',
+  './workdir/Study0028/0471/',
+  './workdir/Study0026/0447/',
+  './workdir/Study0026/0457/',
+  './workdir/Study0026/0455/',
+  './workdir/Study0026/0453/',
+  './workdir/Study0026/0450/',
+  './workdir/Study0026/0451/',
+  './workdir/Study0022/0418/',
+  './workdir/Study0022/0417/',
+  './workdir/Study0021/0409/',
+  './workdir/Study0021/0414/',
+  './workdir/Study0021/0415/',
+  ]
+  
+  ## resultfileList = [
+  ## './workdir/Study0035/0530/',
+  ## './workdir/Study0030/0491/',
+  ## ]
+  
+  texHandle  = open('datasummary.tex' , 'w') 
+  fileHandle = open('datasummary.txt' , 'w') 
+  # write header
+  fileHandle.write("iddata,idmin,mu_eff,alpha,robin,gamma,obj\n")
+  # loop over files and extract optimal value
+  opttype = 'bestfit'
+  for filenamebase in resultfileList:
+    # get latex command
+    config = ConfigParser.SafeConfigParser({})
+    inisetupfile = '%s/opt/setup.ini' % (filenamebase)
+    config.read(inisetupfile)
+  
+    # get min value
+    (idmin,minobjval) = GetMinJobID( '%s/opt/optpp_pds.%s' % (filenamebase,opttype))
+    print (idmin,minobjval) 
+    
+    dataid = int(filenamebase.split('/')[3])
+    # count the file lines
+    dakotafilename = '%s/opt/optpp_pds.%s.in.%d' % (filenamebase,opttype,idmin)
+    opt_fem_params = ParseInput(dakotafilename,False)
+    simvariable = opt_fem_params['cv']     
+    #dataarray = numpy.loadtxt(filename,skiprows=1,usecols=(0,1,2,3,4,6)
+    fileHandle.write("%05d,%05d,%s,%s,%s,%s,%12.5e\n" %( dataid, idmin     ,
+                                                                    simvariable['mu_eff_healthy'],
+                                                                    simvariable['alpha_healthy'],
+                                                                    simvariable['robin_coeff'],
+                                                                    simvariable['gamma_healthy'],
+                                                                    minobjval))
+    # get arrhenius dice value
+    heattimeinterval               = eval(config.get('mrti','heating')  )
+    SEMDataDirectory               = outputDirectory % int(filenamebase.split('/')[-2]) 
+    dicefilename = "%s/dice.%s.%04d.txt" % (SEMDataDirectory,opttype,heattimeinterval[1])
+    print dicefilename 
+    dicevalue = DiceTxtFileParse(dicefilename)
+  
+    # format latex ouput
+    outputformat                   = config.get('latex','opttype')
+    texFormat = outputformat % (opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],minobjval,dicevalue)
+    #print texFormat 
+    texHandle.write("%s\n" %(texFormat))
+
+  texHandle.close() 
+  fileHandle.close()
+
+# rerun the optimizer at the minimum
+elif (options.run_min != None):
+
+  templatefilename = options.run_min
+  # get min value
+  (idmin,minobjval) = GetMinJobID( templatefilename )
+  print (idmin,minobjval) 
+
+  # build execution command
+  runcmd = "vglrun python ./brainsearch.py --param_file  %s.in.%d %s.out.%d --vis_out" % (templatefilename,idmin,templatefilename,idmin)
+  print runcmd
+  os.system( runcmd )
+  
 
 # run planning solver w/ default options from ini file
 elif (options.config_ini != None):
