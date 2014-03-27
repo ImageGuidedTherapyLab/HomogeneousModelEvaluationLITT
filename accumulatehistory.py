@@ -47,7 +47,7 @@ with file('datasummary.tex' , 'w') as texHandle:
     # write header
     fileHandle.write("iddata,mu_eff,obj\n")
     # loop over files and extract optimal value
-    opttype = 'bestfit'
+    opttype = 'heating'
     for filenamebase in resultfileList:
       # get latex command
       config = ConfigParser.SafeConfigParser({})
