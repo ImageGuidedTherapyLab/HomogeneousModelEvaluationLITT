@@ -32,7 +32,7 @@ interface,
           parameters_file = './workdir/Study0023/0425/opt/optpp_pds.heating.in'
           results_file    = './workdir/Study0023/0425/opt/optpp_pds.heating.out'
 
-# data quality   -1
+# data quality   -2
 #        discrete_state_range = 1
 #          initial_state    0
 #          descriptors      'powerhistory:[[0], [0], 1.0, [0, 0], [0, 0]]'
@@ -50,7 +50,6 @@ variables,
           lower_bounds  =   8.00000e-01 
           upper_bounds  =   5.30000e+03 
           descriptors  =  'mu_eff_healthy' 
-          scale_types  =  'auto' 
         continuous_state = 11
           initial_state  =   0.00000e+00   2.28733e-05   0.00000e+00   0.00000e+00   0.00000e+00   3.70000e+01   0.00000e+00   1.38546e-07   0.00000e+00   2.10000e+01   0.00000e+00 
           #lower_bounds  =  -5.00000e+00   1.37787e-05  -1.00000e-03  -1.00000e-03  -1.00000e-03   3.40000e+01  -5.00000e+00   1.19227e-07  -5.00000e+00   2.00000e+01   0.00000e+00 
