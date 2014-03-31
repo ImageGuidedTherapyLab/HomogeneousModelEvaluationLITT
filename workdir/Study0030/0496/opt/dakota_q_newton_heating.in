@@ -49,7 +49,7 @@ variables,
           lower_bounds  =   8.00000e-01 
           upper_bounds  =   5.30000e+03 
           descriptors  =  'mu_eff_healthy' 
-          scale_types  =  'auto' 
+#          scale_types  =  'auto' 
         continuous_state = 11
           initial_state  =  -9.00000e+01   2.28733e-05   1.17170e-01   1.53710e-01   0.00000e+00   3.70000e+01   0.00000e+00   1.38546e-07  -1.20000e+01   2.10000e+01   0.00000e+00 
           #lower_bounds  =  -9.50000e+01   1.37787e-05   1.16170e-01   1.52710e-01  -1.00000e-03   3.40000e+01  -5.00000e+00   1.19227e-07  -1.70000e+01   2.00000e+01   0.00000e+00 
