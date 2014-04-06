@@ -39,6 +39,7 @@ class PyLITTPlan:
 
 class PyLITTPlanWidget:
   def __init__(self, parent = None):
+    self.developerMode = True # change this to true to get reload and test
     if not parent:
       self.parent = slicer.qMRMLWidget()
       self.parent.setLayout(qt.QVBoxLayout())
@@ -58,26 +59,27 @@ class PyLITTPlanWidget:
     # Reload and Test area
     #
     reloadCollapsibleButton = ctk.ctkCollapsibleButton()
-    reloadCollapsibleButton.text = "Reload && Test"
+    reloadCollapsibleButton.text = "Main"
     self.layout.addWidget(reloadCollapsibleButton)
     reloadFormLayout = qt.QFormLayout(reloadCollapsibleButton)
 
-    # reload button
-    # (use this during development, but remove it when delivering
-    #  your module to users)
-    self.reloadButton = qt.QPushButton("Reload")
-    self.reloadButton.toolTip = "Reload this module."
-    self.reloadButton.name = "PyLITTPlan Reload"
-    reloadFormLayout.addWidget(self.reloadButton)
-    self.reloadButton.connect('clicked()', self.onReload)
+    if self.developerMode:
+      # reload button
+      # (use this during development, but remove it when delivering
+      #  your module to users)
+      self.reloadButton = qt.QPushButton("Reload")
+      self.reloadButton.toolTip = "Reload this module."
+      self.reloadButton.name = "PyLITTPlan Reload"
+      reloadFormLayout.addWidget(self.reloadButton)
+      self.reloadButton.connect('clicked()', self.onReload)
 
-    # reload and test button
-    # (use this during development, but remove it when delivering
-    #  your module to users)
-    self.reloadAndTestButton = qt.QPushButton("Reload and Test")
-    self.reloadAndTestButton.toolTip = "Reload this module and then run the self tests."
-    reloadFormLayout.addWidget(self.reloadAndTestButton)
-    self.reloadAndTestButton.connect('clicked()', self.onReloadAndTest)
+      # reload and test button
+      # (use this during development, but remove it when delivering
+      #  your module to users)
+      self.reloadAndTestButton = qt.QPushButton("Reload and Test")
+      self.reloadAndTestButton.toolTip = "Reload this module and then run the self tests."
+      reloadFormLayout.addWidget(self.reloadAndTestButton)
+      self.reloadAndTestButton.connect('clicked()', self.onReloadAndTest)
 
     # Input fiducials node selector
     inputFiducialsNodeSelector = slicer.qMRMLNodeComboBox()
@@ -218,6 +220,8 @@ class PyLITTPlanWidget:
     print  "Model Params:", self.PowerValueSliderWidget.value, self.AbsorptionValueSliderWidget.value 
     # TODO logic.run for brainNek
     #logic.run(self.inputSelector.currentNode(), self.outputSelector.currentNode(), enableScreenshotsFlag,screenshotScaleFactor)
+    x = slicer.util.loadModel("/Users/fuentes/fem.stl",True)
+    print x[1].GetName() 
 
   def onReload(self,moduleName="PyLITTPlan"):
     """Generic reload method for any scripted module.
