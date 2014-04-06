@@ -48,6 +48,7 @@ class PyLITTPlanWidget:
     self.layout = self.parent.layout()
     if not parent:
       self.setup()
+      self.inputFiducialsNodeSelector.setMRMLScene(slicer.mrmlScene)
       self.parent.show()
 
   def setup(self):
@@ -78,6 +79,67 @@ class PyLITTPlanWidget:
     reloadFormLayout.addWidget(self.reloadAndTestButton)
     self.reloadAndTestButton.connect('clicked()', self.onReloadAndTest)
 
+    # Input fiducials node selector
+    inputFiducialsNodeSelector = slicer.qMRMLNodeComboBox()
+    inputFiducialsNodeSelector.nodeTypes = ['vtkMRMLMarkupsFiducialNode', 'vtkMRMLAnnotationHierarchyNode', 'vtkMRMLFiducialListNode']
+    inputFiducialsNodeSelector.objectName = 'inputFiducialsNodeSelector'
+    inputFiducialsNodeSelector.selectNodeUponCreation = True
+    inputFiducialsNodeSelector.noneEnabled = False
+    inputFiducialsNodeSelector.addEnabled  = False
+    inputFiducialsNodeSelector.removeEnabled = False
+    inputFiducialsNodeSelector.showHidden = False
+    inputFiducialsNodeSelector.showChildNodeTypes = False
+    inputFiducialsNodeSelector.setMRMLScene( slicer.mrmlScene )
+    self.inputFiducialsNodeSelector = inputFiducialsNodeSelector
+    inputFiducialsNodeSelector.toolTip = "Select a fiducial list to define control points for the path."
+    reloadFormLayout.addRow("Input Fiducials:", self.inputFiducialsNodeSelector)
+
+    #
+    # output volume selector
+    #
+    self.outputSelector = slicer.qMRMLNodeComboBox()
+    self.outputSelector.nodeTypes = ( ("vtkMRMLScalarVolumeNode"), "" )
+    self.outputSelector.addAttribute( "vtkMRMLScalarVolumeNode", "LabelMap", 1 )
+    self.outputSelector.selectNodeUponCreation = False
+    self.outputSelector.addEnabled = True
+    self.outputSelector.removeEnabled = True
+    self.outputSelector.noneEnabled = False
+    self.outputSelector.showHidden = False
+    self.outputSelector.showChildNodeTypes = False
+    self.outputSelector.setMRMLScene( slicer.mrmlScene )
+    self.outputSelector.setToolTip( "Pick the output to the algorithm." )
+    reloadFormLayout.addRow("Output Volume: ", self.outputSelector)
+
+    #
+    # Power Value
+    #
+    self.PowerValueSliderWidget = ctk.ctkSliderWidget()
+    self.PowerValueSliderWidget.singleStep = 0.5
+    self.PowerValueSliderWidget.minimum = 1.0
+    self.PowerValueSliderWidget.maximum = 30.0
+    self.PowerValueSliderWidget.value = 12.0
+    self.PowerValueSliderWidget.setToolTip("Set Power Value")
+    reloadFormLayout.addRow("Power [W]", self.PowerValueSliderWidget)
+
+    #
+    # Damage Iso Value
+    #
+    self.DamageValueSliderWidget = ctk.ctkSliderWidget()
+    self.DamageValueSliderWidget.singleStep = 1.0
+    self.DamageValueSliderWidget.minimum = 0.01
+    self.DamageValueSliderWidget.maximum = 100.0
+    self.DamageValueSliderWidget.value = 57.0
+    self.DamageValueSliderWidget.setToolTip("Set Damage Value")
+    reloadFormLayout.addRow("Damage", self.DamageValueSliderWidget)
+
+    #
+    # Apply Button
+    #
+    self.applyButton = qt.QPushButton("Treat")
+    self.applyButton.toolTip = "Run the algorithm."
+    self.applyButton.enabled = False
+    reloadFormLayout.addRow(self.applyButton)
+
     #
     # Parameters Area
     #
@@ -87,38 +149,6 @@ class PyLITTPlanWidget:
 
     # Layout within the dummy collapsible button
     parametersFormLayout = qt.QFormLayout(parametersCollapsibleButton)
-
-    #
-    # input volume selector
-    #
-    self.inputSelector = slicer.qMRMLNodeComboBox()
-    self.inputSelector.nodeTypes = ( ("vtkMRMLScalarVolumeNode"), "" )
-    self.inputSelector.addAttribute( "vtkMRMLScalarVolumeNode", "LabelMap", 0 )
-    self.inputSelector.selectNodeUponCreation = True
-    self.inputSelector.addEnabled = False
-    self.inputSelector.removeEnabled = False
-    self.inputSelector.noneEnabled = False
-    self.inputSelector.showHidden = False
-    self.inputSelector.showChildNodeTypes = False
-    self.inputSelector.setMRMLScene( slicer.mrmlScene )
-    self.inputSelector.setToolTip( "Pick the input to the algorithm." )
-    parametersFormLayout.addRow("Input Volume: ", self.inputSelector)
-
-    #
-    # output volume selector
-    #
-    self.outputSelector = slicer.qMRMLNodeComboBox()
-    self.outputSelector.nodeTypes = ( ("vtkMRMLScalarVolumeNode"), "" )
-    self.outputSelector.addAttribute( "vtkMRMLScalarVolumeNode", "LabelMap", 0 )
-    self.outputSelector.selectNodeUponCreation = False
-    self.outputSelector.addEnabled = True
-    self.outputSelector.removeEnabled = True
-    self.outputSelector.noneEnabled = False
-    self.outputSelector.showHidden = False
-    self.outputSelector.showChildNodeTypes = False
-    self.outputSelector.setMRMLScene( slicer.mrmlScene )
-    self.outputSelector.setToolTip( "Pick the output to the algorithm." )
-    parametersFormLayout.addRow("Output Volume: ", self.outputSelector)
 
     #
     # check box to trigger taking screen shots for later use in tutorials
@@ -131,42 +161,63 @@ class PyLITTPlanWidget:
     #
     # scale factor for screen shots
     #
-    self.screenshotScaleFactorSliderWidget = ctk.ctkSliderWidget()
-    self.screenshotScaleFactorSliderWidget.singleStep = 1.0
-    self.screenshotScaleFactorSliderWidget.minimum = 1.0
-    self.screenshotScaleFactorSliderWidget.maximum = 50.0
-    self.screenshotScaleFactorSliderWidget.value = 1.0
-    self.screenshotScaleFactorSliderWidget.setToolTip("Set scale factor for the screen shots.")
-    parametersFormLayout.addRow("Screenshot scale factor", self.screenshotScaleFactorSliderWidget)
+    self.PerfusionValueSliderWidget = ctk.ctkSliderWidget()
+    self.PerfusionValueSliderWidget.singleStep = 1.0
+    self.PerfusionValueSliderWidget.minimum = 0.0
+    self.PerfusionValueSliderWidget.maximum = 50.0
+    self.PerfusionValueSliderWidget.value = 6.0
+    self.PerfusionValueSliderWidget.setToolTip("Set Perfusion Value")
+    parametersFormLayout.addRow("Perfusion [kg/s/m^3]", self.PerfusionValueSliderWidget)
 
     #
-    # Apply Button
+    # scale factor for screen shots
     #
-    self.applyButton = qt.QPushButton("Apply")
-    self.applyButton.toolTip = "Run the algorithm."
-    self.applyButton.enabled = False
-    parametersFormLayout.addRow(self.applyButton)
+    self.AbsorptionValueSliderWidget = ctk.ctkSliderWidget()
+    self.AbsorptionValueSliderWidget.singleStep = 0.5
+    self.AbsorptionValueSliderWidget.minimum = 0.05
+    self.AbsorptionValueSliderWidget.maximum = 5.e2
+    self.AbsorptionValueSliderWidget.value = 5.0
+    self.AbsorptionValueSliderWidget.setToolTip("Set mu_a Value")
+    parametersFormLayout.addRow("mu_a [1/m]", self.AbsorptionValueSliderWidget)
 
     # connections
     self.applyButton.connect('clicked(bool)', self.onApplyButton)
-    self.inputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.onSelect)
+    self.inputFiducialsNodeSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.onSelect)
     self.outputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.onSelect)
 
     # Add vertical spacer
     self.layout.addStretch(1)
 
+  #def enableOrDisableCreateButton(self):
+  #  """Connected to both the fiducial and camera node selector. It allows to
+  #  enable or disable the 'create path' button."""
+  #  self.createPathButton.enabled = self.cameraNodeSelector.currentNode() != None and self.inputFiducialsNodeSelector.currentNode() != None
+
   def cleanup(self):
     pass
 
   def onSelect(self):
-    self.applyButton.enabled = self.inputSelector.currentNode() and self.outputSelector.currentNode()
+    self.applyButton.enabled = self.inputFiducialsNodeSelector.currentNode() and self.outputSelector.currentNode()
 
   def onApplyButton(self):
     logic = PyLITTPlanLogic()
-    enableScreenshotsFlag = self.enableScreenshotsFlagCheckBox.checked
-    screenshotScaleFactor = int(self.screenshotScaleFactorSliderWidget.value)
+    screenshotScaleFactor = int(self.PerfusionValueSliderWidget.value)
     print("Run the algorithm")
-    logic.run(self.inputSelector.currentNode(), self.outputSelector.currentNode(), enableScreenshotsFlag,screenshotScaleFactor)
+    fiducialsNode = self.inputFiducialsNodeSelector.currentNode();
+    if fiducialsNode.GetClassName() == "vtkMRMLMarkupsFiducialNode":
+      # slicer4 Markups node
+      NumFid = fiducialsNode.GetNumberOfFiducials()
+      if NumFid < 2:
+        print("Two Fiducials Needed ")
+        return
+      # get fiducial positions
+      for iFid in xrange(NumFid):
+        coord = [0.0, 0.0, 0.0]
+        fiducialsNode.GetNthFiducialPosition(iFid, coord)
+        print coord
+    print  "Model Params:", self.PowerValueSliderWidget.value, self.AbsorptionValueSliderWidget.value 
+    # TODO logic.run for brainNek
+    #logic.run(self.inputSelector.currentNode(), self.outputSelector.currentNode(), enableScreenshotsFlag,screenshotScaleFactor)
 
   def onReload(self,moduleName="PyLITTPlan"):
     """Generic reload method for any scripted module.
@@ -189,6 +240,7 @@ class PyLITTPlanWidget:
 
 #
 # PyLITTPlanLogic
+#   TODO add brainNek Here
 #
 
 class PyLITTPlanLogic:
