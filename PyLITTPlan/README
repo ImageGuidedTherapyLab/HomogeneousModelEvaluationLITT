@@ -1,0 +1,28 @@
+
+ - created with
+
+	$cd Slicer4; ./Utilities/Scripts/ModuleWizard.py --template ./Extensions/Testing/ScriptedLoadableExtensionTemplate/ScriptedLoadableModuleTemplate/ --target /DakotaApplications/PlanningValidation/PyLITTPlan PyLITTPlan
+	Will copy
+	        ./Extensions/Testing/ScriptedLoadableExtensionTemplate/ScriptedLoadableModuleTemplate/
+	to
+	        /Users/fuentes/github/DakotaApplications/PlanningValidation/PyLITTPlan
+	replacing "ScriptedLoadableModuleTemplate" with "PyLITTPlan"
+	
+	['CMakeLists.txt', 'ScriptedLoadableModuleTemplate.py', 'Resources/Icons/ScriptedLoadableModuleTemplate.png', 'Testing/CMakeLists.txt', 'Testing/Python/CMakeLists.txt']
+	creating /Users/fuentes/github/DakotaApplications/PlanningValidation/PyLITTPlan/CMakeLists.txt
+	creating /Users/fuentes/github/DakotaApplications/PlanningValidation/PyLITTPlan/PyLITTPlan.py
+	creating /Users/fuentes/github/DakotaApplications/PlanningValidation/PyLITTPlan/Resources/Icons/PyLITTPlan.png
+	creating /Users/fuentes/github/DakotaApplications/PlanningValidation/PyLITTPlan/Testing/CMakeLists.txt
+	creating /Users/fuentes/github/DakotaApplications/PlanningValidation/PyLITTPlan/Testing/Python/CMakeLists.txt
+
+	$ svn info
+	Path: .
+	URL: http://svn.slicer.org/Slicer4/trunk
+	Repository Root: http://svn.slicer.org/Slicer4
+	Repository UUID: 3bd1e089-480b-0410-8dfb-8563597acbee
+	Revision: 23047
+	Node Kind: directory
+	Schedule: normal
+	Last Changed Author: finetjul
+	Last Changed Rev: 23047
+	Last Changed Date: 2014-04-04 17:34:32 -0500 (Fri, 04 Apr 2014)

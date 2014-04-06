@@ -6,7 +6,6 @@
 import sys
 import re
 import os
-import scipy.io as scipyio
 import ConfigParser
 
 # numerical support
@@ -18,10 +17,11 @@ import vtk.util.numpy_support as vtkNumPy
 print "using vtk version", vtk.vtkVersion.GetVTKVersion()
 
 brainNekDIR     = '/workarea/fuentes/braincode/tym1' 
+brainNekDIR     = '/Users/fuentes/MyProjects/braincode/tym1'
 if( os.getenv("GPUWORKDIR") ) :
   workDirectory   = os.getenv("GPUWORKDIR") 
 else:
-  workDirectory   = 'optpp_pds/0'
+  workDirectory   = 'optpp_pds/1'
 os.system('mkdir -p %s' % workDirectory )
 
 outputDirectory = '/dev/shm/outputs/dakota/%04d'
@@ -1430,10 +1430,10 @@ if (options.param_file != None):
   # parse the dakota input file
   fem_params = ParseInput(options.param_file,options.vis_out)
 
-  MatlabDriver = False
   MatlabDriver = True
+  MatlabDriver = False
   if(MatlabDriver):
-
+    import scipy.io as scipyio
     # write out for debug
     MatlabDataDictionary  = fem_params
     MatlabDataDictionary['patientID'] = options.param_file.split('/')[2]
