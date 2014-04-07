@@ -1,5 +1,6 @@
 import os
 import unittest
+import numpy
 from __main__ import vtk, qt, ctk, slicer
 
 #
@@ -11,7 +12,7 @@ class PyLITTPlan:
     parent.title = "PyLITTPlan" # TODO make this more human readable by adding spaces
     parent.categories = ["Examples"]
     parent.dependencies = []
-    parent.contributors = ["Jean-Christophe Fillion-Robin (Kitware), Steve Pieper (Isomics)"] # replace with "Firstname Lastname (Org)"
+    parent.contributors = ["David Fuentes (MD Anderson)"] # replace with "Firstname Lastname (Org)"
     parent.helpText = """
     This is an example of scripted loadable module bundled in an extension.
     """
@@ -54,6 +55,7 @@ class PyLITTPlanWidget:
 
   def setup(self):
     # Instantiate and connect widgets ...
+    self.ApplicatorModel = None
 
     #
     # Reload and Test area
@@ -213,15 +215,69 @@ class PyLITTPlanWidget:
         print("Two Fiducials Needed ")
         return
       # get fiducial positions
-      for iFid in xrange(NumFid):
-        coord = [0.0, 0.0, 0.0]
-        fiducialsNode.GetNthFiducialPosition(iFid, coord)
-        print coord
+      else:
+        # template laser tip        at coordinate (0,0,0.  ) meter
+        # template laser distal end at coordinate (0,0,0.03) meter
+        originalLength = 30. #mm
+        originalOrientation = vtk.vtkPoints()
+        originalOrientation.SetNumberOfPoints(2)
+        originalOrientation.SetPoint(0,0.,0.,0.  )
+        originalOrientation.SetPoint(1,0.,originalLength,0.)
+        # slicer Points
+        pointtip   = [0.0, 0.0, 0.0]
+        fiducialsNode.GetNthFiducialPosition(0, pointtip   )
+        pointentry = [0.0, 0.0, 0.0]
+        fiducialsNode.GetNthFiducialPosition(1, pointentry)
+        slicerLength   = numpy.linalg.norm( numpy.array(pointentry) - numpy.array(pointtip) )
+        unitdirection  = 1./slicerLength * (numpy.array(pointentry) - numpy.array(pointtip) ) 
+        pointscaled = pointentry  + originalLength * unitdirection
+        print "points", pointentry,pointtip ,pointscaled   
+        slicerOrientation   = vtk.vtkPoints()
+        slicerOrientation.SetNumberOfPoints(2)
+        slicerOrientation.SetPoint(0,pointtip[   0],pointtip[   1],pointtip[   2] )
+        slicerOrientation.SetPoint(1,pointscaled[0],pointscaled[1],pointscaled[2] )
+
+    LaserLineTransform = vtk.vtkLandmarkTransform()
+    LaserLineTransform.SetSourceLandmarks(originalOrientation)
+    LaserLineTransform.SetTargetLandmarks(slicerOrientation  )
     print  "Model Params:", self.PowerValueSliderWidget.value, self.AbsorptionValueSliderWidget.value 
+    vtkCylinder = vtk.vtkCylinderSource()
+    vtkCylinder.SetHeight(10.0); # Define applicator tip
+    vtkCylinder.SetRadius(.9);
+    vtkCylinder.SetCenter(0.0, 0.0, 0.0);
+    vtkCylinder.SetResolution(16);
+
+    slicertransformFilter = vtk.vtkTransformFilter()
+    slicertransformFilter.SetInput(vtkCylinder.GetOutput() ) 
+    slicertransformFilter.SetTransform( LaserLineTransform  ) 
+    slicertransformFilter.Update()
+    polyData=slicertransformFilter.GetOutput();
     # TODO logic.run for brainNek
     #logic.run(self.inputSelector.currentNode(), self.outputSelector.currentNode(), enableScreenshotsFlag,screenshotScaleFactor)
+
     x = slicer.util.loadModel("/Users/fuentes/fem.stl",True)
     print x[1].GetName() 
+
+    # Create model node
+    scene = slicer.mrmlScene
+    if ( self.ApplicatorModel != None ):
+      print "removing", self.ApplicatorModel.GetName()
+      scene.RemoveNode(self.ApplicatorModel)
+    self.ApplicatorModel = slicer.vtkMRMLModelNode()
+    self.ApplicatorModel.SetScene(scene)
+    self.ApplicatorModel.SetName(scene.GenerateUniqueName("Applicator-%s" % fiducialsNode.GetName()))
+    self.ApplicatorModel.SetAndObservePolyData(polyData)
+
+    # Create display node
+    modelDisplay = slicer.vtkMRMLModelDisplayNode()
+    modelDisplay.SetColor(1,1,0) # yellow
+    modelDisplay.SetScene(scene)
+    scene.AddNode(modelDisplay)
+    self.ApplicatorModel.SetAndObserveDisplayNodeID(modelDisplay.GetID())
+
+    # Add to scene
+    modelDisplay.SetInputPolyData(self.ApplicatorModel.GetPolyData())
+    scene.AddNode(self.ApplicatorModel)
 
   def onReload(self,moduleName="PyLITTPlan"):
     """Generic reload method for any scripted module.
