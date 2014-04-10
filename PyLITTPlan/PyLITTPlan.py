@@ -40,7 +40,7 @@ class PyLITTPlan:
 
 class PyLITTPlanWidget:
   def __init__(self, parent = None):
-    self.developerMode = True # change this to true to get reload and test
+    self.developerMode = False # change this to true to get reload and test
     if not parent:
       self.parent = slicer.qMRMLWidget()
       self.parent.setLayout(qt.QVBoxLayout())
@@ -57,6 +57,14 @@ class PyLITTPlanWidget:
     # Instantiate and connect widgets ...
     self.ApplicatorModel = None
 
+    # define constant parameters
+    #  diffusing tip is 10. mm axial
+    #  diffusing tip is 1.5 mm radial
+    self.DiffusingTipLength = 10. #mm
+    self.DiffusingTipRadius = .75 #mm
+    # In canine brain and transmissible venereal tumours, up to 18.11.4mm lesions were achieved. It is concluded
+    self.AblationMinorAxis = 18.0 #mm
+    self.AblationMajorAxis = 22.0 #mm
     #
     # Reload and Test area
     #
@@ -137,7 +145,15 @@ class PyLITTPlanWidget:
     reloadFormLayout.addRow("Damage", self.DamageValueSliderWidget)
 
     #
-    # Apply Button
+    # Locate Applicator Button
+    #
+    self.referenceButton = qt.QPushButton("Locate Applicator")
+    self.referenceButton.toolTip = "Locate the Applicator for Reference"
+    self.referenceButton.enabled = False
+    reloadFormLayout.addRow(self.referenceButton)
+
+    #
+    # Treat Button
     #
     self.applyButton = qt.QPushButton("Treat")
     self.applyButton.toolTip = "Run the algorithm."
@@ -149,6 +165,7 @@ class PyLITTPlanWidget:
     #
     parametersCollapsibleButton = ctk.ctkCollapsibleButton()
     parametersCollapsibleButton.text = "Parameters"
+    parametersCollapsibleButton.collapsed = True
     self.layout.addWidget(parametersCollapsibleButton)
 
     # Layout within the dummy collapsible button
@@ -185,9 +202,10 @@ class PyLITTPlanWidget:
     parametersFormLayout.addRow("mu_a [1/m]", self.AbsorptionValueSliderWidget)
 
     # connections
-    self.applyButton.connect('clicked(bool)', self.onApplyButton)
     self.inputFiducialsNodeSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.onSelect)
     self.outputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.onSelect)
+    self.referenceButton.connect('clicked(bool)', self.onReferenceButton)
+    self.applyButton.connect('clicked(bool)', self.onApplyButton)
 
     # Add vertical spacer
     self.layout.addStretch(1)
@@ -201,62 +219,76 @@ class PyLITTPlanWidget:
     pass
 
   def onSelect(self):
-    self.applyButton.enabled = self.inputFiducialsNodeSelector.currentNode() and self.outputSelector.currentNode()
+    #self.applyButton.enabled = self.inputFiducialsNodeSelector.currentNode() and self.outputSelector.currentNode()
+    self.applyButton.enabled = self.inputFiducialsNodeSelector.currentNode() 
+    self.referenceButton.enabled = self.applyButton.enabled 
 
-  def onApplyButton(self):
-    logic = PyLITTPlanLogic()
-    screenshotScaleFactor = int(self.PerfusionValueSliderWidget.value)
-    print("Run the algorithm")
+  def GetDiffusingLaserTransform(self):
     fiducialsNode = self.inputFiducialsNodeSelector.currentNode();
+    print fiducialsNode.GetClassName() 
     if fiducialsNode.GetClassName() == "vtkMRMLMarkupsFiducialNode":
       # slicer4 Markups node
       NumFid = fiducialsNode.GetNumberOfFiducials()
       if NumFid < 2:
         print("Two Fiducials Needed ")
-        return
+        return None
       # get fiducial positions
       else:
-        # template laser tip        at coordinate (0,0,0.  ) meter
-        # template laser distal end at coordinate (0,0,0.03) meter
-        originalLength = 30. #mm
-        originalOrientation = vtk.vtkPoints()
-        originalOrientation.SetNumberOfPoints(2)
-        originalOrientation.SetPoint(0,0.,0.,0.  )
-        originalOrientation.SetPoint(1,0.,originalLength,0.)
         # slicer Points
         pointtip   = [0.0, 0.0, 0.0]
         fiducialsNode.GetNthFiducialPosition(0, pointtip   )
         pointentry = [0.0, 0.0, 0.0]
         fiducialsNode.GetNthFiducialPosition(1, pointentry)
-        slicerLength   = numpy.linalg.norm( numpy.array(pointentry) - numpy.array(pointtip) )
-        unitdirection  = 1./slicerLength * (numpy.array(pointentry) - numpy.array(pointtip) ) 
-        pointscaled = pointentry  + originalLength * unitdirection
-        print "points", pointentry,pointtip ,pointscaled   
-        slicerOrientation   = vtk.vtkPoints()
-        slicerOrientation.SetNumberOfPoints(2)
-        slicerOrientation.SetPoint(0,pointtip[   0],pointtip[   1],pointtip[   2] )
-        slicerOrientation.SetPoint(1,pointscaled[0],pointscaled[1],pointscaled[2] )
+    else:
+      print("Unknown Class ")
+      return None
+    # diffusing applicator center at coordinate  (0,                        0., 0. ) mm
+    # template laser distal ends  at coordinates (0, +/- DiffusingTipLength/2., 0. ) mm
+    originalOrientation = vtk.vtkPoints()
+    originalOrientation.SetNumberOfPoints(2)
+    originalOrientation.SetPoint(0,0.,0.,0.  )
+    originalOrientation.SetPoint(1,0.,self.DiffusingTipLength/2.,0.)
+    slicerLength   = numpy.linalg.norm( numpy.array(pointentry) - numpy.array(pointtip) )
+    unitdirection  = 1./slicerLength * (numpy.array(pointentry) - numpy.array(pointtip) ) 
+    pointscaled = pointtip + self.DiffusingTipLength/2. * unitdirection
+    print "points", pointentry, pointtip, pointscaled, slicerLength, numpy.linalg.norm( unitdirection  ), numpy.linalg.norm( pointscaled - pointtip ) 
+    slicerOrientation   = vtk.vtkPoints()
+    slicerOrientation.SetNumberOfPoints(2)
+    slicerOrientation.SetPoint(0,pointtip[   0],pointtip[   1],pointtip[   2] )
+    slicerOrientation.SetPoint(1,pointscaled[0],pointscaled[1],pointscaled[2] )
 
     LaserLineTransform = vtk.vtkLandmarkTransform()
     LaserLineTransform.SetSourceLandmarks(originalOrientation)
     LaserLineTransform.SetTargetLandmarks(slicerOrientation  )
+    LaserLineTransform.Update()
+    print LaserLineTransform.GetMatrix()
+    return LaserLineTransform
+
+  def onReferenceButton(self):
+    logic = PyLITTPlanLogic()
+    screenshotScaleFactor = int(self.PerfusionValueSliderWidget.value)
+    print("Run the algorithm")
+
+    # get fiducial based transform
+    LineLandmarkTransform = self.GetDiffusingLaserTransform()
+    if ( LineLandmarkTransform == None): 
+      return
     print  "Model Params:", self.PowerValueSliderWidget.value, self.AbsorptionValueSliderWidget.value 
+
+    # Define applicator tip
     vtkCylinder = vtk.vtkCylinderSource()
-    vtkCylinder.SetHeight(10.0); # Define applicator tip
-    vtkCylinder.SetRadius(.9);
+    vtkCylinder.SetHeight(self.DiffusingTipLength ); 
+    vtkCylinder.SetRadius(self.DiffusingTipRadius );
     vtkCylinder.SetCenter(0.0, 0.0, 0.0);
     vtkCylinder.SetResolution(16);
 
     slicertransformFilter = vtk.vtkTransformFilter()
     slicertransformFilter.SetInput(vtkCylinder.GetOutput() ) 
-    slicertransformFilter.SetTransform( LaserLineTransform  ) 
+    slicertransformFilter.SetTransform( LineLandmarkTransform ) 
     slicertransformFilter.Update()
     polyData=slicertransformFilter.GetOutput();
     # TODO logic.run for brainNek
     #logic.run(self.inputSelector.currentNode(), self.outputSelector.currentNode(), enableScreenshotsFlag,screenshotScaleFactor)
-
-    x = slicer.util.loadModel("/Users/fuentes/fem.stl",True)
-    print x[1].GetName() 
 
     # Create model node
     scene = slicer.mrmlScene
@@ -265,12 +297,13 @@ class PyLITTPlanWidget:
       scene.RemoveNode(self.ApplicatorModel)
     self.ApplicatorModel = slicer.vtkMRMLModelNode()
     self.ApplicatorModel.SetScene(scene)
-    self.ApplicatorModel.SetName(scene.GenerateUniqueName("Applicator-%s" % fiducialsNode.GetName()))
+    #self.ApplicatorModel.SetName(scene.GenerateUniqueName("Applicator-%s" % fiducialsNode.GetName()))
+    self.ApplicatorModel.SetName("Applicator" )
     self.ApplicatorModel.SetAndObservePolyData(polyData)
 
     # Create display node
     modelDisplay = slicer.vtkMRMLModelDisplayNode()
-    modelDisplay.SetColor(1,1,0) # yellow
+    modelDisplay.SetColor(1,0,0) # red
     modelDisplay.SetScene(scene)
     scene.AddNode(modelDisplay)
     self.ApplicatorModel.SetAndObserveDisplayNodeID(modelDisplay.GetID())
@@ -278,6 +311,65 @@ class PyLITTPlanWidget:
     # Add to scene
     modelDisplay.SetInputPolyData(self.ApplicatorModel.GetPolyData())
     scene.AddNode(self.ApplicatorModel)
+
+  def onApplyButton(self):
+    logic = PyLITTPlanLogic()
+    screenshotScaleFactor = int(self.PerfusionValueSliderWidget.value)
+    print("Run the algorithm")
+
+    # get fiducial based transform
+    LineLandmarkTransform = self.GetDiffusingLaserTransform()
+    if ( LineLandmarkTransform == None): 
+      return
+    print  "Model Params:", self.PowerValueSliderWidget.value, self.AbsorptionValueSliderWidget.value 
+
+    # use ellipsoid for testing
+    # create sphere and scale
+    vtkSphere = vtk.vtkSphereSource()
+    vtkSphere.SetRadius(1.) 
+    vtkSphere.SetThetaResolution(16)
+    vtkSphere.SetPhiResolution(16)
+    ScaleAffineTransform = vtk.vtkTransform()
+    ScaleAffineTransform.Scale([self.AblationMinorAxis,self.AblationMajorAxis,self.AblationMinorAxis])
+    vtkEllipsoid= vtk.vtkTransformFilter()
+    vtkEllipsoid.SetInput(vtkSphere.GetOutput() ) 
+    vtkEllipsoid.SetTransform( ScaleAffineTransform ) 
+    vtkEllipsoid.Update()
+
+    slicertransformFilter = vtk.vtkTransformFilter()
+    slicertransformFilter.SetInput(vtkEllipsoid.GetOutput() ) 
+    slicertransformFilter.SetTransform( LineLandmarkTransform ) 
+    slicertransformFilter.Update()
+    polyData=slicertransformFilter.GetOutput();
+
+
+    # display ellipse if solver not available
+    GPUSolverAvailable = True
+    GPUSolverAvailable = False
+    if ( GPUSolverAvailable ) :
+      # TODO logic.run for brainNek
+      #logic.run(self.inputSelector.currentNode(), self.outputSelector.currentNode(), enableScreenshotsFlag,screenshotScaleFactor)
+      x = slicer.util.loadModel("/Users/fuentes/fem.stl",True)
+      print x[1].GetName() 
+    else:
+      # Create model node
+      scene = slicer.mrmlScene
+      TreatmentModel = slicer.vtkMRMLModelNode()
+      TreatmentModel.SetScene(scene)
+      #TreatmentModel.SetName(scene.GenerateUniqueName("Treatment-%s" % fiducialsNode.GetName()))
+      TreatmentModel.SetName( scene.GenerateUniqueName("Treatment") )
+      TreatmentModel.SetAndObservePolyData(polyData)
+
+      # Create display node
+      modelDisplay = slicer.vtkMRMLModelDisplayNode()
+      modelDisplay.SetColor(1,1,0) # yellow
+      modelDisplay.SetScene(scene)
+      scene.AddNode(modelDisplay)
+      TreatmentModel.SetAndObserveDisplayNodeID(modelDisplay.GetID())
+
+      # Add to scene
+      modelDisplay.SetInputPolyData(TreatmentModel.GetPolyData())
+      scene.AddNode(TreatmentModel)
 
   def onReload(self,moduleName="PyLITTPlan"):
     """Generic reload method for any scripted module.
