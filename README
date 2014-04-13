@@ -1,18 +1,16 @@
 all registration parameters are WRT workdir/meshTemplateFull1.e
 
+------------------------- accumulate stats ---------------------------------------
+
+# run analysis
+make -f exe.makefile -j 6 &
+# python brainsearch.py --accum_history
+
 ------------------------- Running with MATLAB ------------------------------------
 
 1. Make sure 'brainsearch.py' has MATLAB = True . Make sure DAKMATLAB isn't running and the pipes are absent.  pkill -9 dakmatlab
 2. ./analytic/dakmatlab setup workspace
 3. ./exe.heathing.txt           Or whatever script you want to run
-
-------------------------- accumulate stats ---------------------------------------
-
-
-python accumulatehistory.py
-R
-source('datasummary.R')
-
 
 ----------------------------------------------------------------------------------
 parallel direct search in Dakota

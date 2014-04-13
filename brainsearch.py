@@ -1346,7 +1346,7 @@ def ParseInput(paramfilename,VisualizeOutput):
   config = ConfigParser.SafeConfigParser({})
   config.read(inisetupfile)
   fem_params['ccode']        = config.get('power','ccode')
-  fem_params['powerhistory'] = config.get('power','history')
+  #fem_params['powerhistory'] = config.get('power','history')
   fulltimeinterval               = eval(config.get('mrti','fulltime') )
   cooltimeinterval               = eval(config.get('mrti','cooling')  )
   heattimeinterval               = eval(config.get('mrti','heating')  )
@@ -1565,6 +1565,7 @@ elif (options.run_min != None):
   # build execution command
   runcmd = "vglrun python ./brainsearch.py --param_file  %s.in.%d %s.out.%d --vis_out" % (templatefilename,idmin,templatefilename,idmin)
   print runcmd
+  #FIXME not running ???
   os.system( runcmd )
   
 
