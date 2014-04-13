@@ -16,8 +16,8 @@ import vtk
 import vtk.util.numpy_support as vtkNumPy 
 print "using vtk version", vtk.vtkVersion.GetVTKVersion()
 
-brainNekDIR     = '/workarea/fuentes/braincode/tym1' 
 brainNekDIR     = '/Users/fuentes/MyProjects/braincode/tym1'
+brainNekDIR     = '/workarea/fuentes/braincode/tym1' 
 if( os.getenv("GPUWORKDIR") ) :
   workDirectory   = os.getenv("GPUWORKDIR") 
 else:
@@ -1049,7 +1049,12 @@ def ComputeObjective(**kwargs):
 
     # load image 
     mrtifilename = '%s/temperature.%04d.vtk' % (kwargs['mrti'], MRTItimeID) 
-    print 'opening' , mrtifilename , currentTime
+    if (os.path.isfile(mrtifilename ) ):
+      print 'opening' , mrtifilename , currentTime
+    else:
+      print '#####NOT FOUND' , mrtifilename 
+      print '#####USING DEFAULT at time 0' 
+      mrtifilename = '%s/temperature.%04d.vtk' % (kwargs['mrti'], 0) 
     vtkImageReader = vtk.vtkDataSetReader() 
     vtkImageReader.SetFileName(mrtifilename )
     vtkImageReader.Update() 
