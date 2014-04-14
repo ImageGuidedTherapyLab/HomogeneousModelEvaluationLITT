@@ -29,17 +29,20 @@ upper_bound_robin  = 1.00000e+04
 rawdata$alpha  = rawdata$alpha  * alphaconversion
 rawdata$mu_eff = rawdata$mu_eff * mueffconversion 
 iterstats        =  subset(rawdata , obj<=5.e5   
-                                   & alpha  < upper_bound_alpha
-                                   & alpha  < (1.9e-7*alphaconversion)
-                                   & alpha  > lower_bound_alpha
+                                   & dice   >  .5
                                    & alpha  > (1.34e-7*alphaconversion) 
-                                   & mu_eff < upper_bound_mu_eff 
                                    & mu_eff < (5.e3*mueffconversion)
-                                   & mu_eff > lower_bound_mu_eff ) 
-
+                          )
+                                   ##& alpha  < upper_bound_alpha
+                                   ##& alpha  < (1.9e-7*alphaconversion)
+                                   ##& alpha  > lower_bound_alpha
+                                   ##& mu_eff < upper_bound_mu_eff 
+                                   ##& mu_eff > lower_bound_mu_eff ) 
+ 
 # view first 10 lines
 NumDataPoints = length(iterstats$iddata)
 print(head(iterstats,n=10))
+print( paste(paste(paste("selected ", NumDataPoints ), " of "), length(rawdata$iddata)) )
 
 # print columns
 names(iterstats)
@@ -109,11 +112,12 @@ panel.linear <- function(x, y)
 # plot global summary plot
 do.legend <- FALSE
 pdf(paste(paste('datasummary',PlotID,sep=""),'.pdf',sep=""))
- #pairs(~obj+alpha+mu_eff,data=rawdata,
- pairs(~obj+alpha+mu_eff,data=iterstats,
+ #pairs(~obj+dice+alpha+mu_eff,data=rawdata,
+ pairs(~obj+dice+alpha+mu_eff,data=iterstats,
         diag.panel  = panel.hist, 
         lower.panel = panel.linear,
         upper.panel = panel.cor,
+        main=paste("N = "   ,NumDataPoints,sep="")
        )
 dev.off()
 

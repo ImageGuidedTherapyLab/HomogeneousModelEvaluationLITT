@@ -1478,13 +1478,22 @@ if (options.param_file != None):
 elif (options.accum_history ):
   resultfileList = [
   './workdir/Study0035/0530/',
-  './workdir/Study0030/0495/',
   './workdir/Study0023/0433/',
+  './workdir/Study0023/0428/',
+  ##'./workdir/Study0023/0425/',
+  './workdir/Study0030/0495/',
   './workdir/Study0030/0497/',
+  './workdir/Study0030/0488/',
   './workdir/Study0030/0491/',
   './workdir/Study0030/0496/',
   './workdir/Study0030/0490/',
   './workdir/Study0017/0378/',
+  ##'./workdir/Study0018/0388/',
+  './workdir/Study0018/0402/',
+  './workdir/Study0018/0389/',
+  './workdir/Study0018/0385/',
+  './workdir/Study0029/0476/',
+  './workdir/Study0029/0477/',
   './workdir/Study0025/0438/',
   './workdir/Study0025/0435/',
   './workdir/Study0025/0440/',
@@ -1492,17 +1501,25 @@ elif (options.accum_history ):
   './workdir/Study0028/0466/',
   './workdir/Study0028/0468/',
   './workdir/Study0028/0471/',
+  './workdir/Study0052/0725/',
+  './workdir/Study0052/0720/',
   './workdir/Study0026/0447/',
   './workdir/Study0026/0457/',
   './workdir/Study0026/0455/',
   './workdir/Study0026/0453/',
   './workdir/Study0026/0450/',
   './workdir/Study0026/0451/',
+  ##'./workdir/Study0057/0772/',
+  ##'./workdir/Study0057/0769/',
   './workdir/Study0022/0418/',
   './workdir/Study0022/0417/',
   './workdir/Study0021/0409/',
   './workdir/Study0021/0414/',
   './workdir/Study0021/0415/',
+  ##'./workdir/Study0054/0753/',
+  ##'./workdir/Study0054/0756/',
+  ##'./workdir/Study0053/0755/',
+  './workdir/Study0006/0183/',
   ]
   
   ## resultfileList = [
@@ -1513,7 +1530,7 @@ elif (options.accum_history ):
   texHandle  = open('datasummary.tex' , 'w') 
   fileHandle = open('datasummary.txt' , 'w') 
   # write header
-  fileHandle.write("iddata,idmin,mu_eff,alpha,robin,gamma,obj\n")
+  fileHandle.write("iddata,idmin,mu_eff,alpha,robin,gamma,dice,obj\n")
   # loop over files and extract optimal value
   opttype = 'bestfit'
   for filenamebase in resultfileList:
@@ -1531,13 +1548,6 @@ elif (options.accum_history ):
     dakotafilename = '%s/opt/optpp_pds.%s.in.%d' % (filenamebase,opttype,idmin)
     opt_fem_params = ParseInput(dakotafilename,False)
     simvariable = opt_fem_params['cv']     
-    #dataarray = numpy.loadtxt(filename,skiprows=1,usecols=(0,1,2,3,4,6)
-    fileHandle.write("%05d,%05d,%s,%s,%s,%s,%12.5e\n" %( dataid, idmin     ,
-                                                                    simvariable['mu_eff_healthy'],
-                                                                    simvariable['alpha_healthy'],
-                                                                    simvariable['robin_coeff'],
-                                                                    simvariable['gamma_healthy'],
-                                                                    minobjval))
     # get arrhenius dice value
     heattimeinterval               = eval(config.get('mrti','heating')  )
     SEMDataDirectory               = outputDirectory % int(filenamebase.split('/')[-2]) 
@@ -1545,6 +1555,14 @@ elif (options.accum_history ):
     print dicefilename 
     dicevalue = DiceTxtFileParse(dicefilename)
   
+    #dataarray = numpy.loadtxt(filename,skiprows=1,usecols=(0,1,2,3,4,6)
+    fileHandle.write("%05d,%05d,%s,%s,%s,%s,%12.5e,%12.5e\n" %( dataid, idmin     ,
+                                                                    simvariable['mu_eff_healthy'],
+                                                                    simvariable['alpha_healthy'],
+                                                                    simvariable['robin_coeff'],
+                                                                    simvariable['gamma_healthy'],
+                                                                    dicevalue,
+                                                                    minobjval))
     # format latex ouput
     outputformat                   = config.get('latex','opttype')
     texFormat = outputformat % (opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],minobjval,dicevalue)
