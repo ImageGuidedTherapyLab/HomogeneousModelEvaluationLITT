@@ -1296,7 +1296,7 @@ def ParseInput(paramfilename,VisualizeOutput):
   # mu_eff = sqrt( 3 mu_a  mu_tr )
   mu_eff = float(continuous_vars['mu_eff_healthy'])
   mu_a   =  0.5*( -mu_s_p + math.sqrt( mu_s_p * mu_s_p  + 4. * mu_eff * mu_eff  /3. ) )
-  # alpha  == k / rho / c_p
+  # alpha  == k / rho / c_p   W/m/K * m^3/kg * kg*K/W/s = m^2/s
   # gamma  == k / w   / c_blood
   alpha  = float(continuous_vars['alpha_healthy'])
   gamma  = float(continuous_vars['gamma_healthy'])

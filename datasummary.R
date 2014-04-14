@@ -7,69 +7,44 @@
 # library(oro.nifti)
 library(car)
 # jac2009 = readNIfTI("Brain_Stemlogjacobian2009.nii.gz", reorient=FALSE)
-PlotID='heating'
-iterstats = read.table('datasummary.txt',header = TRUE, sep = ',')
 
+# global vars
+PlotID='bestfit'
+NumBreaks = 10
 
+# read data
+rawdata = read.table('datasummary.txt',header = TRUE, sep = ',')
+
+# for large objective functions and data on the boundary of optimization
+# space most likely and error in the optimization
+alphaconversion = 1.e7   # 1.e7 [cm^2 /s * 1e3] =  1 [m^2/s]
+mueffconversion = 1.e-2  # 1.e-2 [1/cm]  = 1 [1/m]
+lower_bound_alpha  = 1.19227e-07 * alphaconversion 
+upper_bound_alpha  = 2.91296e-07 * alphaconversion 
+lower_bound_mu_eff = 8.00000e-01 * mueffconversion 
+upper_bound_mu_eff = 5.30000e+03 * mueffconversion 
+lower_bound_robin  = 0.00000e+00 
+upper_bound_robin  = 1.00000e+04 
+
+rawdata$alpha  = rawdata$alpha  * alphaconversion
+rawdata$mu_eff = rawdata$mu_eff * mueffconversion 
+iterstats        =  subset(rawdata , obj<=5.e5   
+                                   & alpha  < upper_bound_alpha
+                                   & alpha  < (1.9e-7*alphaconversion)
+                                   & alpha  > lower_bound_alpha
+                                   & alpha  > (1.34e-7*alphaconversion) 
+                                   & mu_eff < upper_bound_mu_eff 
+                                   & mu_eff < (5.e3*mueffconversion)
+                                   & mu_eff > lower_bound_mu_eff ) 
 
 # view first 10 lines
+NumDataPoints = length(iterstats$iddata)
 print(head(iterstats,n=10))
 
 # print columns
 names(iterstats)
 
-## # summary stats of patient data
-## patientstats = read.table("../BrainCases.csv"  , header = FALSE, sep = ';',skip=1)
-## print(paste("num=", format(length( patientstats$V4))))
-## print(paste("avg=", format(mean(   patientstats$V4))))
-## print(paste("med=", format(median( patientstats$V4))))
-## print(paste("std=", format(sd(     patientstats$V4))))
-## print(paste("min=", format(min(    patientstats$V4))))
-## print(paste("max=", format(max(    patientstats$V4))))
-## print(summary(patientstats$V4))
-## 
-## # extract subsets
-## wholebrainlabel                         =  subset(iterstats , labeltype=='ICBM_FullBrain' & jacobian=='full' ) 
-## Cerebrum				=  subset(wholebrainlabel, LabelID==1  ) 
-## Brain_Stem                            	=  subset(wholebrainlabel, LabelID==58 ) 
-## Cerebellum                          	=  subset(wholebrainlabel, LabelID==67 ) 
-## Ventricle                              	=  subset(wholebrainlabel, LabelID==255) 
-## 
-## # rename columns
-## names(Cerebrum)[  names(Cerebrum)   == 'Mean'] <- 'Cerebrum'
-## names(Brain_Stem)[names(Brain_Stem) == 'Mean'] <- 'Brain_Stem'
-## names(Cerebellum)[names(Cerebellum) == 'Mean'] <- 'Cerebellum'
-## names(Ventricle )[names(Ventricle)  == 'Mean'] <- 'Ventricle'
-## 
-## # concatenate multiple data anatomy
-## dataqoi = cbind(Cerebrum,  Brain_Stem,Cerebellum , Ventricle )
-## qoisubset = subset(dataqoi , studytime <= 400.0  &mrn!=888    );PlotID='TimeZeroFull';
 CrossOver=1.0
-## 
-## print(paste("TE num=", format(length( dataqoi$TE))))
-## print(paste("TE avg=", format(mean(   dataqoi$TE))))
-## print(paste("TE med=", format(median( dataqoi$TE))))
-## print(paste("TE std=", format(sd(     dataqoi$TE))))
-## print(paste("TE min=", format(min(    dataqoi$TE))))
-## print(paste("TE max=", format(max(    dataqoi$TE))))
-## 
-## print(paste("TR num=", format(length( dataqoi$TR))))
-## print(paste("TR avg=", format(mean(   dataqoi$TR))))
-## print(paste("TR med=", format(median( dataqoi$TR))))
-## print(paste("TR std=", format(sd(     dataqoi$TR))))
-## print(paste("TR min=", format(min(    dataqoi$TR))))
-## print(paste("TR max=", format(max(    dataqoi$TR))))
-## 
-## # count images columns
-## counttotalimages                            =  subset(dataqoi , dirmethod =='GR' & metrictype =='CC' & LabelID==1 ) 
-## countsubsetimages                           =  subset(qoisubset , dirmethod =='GR' & metrictype =='CC' & LabelID==1 ) 
-## print(paste("total  images=", format(length( counttotalimages$Ventricle))))
-## print(paste("subset images=", format(length( countsubsetimages$Ventricle))))
-## 
-## #qoisubset = subset(dataqoi , subset = PtId!=947329  & ImageBase =='timezero'  & Jac=='projection'  );PlotID='TimeZeroProj';CrossOver=1.0
-## #qoisubset = subset(dataqoi , subset = PtId!=947329  & ImageBase =='template'  & Jac=='full'  );PlotID='TemplateFull';CrossOver=0.0
-## #qoisubset = subset(dataqoi , subset = PtId!=947329  & ImageBase =='template'  & Jac=='projection'  );PlotID='TemplateProj';CrossOver=0.0
-## 
 #color code
 colcode <- character(nrow(iterstats))
 ## colcode[] <- "black"
@@ -87,7 +62,7 @@ panel.hist <- function(x, ...)
 {
     usr <- par("usr"); on.exit(par(usr))
     par(usr = c(usr[1:2], 0, 2.5) )
-    h <- hist(x, plot = FALSE)
+    h <- hist(x, breaks=NumBreaks, plot = FALSE)
     breaks <- h$breaks; nB <- length(breaks)
     y <- h$counts; y <- y/max(y)
     rect(breaks[-nB], 0, breaks[-1], y, col='cyan', ...)
@@ -131,27 +106,58 @@ panel.linear <- function(x, y)
 }
 
 
-# plot volume change 
+# plot global summary plot
 do.legend <- FALSE
 pdf(paste(paste('datasummary',PlotID,sep=""),'.pdf',sep=""))
- pairs(~iddata+mu_eff+obj,data=iterstats,
+ #pairs(~obj+alpha+mu_eff,data=rawdata,
+ pairs(~obj+alpha+mu_eff,data=iterstats,
         diag.panel  = panel.hist, 
         lower.panel = panel.linear,
         upper.panel = panel.cor,
        )
-## scatterplotMatrix(~PtNum+Time+Lobes+White_Matter+CSF|Dir,data=dataqoi,
-##          diagonal='density',
-##          subset = PtId!=947329  & ImageBase =='timezero'  & Jac=='full' ,
-##   	 main="Three Cylinder Options")
 dev.off()
-## #      source('stats.R')
-## 
-## do.legend <- TRUE
-## pdf(paste(paste('/var/www/fuentes/CohortWholeTime',PlotID,sep=""),'.pdf',sep=""))
-## # pairs(~PtNum+age+Cerebrum+Cerebellum+Brain_Stem+CSF,data=qoisubset,
-##  pairs(~age+studytime+dose+Cerebrum+Ventricle,data=dataqoi,
-##         diag.panel  = panel.hist, 
-##         lower.panel = panel.linear,
-##         upper.panel = panel.cor,
-##        )
-## dev.off()
+
+parametersummary <- function(param, paramname,literature_value,unitdimension)
+{
+    pdf(paste(paste(paste('datasummary',paramname,sep=""),PlotID,sep=""),'.pdf',sep=""))
+    usr <- par("usr"); on.exit(par(usr))
+    par(usr = c(usr[1:2], 0, 2.5) )
+    #h <- hist(x, breaks=15, FALSE)
+    histinfo <- hist(param, freq=FALSE, breaks=NumBreaks,
+                     xlab=paste(paramname,unitdimension,sep=""), 
+                     main=paste("N = "   ,NumDataPoints,sep=""), col="cyan")
+    print("sum" )
+    print(histinfo$breaks )
+    print(histinfo$density )
+    print(sum(diff(histinfo$breaks)*histinfo$density))
+    #breaks <- h$breaks; nB <- length(breaks)
+    #y <- h$counts; y <- y/max(y)
+    #rect(breaks[-nB], 0, breaks[-1], y, col='cyan')
+    curve(dnorm(x, mean=mean(param), sd=sd(param)), add=TRUE, col="darkblue", lwd=2)
+    abline(v=literature_value,col='red',lty=2)
+    meanvalue <- mean(param)
+    localdigits <- 4
+    avgstdtxt <- paste(paste(paste("avg=" , format( meanvalue , digits = localdigits )),
+                                  " std="), format( sd(param) , digits = localdigits ))
+    minmaxtxt <- paste(paste(paste("min=",  format( min(param), digits = localdigits )),
+                                  " max="), format( max(param), digits = localdigits ))
+    text(meanvalue , mean(histinfo$density)+1*  histinfo$density[1], minmaxtxt )
+    text(meanvalue , mean(histinfo$density)+1.2*histinfo$density[1], avgstdtxt )
+    ## if (do.legend) legend(43,2.5,c("GR","S2"), col = c(1,3), pch = c(1,3), bg="white")
+    ## do.legend <<- FALSE
+    dev.off()
+  
+}
+
+# plot volume change 
+initial_alpha  = 1.38546e-07  * alphaconversion 
+initial_mu_eff = 1.80000e+02  * mueffconversion 
+initial_robin  = 0.00000e+00 
+parametersummary(iterstats$mu_eff ,'mueff',initial_mu_eff,' [1/cm]'   )
+parametersummary(iterstats$alpha  ,'alpha',initial_alpha ,' [cm^2/s x 1.e3]' )
+
+## plot(iterstats$alpha, iterstats$mu_eff, 
+##   	 xlab="alpha", ylab="mu_eff", pch=3,cex=.5,
+## abline(v=upper_bound_alpha ,h=upper_bound_mu_eff ,col='blue',lty=2)
+## abline(v=lower_bound_alpha ,h=lower_bound_mu_eff ,col='blue',lty=2)
+## abline(v=initial_alpha ,h=initial_mu_eff ,col='red',lty=2)
