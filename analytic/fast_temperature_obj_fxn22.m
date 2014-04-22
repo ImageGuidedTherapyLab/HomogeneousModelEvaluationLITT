@@ -1,7 +1,7 @@
 % This is the updated Bioheat_script that should be used with DF's DAKOTA
 % run. The metric is based on temperature (not dose and isotherms).
 
-function [metric,tmap_model_scaled_to_MRTI,MRTI_crop] = fast_temperature_obj_fxn ( inputdatavars );
+function [metric,tmap_model_scaled_to_MRTI,MRTI_crop] = fast_temperature_obj_fxn22 ( inputdatavars, index );
 % Record the working directory
 setenv ( 'PATH22' , pwd);
 path22 = getenv ( 'PATH22' );
@@ -29,14 +29,21 @@ power_log = max(power_log); % Find the maximum power value
 
 clear diff
 
+cd(patient_opt_path);
+aaa = csvimport( strcat('optpp_pds.heating.in.',num2str(index))); %read in the mu_eff from DAKOTA .in files
+bbb=strtrim(aaa{2,1});
+ccc=strread(bbb,'%s','delimiter',' ');
+ddd=strread(ccc{1,1},'%s','delimiter',' ');
+mu_eff = str2num(ddd{1,1});
+
 % Read in the CVs from inputdatavars . Some need str2num coz they were
 % written as strings.
 probe_u = str2num(inputdatavars.cv.probe_init);
 %g_anisotropy = str2num(inputdatavars.cv.gamma_healthy);
 g_anisotropy = inputdatavars.cv.anfact;
-mu_a = inputdatavars.cv.mu_a;
+%mu_a = inputdatavars.cv.mu_a;
 mu_s = inputdatavars.cv.mu_s;
-mu_eff = str2num(inputdatavars.cv.mu_eff_healthy);
+%mu_eff = str2num(inputdatavars.cv.mu_eff_healthy);
 k_cond = inputdatavars.cv.k_0;
 w_perf = inputdatavars.cv.w_0;
 x_disp = str2num(inputdatavars.cv.x_displace);
@@ -45,6 +52,9 @@ z_disp = str2num(inputdatavars.cv.z_displace);
 x_rot  = str2num(inputdatavars.cv.x_rotate);
 y_rot  = str2num(inputdatavars.cv.y_rotate);
 z_rot  = str2num(inputdatavars.cv.z_rotate);
+
+% Calculate mu_a from mu_eff
+mu_a = 0.5.*( -(1-g_anisotropy).*mu_s + sqrt( (1-g_anisotropy).*mu_s .* (1-g_anisotropy).*mu_s  + 4. .* mu_eff .* mu_eff  ./3 ) )
 
 robin_co=0; %dummy var
 
@@ -98,6 +108,7 @@ tmap_model_scaled_to_MRTI = imresize (tmap_unique , 1/scaling.x); % Set the mode
  
 
 % Change directory and load the temperature from VTK
+cd ../../../..
 cd (patient_MRTI_path);
 MRTI = readVTK_SJF('temperature', pwr_hist(ii));   % This 'vtkNumber' should b
 

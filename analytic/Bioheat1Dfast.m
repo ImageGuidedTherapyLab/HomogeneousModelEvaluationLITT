@@ -35,7 +35,7 @@ points.x=linspace(-dom.x/2,dom.x/2,dom.pointx);
 points.y=linspace(-dom.y/2,dom.y/2,dom.pointy);
 points.z=linspace(-dom.z/2,dom.z/2,dom.pointz);
 
-%Initialize tmap, t_sample, and r
+%Initialize t_sample and r
 
 t_sample=zeros(dom.pointx,dom.pointy,dom.pointz,source.n);
 r=zeros(source.n,1);
