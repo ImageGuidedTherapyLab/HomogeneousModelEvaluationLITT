@@ -37,7 +37,7 @@ for ii = 1:n_patients
     % thermal code to run
     % Sample:  'python ./brainsearch.py --param_file '
     params_iter = load( 'TmpDataInput.mat' ); % Read in one dakota.in file to find the constant parameters
-    params_iter.cv.mu_eff_heatlthy = mu_eff_opt(ii);
+    params_iter.cv.mu_eff_healthy = mu_eff_opt(ii);
 %     single_path = strcat( 'workdir/', Study_paths{ii,1}, '/', Study_paths{ii,2}, '/opt/');
 %     load ( strcat(single_path, 'VOI.mat'));
 %     mu_eff_iter = mu_eff_opt; % Make a copy of both the mu_eff values and the paths
@@ -51,7 +51,7 @@ for ii = 1:n_patients
 %     params_iter.voi(3:4) = VOI.y;
    
     % This section runs the thermal code
-    [metric, thermal_model, MRTI_crop] = fast_temperature_obj_fxn ( params_iter );
+    [metric, thermal_model, MRTI_crop] = fast_temperature_obj_fxn33 ( params_iter );
     model_deg57 = zeros( size(thermal_model,1), size(thermal_model,2) );
     MRTI_deg57 = zeros( size(MRTI_crop,1), size(MRTI_crop,2) );
     model_deg57 = thermal_model >= 57;
