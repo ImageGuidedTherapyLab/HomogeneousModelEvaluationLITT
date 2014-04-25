@@ -1,4 +1,5 @@
 % This script finds the best mu_eff for the different studies.
+tic;
 cell_data = csvimport('datasummary.txt');
 headers = cell_data(1,1:3);
 mu_eff_data = cell2mat(cell_data(2:end,:));
@@ -68,5 +69,6 @@ for ii = 1:num_studies
     mu_eff_index(ii) = find( mu_eff_data(:,1) == matching_num(ii));
     mu_eff_opt(ii) = mu_eff_data(mu_eff_index(ii),2);
 end
-
-[ H0, H1, dice_values ] = Check_ablation ( Study_paths, mu_eff_opt );
+[ total, dice_values ] = Check_ablation22 ( Study_paths, mu_eff_opt );
+%[ H0, H1, dice_values ] = Check_ablation ( Study_paths, mu_eff_opt );
+toc
