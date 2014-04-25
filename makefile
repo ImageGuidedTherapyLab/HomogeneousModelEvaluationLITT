@@ -1,4 +1,6 @@
 obj_path     = build.tmp
+MATLABROOT	:= /opt/MATLAB/R2011a/
+MCC=$(MATLABROOT)/bin/mcc
 
 #======================================================================
 ## $ mpic++ -show
@@ -18,3 +20,6 @@ BrainNek_SOURCE = /workarea/fuentes/braincode/tym1/
 
 tags:
 	ctags -R --langmap=c++:+.tpp --langmap=c++:+.occa --langmap=c++:+.cl $(BrainNek_SOURCE) .
+
+hello:  hello.m 
+	$(MCC) -m $^ -o $@
