@@ -1519,7 +1519,7 @@ elif (options.accum_history ):
   ##'./workdir/Study0054/0753/',
   ##'./workdir/Study0054/0756/',
   ##'./workdir/Study0053/0755/',
-  './workdir/Study0006/0183/',
+  ##'./workdir/Study0006/0183/',
   ]
   
   ## resultfileList = [

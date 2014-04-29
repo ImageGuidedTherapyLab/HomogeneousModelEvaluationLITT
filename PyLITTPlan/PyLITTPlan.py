@@ -40,6 +40,7 @@ class PyLITTPlan:
 
 class PyLITTPlanWidget:
   def __init__(self, parent = None):
+    self.developerMode = True # change this to true to get reload and test
     self.developerMode = False # change this to true to get reload and test
     if not parent:
       self.parent = slicer.qMRMLWidget()
@@ -55,7 +56,9 @@ class PyLITTPlanWidget:
 
   def setup(self):
     # Instantiate and connect widgets ...
-    self.ApplicatorModel = None
+    self.ApplicatorModel           = None
+    self.ApplicatorTrajectoryModel = None
+    self.DamageTemplateModel       = None
 
     # define constant parameters
     #  diffusing tip is 10. mm axial
@@ -63,8 +66,8 @@ class PyLITTPlanWidget:
     self.DiffusingTipLength = 10. #mm
     self.DiffusingTipRadius = .75 #mm
     # In canine brain and transmissible venereal tumours, up to 18.11.4mm lesions were achieved. It is concluded
-    self.AblationMinorAxis = 18.0 #mm
-    self.AblationMajorAxis = 22.0 #mm
+    self.AblationMinorAxis = 18.0/2. #mm
+    self.AblationMajorAxis = 22.0/2. #mm
     #
     # Reload and Test area
     #
@@ -260,9 +263,129 @@ class PyLITTPlanWidget:
     LaserLineTransform = vtk.vtkLandmarkTransform()
     LaserLineTransform.SetSourceLandmarks(originalOrientation)
     LaserLineTransform.SetTargetLandmarks(slicerOrientation  )
+    LaserLineTransform.SetModeToRigidBody()
     LaserLineTransform.Update()
     print LaserLineTransform.GetMatrix()
     return LaserLineTransform
+
+  def AddApplicatorModel(self,scene,LineLandmarkTransform ):
+      # check if already implemented
+      if ( self.ApplicatorModel != None ):
+        print "removing", self.ApplicatorModel.GetName()
+        scene.RemoveNode(self.ApplicatorModel)
+
+      # Define applicator tip
+      vtkCylinder = vtk.vtkCylinderSource()
+      vtkCylinder.SetHeight(self.DiffusingTipLength ); 
+      vtkCylinder.SetRadius(self.DiffusingTipRadius );
+      vtkCylinder.SetCenter(0.0, 0.0, 0.0);
+      vtkCylinder.SetResolution(16);
+
+      # transform
+      slicertransformFilter = vtk.vtkTransformFilter()
+      slicertransformFilter.SetInput(vtkCylinder.GetOutput() ) 
+      slicertransformFilter.SetTransform( LineLandmarkTransform ) 
+      slicertransformFilter.Update()
+      apppolyData=slicertransformFilter.GetOutput();
+
+      # add to scene
+      self.ApplicatorModel = slicer.vtkMRMLModelNode()
+      self.ApplicatorModel.SetScene(scene)
+      #self.ApplicatorModel.SetName(scene.GenerateUniqueName("Applicator-%s" % fiducialsNode.GetName()))
+      self.ApplicatorModel.SetName("Applicator" )
+      self.ApplicatorModel.SetAndObservePolyData(apppolyData)
+
+      # Create display node
+      modelDisplay = slicer.vtkMRMLModelDisplayNode()
+      modelDisplay.SetColor(1,0,0) # red
+      modelDisplay.SetScene(scene)
+      scene.AddNode(modelDisplay)
+      self.ApplicatorModel.SetAndObserveDisplayNodeID(modelDisplay.GetID())
+
+      # Add to scene
+      modelDisplay.SetInputPolyData(self.ApplicatorModel.GetPolyData())
+      scene.AddNode(self.ApplicatorModel)
+
+  def AddApplicatorTrajectoryModel(self,scene,LineLandmarkTransform ):
+      # check if already implemented
+      if ( self.ApplicatorTrajectoryModel != None ):
+        print "removing", self.ApplicatorTrajectoryModel.GetName()
+        scene.RemoveNode(self.ApplicatorTrajectoryModel)
+
+      # Define applicator tip
+      vtkCylinder = vtk.vtkCylinderSource()
+      vtkCylinder.SetHeight(10.*self.DiffusingTipLength); 
+      vtkCylinder.SetRadius(0.1*self.DiffusingTipRadius);
+      vtkCylinder.SetCenter(0.0,  10.*self.DiffusingTipLength/2.0, 0.0);
+      vtkCylinder.SetResolution(16);
+
+      # transform
+      slicertransformFilter = vtk.vtkTransformFilter()
+      slicertransformFilter.SetInput(vtkCylinder.GetOutput() ) 
+      slicertransformFilter.SetTransform( LineLandmarkTransform ) 
+      slicertransformFilter.Update()
+      apppolyData=slicertransformFilter.GetOutput();
+
+      # add to scene
+      self.ApplicatorTrajectoryModel = slicer.vtkMRMLModelNode()
+      self.ApplicatorTrajectoryModel.SetScene(scene)
+      #self.ApplicatorTrajectoryModel.SetName(scene.GenerateUniqueName("Applicator-%s" % fiducialsNode.GetName()))
+      self.ApplicatorTrajectoryModel.SetName("ApplicatorTrajectory" )
+      self.ApplicatorTrajectoryModel.SetAndObservePolyData(apppolyData)
+
+      # Create display node
+      modelDisplay = slicer.vtkMRMLModelDisplayNode()
+      modelDisplay.SetColor(1,0.5,0) # red
+      modelDisplay.SetScene(scene)
+      scene.AddNode(modelDisplay)
+      self.ApplicatorTrajectoryModel.SetAndObserveDisplayNodeID(modelDisplay.GetID())
+
+      # Add to scene
+      modelDisplay.SetInputPolyData(self.ApplicatorTrajectoryModel.GetPolyData())
+      scene.AddNode(self.ApplicatorTrajectoryModel)
+
+
+  def AddDamageTemplateModel(self,scene,LineLandmarkTransform ):
+      # check if already implemented
+      if ( self.DamageTemplateModel != None ):
+        print "removing", self.DamageTemplateModel.GetName()
+        scene.RemoveNode(self.DamageTemplateModel)
+      # create sphere and scale
+      vtkSphere = vtk.vtkSphereSource()
+      vtkSphere.SetRadius(1.) 
+      vtkSphere.SetThetaResolution(16)
+      vtkSphere.SetPhiResolution(16)
+      ScaleAffineTransform = vtk.vtkTransform()
+      ScaleAffineTransform.Scale([self.AblationMinorAxis,self.AblationMajorAxis,self.AblationMinorAxis])
+      vtkEllipsoid= vtk.vtkTransformFilter()
+      vtkEllipsoid.SetInput(vtkSphere.GetOutput() ) 
+      vtkEllipsoid.SetTransform( ScaleAffineTransform ) 
+      vtkEllipsoid.Update()
+
+      slicertransformFilter = vtk.vtkTransformFilter()
+      slicertransformFilter.SetInput(vtkEllipsoid.GetOutput() ) 
+      slicertransformFilter.SetTransform( LineLandmarkTransform ) 
+      slicertransformFilter.Update()
+      dampolyData=slicertransformFilter.GetOutput();
+
+      # Create model node
+      self.DamageTemplateModel = slicer.vtkMRMLModelNode()
+      self.DamageTemplateModel.SetScene(scene)
+      #self.DamageTemplateModel.SetName(scene.GenerateUniqueName("Treatment-%s" % fiducialsNode.GetName()))
+      self.DamageTemplateModel.SetName( scene.GenerateUniqueName("Treatment") )
+      self.DamageTemplateModel.SetAndObservePolyData(dampolyData)
+
+      # Create display node
+      modelDisplay = slicer.vtkMRMLModelDisplayNode()
+      modelDisplay.SetColor(1,1,0) # yellow
+      modelDisplay.SetOpacity(0.3) 
+      modelDisplay.SetScene(scene)
+      scene.AddNode(modelDisplay)
+      self.DamageTemplateModel.SetAndObserveDisplayNodeID(modelDisplay.GetID())
+
+      # Add to scene
+      modelDisplay.SetInputPolyData(self.DamageTemplateModel.GetPolyData())
+      scene.AddNode(self.DamageTemplateModel)
 
   def onReferenceButton(self):
     logic = PyLITTPlanLogic()
@@ -275,42 +398,24 @@ class PyLITTPlanWidget:
       return
     print  "Model Params:", self.PowerValueSliderWidget.value, self.AbsorptionValueSliderWidget.value 
 
-    # Define applicator tip
-    vtkCylinder = vtk.vtkCylinderSource()
-    vtkCylinder.SetHeight(self.DiffusingTipLength ); 
-    vtkCylinder.SetRadius(self.DiffusingTipRadius );
-    vtkCylinder.SetCenter(0.0, 0.0, 0.0);
-    vtkCylinder.SetResolution(16);
-
-    slicertransformFilter = vtk.vtkTransformFilter()
-    slicertransformFilter.SetInput(vtkCylinder.GetOutput() ) 
-    slicertransformFilter.SetTransform( LineLandmarkTransform ) 
-    slicertransformFilter.Update()
-    polyData=slicertransformFilter.GetOutput();
     # TODO logic.run for brainNek
     #logic.run(self.inputSelector.currentNode(), self.outputSelector.currentNode(), enableScreenshotsFlag,screenshotScaleFactor)
 
     # Create model node
     scene = slicer.mrmlScene
-    if ( self.ApplicatorModel != None ):
-      print "removing", self.ApplicatorModel.GetName()
-      scene.RemoveNode(self.ApplicatorModel)
-    self.ApplicatorModel = slicer.vtkMRMLModelNode()
-    self.ApplicatorModel.SetScene(scene)
-    #self.ApplicatorModel.SetName(scene.GenerateUniqueName("Applicator-%s" % fiducialsNode.GetName()))
-    self.ApplicatorModel.SetName("Applicator" )
-    self.ApplicatorModel.SetAndObservePolyData(polyData)
 
-    # Create display node
-    modelDisplay = slicer.vtkMRMLModelDisplayNode()
-    modelDisplay.SetColor(1,0,0) # red
-    modelDisplay.SetScene(scene)
-    scene.AddNode(modelDisplay)
-    self.ApplicatorModel.SetAndObserveDisplayNodeID(modelDisplay.GetID())
+    # display applicator tip
+    DisplayApplicatorTipOnLocate = False
+    DisplayApplicatorTipOnLocate = True
+    if (DisplayApplicatorTipOnLocate):
+      self.AddApplicatorModel(scene,LineLandmarkTransform )
+      self.AddApplicatorTrajectoryModel(scene,LineLandmarkTransform )
 
-    # Add to scene
-    modelDisplay.SetInputPolyData(self.ApplicatorModel.GetPolyData())
-    scene.AddNode(self.ApplicatorModel)
+    # display applicator tip
+    DisplayDamageTemplateOnLocate = False
+    DisplayDamageTemplateOnLocate = True
+    if (DisplayDamageTemplateOnLocate ):
+      self.AddDamageTemplateModel(scene,LineLandmarkTransform )
 
   def onApplyButton(self):
     logic = PyLITTPlanLogic()
@@ -323,26 +428,6 @@ class PyLITTPlanWidget:
       return
     print  "Model Params:", self.PowerValueSliderWidget.value, self.AbsorptionValueSliderWidget.value 
 
-    # use ellipsoid for testing
-    # create sphere and scale
-    vtkSphere = vtk.vtkSphereSource()
-    vtkSphere.SetRadius(1.) 
-    vtkSphere.SetThetaResolution(16)
-    vtkSphere.SetPhiResolution(16)
-    ScaleAffineTransform = vtk.vtkTransform()
-    ScaleAffineTransform.Scale([self.AblationMinorAxis,self.AblationMajorAxis,self.AblationMinorAxis])
-    vtkEllipsoid= vtk.vtkTransformFilter()
-    vtkEllipsoid.SetInput(vtkSphere.GetOutput() ) 
-    vtkEllipsoid.SetTransform( ScaleAffineTransform ) 
-    vtkEllipsoid.Update()
-
-    slicertransformFilter = vtk.vtkTransformFilter()
-    slicertransformFilter.SetInput(vtkEllipsoid.GetOutput() ) 
-    slicertransformFilter.SetTransform( LineLandmarkTransform ) 
-    slicertransformFilter.Update()
-    polyData=slicertransformFilter.GetOutput();
-
-
     # display ellipse if solver not available
     GPUSolverAvailable = True
     GPUSolverAvailable = False
@@ -351,25 +436,6 @@ class PyLITTPlanWidget:
       #logic.run(self.inputSelector.currentNode(), self.outputSelector.currentNode(), enableScreenshotsFlag,screenshotScaleFactor)
       x = slicer.util.loadModel("/Users/fuentes/fem.stl",True)
       print x[1].GetName() 
-    else:
-      # Create model node
-      scene = slicer.mrmlScene
-      TreatmentModel = slicer.vtkMRMLModelNode()
-      TreatmentModel.SetScene(scene)
-      #TreatmentModel.SetName(scene.GenerateUniqueName("Treatment-%s" % fiducialsNode.GetName()))
-      TreatmentModel.SetName( scene.GenerateUniqueName("Treatment") )
-      TreatmentModel.SetAndObservePolyData(polyData)
-
-      # Create display node
-      modelDisplay = slicer.vtkMRMLModelDisplayNode()
-      modelDisplay.SetColor(1,1,0) # yellow
-      modelDisplay.SetScene(scene)
-      scene.AddNode(modelDisplay)
-      TreatmentModel.SetAndObserveDisplayNodeID(modelDisplay.GetID())
-
-      # Add to scene
-      modelDisplay.SetInputPolyData(TreatmentModel.GetPolyData())
-      scene.AddNode(TreatmentModel)
 
   def onReload(self,moduleName="PyLITTPlan"):
     """Generic reload method for any scripted module.
