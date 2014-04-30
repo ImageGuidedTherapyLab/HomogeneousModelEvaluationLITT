@@ -59,6 +59,8 @@ class PyLITTPlanWidget:
     self.ApplicatorModel           = None
     self.ApplicatorTrajectoryModel = None
     self.DamageTemplateModel       = None
+    self.SourceLandmarkFileName    = "./SourceLandmarks.vtk"
+    self.TargetLandmarkFileName    = "./TargetLandmarks.vtk"
 
     # define constant parameters
     #  diffusing tip is 10. mm axial
@@ -225,6 +227,27 @@ class PyLITTPlanWidget:
     #self.applyButton.enabled = self.inputFiducialsNodeSelector.currentNode() and self.outputSelector.currentNode()
     self.applyButton.enabled = self.inputFiducialsNodeSelector.currentNode() 
     self.referenceButton.enabled = self.applyButton.enabled 
+
+  # write vtk points file
+  def WriteVTKPoints(self,vtkpoints,OutputFileName):
+     # loop over points an store in vtk data structure
+     #vtkpoints = vtk.vtkPoints()
+     vertices= vtk.vtkCellArray()
+     for idpoint in range(vtkpoints.GetNumberOfPoints()):
+         #vertices.InsertNextCell( 1 ); vertices.InsertCellPoint( vtkpoints.InsertNextPoint(point) )
+         vertices.InsertNextCell( 1 ); vertices.InsertCellPoint( idpoint )
+  
+     # set polydata
+     polydata = vtk.vtkPolyData()
+     polydata.SetPoints(vtkpoints)
+     polydata.SetVerts( vertices )
+  
+     # write to file
+     print "WriteVTKPoints: writing",OutputFileName
+     polydatawriter = vtk.vtkDataSetWriter()
+     polydatawriter.SetFileName(OutputFileName)
+     polydatawriter.SetInput(polydata)
+     polydatawriter.Update()
 
   def GetDiffusingLaserTransform(self):
     fiducialsNode = self.inputFiducialsNodeSelector.currentNode();
@@ -429,13 +452,15 @@ class PyLITTPlanWidget:
     print  "Model Params:", self.PowerValueSliderWidget.value, self.AbsorptionValueSliderWidget.value 
 
     # display ellipse if solver not available
-    GPUSolverAvailable = True
     GPUSolverAvailable = False
+    GPUSolverAvailable = True
     if ( GPUSolverAvailable ) :
       # TODO logic.run for brainNek
       #logic.run(self.inputSelector.currentNode(), self.outputSelector.currentNode(), enableScreenshotsFlag,screenshotScaleFactor)
-      x = slicer.util.loadModel("/Users/fuentes/fem.stl",True)
-      print x[1].GetName() 
+      self.WriteVTKPoints(LineLandmarkTransform.GetSourceLandmarks(),self.SourceLandmarkFileName )
+      self.WriteVTKPoints(LineLandmarkTransform.GetTargetLandmarks(),self.TargetLandmarkFileName )
+      #x = slicer.util.loadModel("/Users/fuentes/fem.stl",True)
+      #print x[1].GetName() 
 
   def onReload(self,moduleName="PyLITTPlan"):
     """Generic reload method for any scripted module.

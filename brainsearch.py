@@ -1616,8 +1616,8 @@ elif (options.config_ini != None):
   # time stamp
   import time
   timeStamp =0 
-  while(True):
-    if(os.path.getmtime(fem_params['ini_filename']) > timeStamp):
+  #while(True):
+  if(os.path.getmtime(fem_params['ini_filename']) > timeStamp):
       timeStamp = os.path.getmtime(fem_params['ini_filename'] ) 
       # set tissue lookup tables
       k_0Table  = {"default":config.getfloat("thermal_conductivity","k_0_healthy")  ,
@@ -1686,19 +1686,19 @@ elif (options.config_ini != None):
       
       # write objective function 
       objfunction = ForwardSolve(**fem_params)
-    else:
-      print "waiting on user input.."
-      # echo lookup table
-      print "lookup tables"
-      #print "labeled %d voxels" % len(imageLabel)
-      print "labels"      , labelTable
-      print "counts"      , labelCount
-      print "conductivity", k_0Table  
-      print "perfusion"   , w_0Table  
-      print "absorption"  , mu_aTable  
-      print "scattering"  , mu_sTable  
-      print "anfact"      , anfactTable  
-      time.sleep(2)
+   # else:
+   #   print "waiting on user input.."
+   #   # echo lookup table
+   #   print "lookup tables"
+   #   #print "labeled %d voxels" % len(imageLabel)
+   #   print "labels"      , labelTable
+   #   print "counts"      , labelCount
+   #   print "conductivity", k_0Table  
+   #   print "perfusion"   , w_0Table  
+   #   print "absorption"  , mu_aTable  
+   #   print "scattering"  , mu_sTable  
+   #   print "anfact"      , anfactTable  
+   #   time.sleep(2)
 else:
   parser.print_help()
   print options
