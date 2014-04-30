@@ -272,8 +272,7 @@ caseFileTemplate = \
 
 # first row is center of probe, second row specifies direction
 [PROBE POSITION]
-0 0 0
-0 0 1
+./TargetLandmarks.vtk
 
 [LASER MAXIMUM POWER]
 15
@@ -325,7 +324,7 @@ probeSurface
 [BRAIN TYPES - DIRICHLET (BODY TEMPERATURE)]
 
 [BRAIN MATERIAL DATA FILE]
-./material_data.setup
+%s
 
 [BRAIN MATERIAL PROPERTIES FILE]
 %s/material_types.%04d.setup
@@ -591,22 +590,6 @@ def ForwardSolve(**kwargs):
   # reshape for convenience
   bNekNodes        = bNekNodes.reshape(      numPoints , 3)
 
-  ## # setup elements
-  ## bNekConnectivityreshape = bNekConnectivity.reshape(numElems , numHexPts +1)
-  ## for ielem in range(numElems ):
-  ##   aHexahedron = vtk.vtkHexahedron()
-  ##   # print 'number of nodes %d ' % bNekConnectivityreshape[ielem][0]
-  ##   aHexahedron.GetPointIds().SetId(0,bNekConnectivityreshape[ielem][1])
-  ##   aHexahedron.GetPointIds().SetId(1,bNekConnectivityreshape[ielem][2])
-  ##   aHexahedron.GetPointIds().SetId(2,bNekConnectivityreshape[ielem][3])
-  ##   aHexahedron.GetPointIds().SetId(3,bNekConnectivityreshape[ielem][4])
-  ##   aHexahedron.GetPointIds().SetId(4,bNekConnectivityreshape[ielem][5])
-  ##   aHexahedron.GetPointIds().SetId(5,bNekConnectivityreshape[ielem][6])
-  ##   aHexahedron.GetPointIds().SetId(6,bNekConnectivityreshape[ielem][7])
-  ##   aHexahedron.GetPointIds().SetId(7,bNekConnectivityreshape[ielem][8])
-  ##   hexahedronGrid.InsertNextCell(aHexahedron.GetCellType(),
-  ##                                 aHexahedron.GetPointIds())
-
   # TODO : check if deepcopy needed
   DeepCopy = 1
 
@@ -644,16 +627,17 @@ def ForwardSolve(**kwargs):
   # get registration parameters
   variableDictionary = kwargs['cv']
 
-  ## vtkSEMReader = vtk.vtkXMLUnstructuredGridReader()
-  ## SEMDataDirectory = outputDirectory % kwargs['UID']
-  ## SEMtimeID = 0 
-  ## vtufileName = "%s/%d.vtu" % (SEMDataDirectory,SEMtimeID)
-  ## print "reading ", vtufileName 
-  ## vtkSEMReader.SetFileName( vtufileName )
-  ## vtkSEMReader.SetPointArrayStatus("Temperature",1)
-  ## vtkSEMReader.Update()
-  ## fem_point_data= vtkSEMReader.GetOutput().GetPointData() 
-  ## tmparray = vtkNumPy.vtk_to_numpy(fem_point_data.GetArray('Temperature')) 
+  if ( DebugObjective ):
+     vtkSEMReader = vtk.vtkXMLUnstructuredGridReader()
+     SEMDataDirectory = outputDirectory % kwargs['UID']
+     SEMtimeID = 0 
+     vtufileName = "%s/%d.vtu" % (SEMDataDirectory,SEMtimeID)
+     print "reading ", vtufileName 
+     vtkSEMReader.SetFileName( vtufileName )
+     vtkSEMReader.SetPointArrayStatus("Temperature",1)
+     vtkSEMReader.Update()
+     fem_point_data= vtkSEMReader.GetOutput().GetPointData() 
+     tmparray = vtkNumPy.vtk_to_numpy(fem_point_data.GetArray('Temperature')) 
 
   # loop over time steps
   tstep = 0
@@ -666,16 +650,11 @@ def ForwardSolve(**kwargs):
   # setup screen shot interval 
   screenshotNum = 1;
   screenshotTol = 1e-10;
-  screenshotInterval = MRTIInterval ;
 
   ## loop over time
   while( brainNek.timeStep(tstep * brainNek.dt() ) ) :
     tstep = tstep + 1
     currentTime = tstep * brainNek.dt()
-    ## if(currentTime+screenshotTol >= screenshotNum*screenshotInterval):
-    ##    brainNek.getHostTemperature( bNekSoln )
-    ##    screenshotNum = screenshotNum + 1;
-    ##    print "get host data",bNekSoln 
 
     if(currentTime+screenshotTol >= MRTItimeID * MRTIInterval):
       
@@ -708,33 +687,6 @@ def ForwardSolve(**kwargs):
       # update counter
       MRTItimeID = MRTItimeID + 1;
 
-  # template laser tip        at coordinate (0,0,0.  ) meter
-  # template laser distal end at coordinate (0,0,0.03) meter
-  originalLength = 0.03
-  originalOrientation = vtk.vtkPoints()
-  originalOrientation.SetNumberOfPoints(2)
-  originalOrientation.SetPoint(0,0.,0.,0.  )
-  originalOrientation.SetPoint(1,0.,0.,originalLength)
-
-
-  # get updated laser coordinates
-  newIni = ConfigParser.SafeConfigParser({})
-  newIni.read(fem_params['ini_filename'])
-  slicerOrientation   = vtk.vtkPoints()
-  slicerOrientation.SetNumberOfPoints(2)
-  # TODO Verify correct orientation info
-  pointentry = numpy.array((newIni.getfloat('probe','x_0'),newIni.getfloat('probe','y_0'),newIni.getfloat('probe','z_0')))
-  pointtip   = numpy.array((newIni.getfloat('probe','x_1'),newIni.getfloat('probe','y_1'),newIni.getfloat('probe','z_1')))
-  slicerLength   = numpy.linalg.norm( pointentry - pointtip)
-  unitdirection  = 1./slicerLength * (pointentry - pointtip) 
-  pointscaled = pointentry  + originalLength * unitdirection
-  slicerOrientation.SetPoint(0,pointtip[   0],pointtip[   1],pointtip[   2] )
-  slicerOrientation.SetPoint(1,pointscaled[0],pointscaled[1],pointscaled[2] )
-
-  LaserLineTransform = vtk.vtkLandmarkTransform()
-  LaserLineTransform.SetSourceLandmarks(originalOrientation)
-  LaserLineTransform.SetTargetLandmarks(slicerOrientation  )
-
   # scale to millimeter for vis
   ScaleAffineTransform = vtk.vtkTransform()
   ScaleAffineTransform.Translate([ 0.0,0.0,0.0])
@@ -743,18 +695,8 @@ def ForwardSolve(**kwargs):
   ScaleAffineTransform.RotateX( 0.0  )
   ScaleAffineTransform.Scale([1000.,1000.,1000.])
 
-  FixmeHackSEMRegister = vtk.vtkTransformFilter()
-  FixmeHackSEMRegister.SetInput( hexahedronGrid )
-  FixmeHackSEMRegister.SetTransform(FIXMEHackTransform)
-  FixmeHackSEMRegister.Update()
-
-  slicertransformFilter = vtk.vtkTransformFilter()
-  slicertransformFilter.SetInput(FixmeHackSEMRegister.GetOutput() ) 
-  slicertransformFilter.SetTransform( LaserLineTransform ) 
-  slicertransformFilter.Update()
-
   scaletransformFilter = vtk.vtkTransformFilter()
-  scaletransformFilter.SetInput( slicertransformFilter.GetOutput() ) 
+  scaletransformFilter.SetInput( hexahedronGrid ) 
   scaletransformFilter.SetTransform(ScaleAffineTransform ) 
   scaletransformFilter.Update()
 
@@ -1190,14 +1132,15 @@ def brainNekWrapper(**kwargs):
   fileHandle = file(outputMaterialFile   ,'w')
   fileHandle.write('[MATERIAL PROPERTIES]\n'  )
   fileHandle.write('# Name,      Type index, Density, Specific Heat, Conductivity, Perfusion, Absorption, Scattering, Anisotropy\n'  )
-  fileHandle.write('Brain     0           %12.5f     %12.5f           %12.5f        %12.5f     %12.5f      %12.5f      %12.5f \n' % ( rho, c_p, k_0, w_0, mu_a, mu_s, anfact )
- )
+  fileHandle.write('Brain     0           %12.5f     %12.5f           %12.5f        %12.5f     %12.5f      %12.5f      %12.5f \n' % ( rho, c_p, k_0, w_0, mu_a, mu_s, anfact ))
+  fileHandle.write('Tumor     1           %12.5f     %12.5f           %12.5f        %12.5f     %12.5f      %12.5f      %12.5f \n' % ( rho, c_p, k_0, w_0, mu_a, mu_s, anfact ))
+  fileHandle.write('CSF      25           %12.5f     %12.5f           %12.5f        %12.5f     %12.5f      %12.5f      %12.5f \n' % ( rho, c_p, 10.* k_0, w_0, mu_a, mu_s, anfact ))
   fileHandle.flush(); fileHandle.close()
 
   # case file
   outputCaseFile = '%s/case.%04d.setup' % (workDirectory,kwargs['fileID'])
   print 'writing', outputCaseFile 
-  with file(outputCaseFile , 'w') as fileHandle: fileHandle.write(caseFileTemplate % (workDirectory,kwargs['fileID'],variableDictionary['body_temp'],variableDictionary['body_temp'],variableDictionary['probe_init'],variableDictionary['c_blood'],workDirectory,kwargs['fileID'])  )
+  with file(outputCaseFile , 'w') as fileHandle: fileHandle.write(caseFileTemplate % (workDirectory,kwargs['fileID'],variableDictionary['body_temp'],variableDictionary['body_temp'],variableDictionary['probe_init'],variableDictionary['c_blood'],kwargs['segment_file'],workDirectory,kwargs['fileID'])  )
 
   ## # build command to run brainNek
   ## brainNekCommand = "%s/main %s -heattransfercoefficient %s -coolanttemperature  %s > %s/run.%04d.log 2>&1 " % (brainNekDIR , outputSetupRCFile ,variableDictionary['robin_coeff'  ], variableDictionary['probe_init'   ], workDirectory ,kwargs['fileID'])
@@ -1596,109 +1539,121 @@ elif (options.config_ini != None):
   
   fem_params = {}
   fem_params['powerHistory']  = [[1,10],[0.0,config.getfloat('timestep','power')]]
-  timePowerList = fem_params['powerHistory']  
   fem_params['deltat']        =  5.0
   fem_params['ntime']         =  fem_params['powerHistory'][0][-1]
   fem_params['finaltime']     =  fem_params['deltat']  * fem_params['ntime']
   fem_params['UID']           =  0000
-  # build ccode of power history
-  ccode = ''
-  controlstatement = 'if'
-  for iBound,powervalue in zip(timePowerList[0],timePowerList[1]):
-      ccode = ccode + '\t%s( time< %f  ) return %f;' % ( controlstatement,iBound*fem_params['deltat'],powervalue )
-      controlstatement = 'else if'
-  fem_params['ccode']         =  ccode
   fem_params['fileID']        = 0
+  fem_params['segment_file']  = config.get('exec','segment_file')
   # store the entire configuration file for convienence
   fem_params['config_parser'] = config
-  fem_params['ini_filename'] = options.config_ini
+  
+  # write initial slicer.ini
+  SlicerIniFilename = "./slicer.ini"
+  initialconfig = ConfigParser.SafeConfigParser({})
+  initialconfig.add_section("timestep")
+  initialconfig.set("timestep","power",config.get('timestep','power'))
+  with open(SlicerIniFilename , 'w') as configfile:
+    initialconfig.write(configfile)
+  
 
   # time stamp
   import time
   timeStamp =0 
-  #while(True):
-  if(os.path.getmtime(fem_params['ini_filename']) > timeStamp):
-      timeStamp = os.path.getmtime(fem_params['ini_filename'] ) 
-      # set tissue lookup tables
-      k_0Table  = {"default":config.getfloat("thermal_conductivity","k_0_healthy")  ,
-                   "vessel" :config.getfloat("thermal_conductivity","k_0_healthy")  ,
-                   "grey"   :config.getfloat("thermal_conductivity","k_0_grey"   )  ,
-                   "white"  :config.getfloat("thermal_conductivity","k_0_white"  )  ,
-                   "csf"    :config.getfloat("thermal_conductivity","k_0_csf"    )  ,
-                   "tumor"  :config.getfloat("thermal_conductivity","k_0_tumor"  )  }
-      w_0Table  = {"default":config.getfloat("perfusion","w_0_healthy")  ,
-                   "vessel" :config.getfloat("perfusion","w_0_healthy")  ,
-                   "grey"   :config.getfloat("perfusion","w_0_grey"   )  ,
-                   "white"  :config.getfloat("perfusion","w_0_white"  )  ,
-                   "csf"    :config.getfloat("perfusion","w_0_csf"    )  ,
-                   "tumor"  :config.getfloat("perfusion","w_0_tumor"  )  }
-      mu_aTable = {"default":config.getfloat("optical","mu_a_healthy")  ,
-                   "vessel" :config.getfloat("optical","mu_a_healthy")  ,
-                   "grey"   :config.getfloat("optical","mu_a_grey"   )  ,
-                   "white"  :config.getfloat("optical","mu_a_white"  )  ,
-                   "csf"    :config.getfloat("optical","mu_a_csf"    )  ,
-                   "tumor"  :config.getfloat("optical","mu_a_tumor"  )  }
-      mu_sTable = {"default":config.getfloat("optical","mu_s_healthy")  ,
-                   "vessel" :config.getfloat("optical","mu_s_healthy")  ,
-                   "grey"   :config.getfloat("optical","mu_s_grey"   )  ,
-                   "white"  :config.getfloat("optical","mu_s_white"  )  ,
-                   "csf"    :config.getfloat("optical","mu_s_csf"    )  ,
-                   "tumor"  :config.getfloat("optical","mu_s_tumor"  )  }
-      anfactTable={"default":config.getfloat("optical","anfact_healthy")  ,
-                   "vessel" :config.getfloat("optical","anfact_healthy")  ,
-                   "grey"   :config.getfloat("optical","anfact_grey"   )  ,
-                   "white"  :config.getfloat("optical","anfact_white"  )  ,
-                   "csf"    :config.getfloat("optical","anfact_csf"    )  ,
-                   "tumor"  :config.getfloat("optical","anfact_tumor"  )  }
-      labelTable= {config.get("labels","greymatter" ):"grey" , 
-                   config.get("labels","whitematter"):"white", 
-                   config.get("labels","csf"        ):"csf"  , 
-                   config.get("labels","tumor"      ):"tumor", 
-                   config.get("labels","vessel"     ):"vessel"}
-      labelCount= {"default":0,
-                   "grey"   :0, 
-                   "white"  :0, 
-                   "csf"    :0, 
-                   "tumor"  :0, 
-                   "vessel" :0}
-      # store constitutive data
-      continuous_vars  = {}
-      continuous_vars['rho'    ]   =  1045.
-      continuous_vars['c_p'    ]   =  3640.
-      continuous_vars['c_blood']   =  3840.
-      continuous_vars['k_0'    ]   =  k_0Table["default"]
-      continuous_vars['w_0'    ]   =  w_0Table["default"]
-      continuous_vars['mu_a'   ]   =  mu_aTable["default"] 
-      continuous_vars['mu_s'   ]   =  mu_sTable["default"]
-      continuous_vars['anfact' ]   =  anfactTable["default"]
-      continuous_vars['body_temp'] = config.getfloat("initial_condition","u_init"  ) 
-      continuous_vars['probe_init'] = 21.0
-      continuous_vars['x_displace'] = 0.0
-      continuous_vars['y_displace'] = 0.0
-      continuous_vars['z_displace'] = 0.0
-      continuous_vars['x_rotate']   = 0.0
-      continuous_vars['y_rotate']   = 0.0
-      continuous_vars['z_rotate']   = 0.0
-      fem_params['cv']         = continuous_vars
-      # execute 
-      print "Running BrainNek..."
-      brainNekWrapper(**fem_params)
-      
-      # write objective function 
-      objfunction = ForwardSolve(**fem_params)
-   # else:
-   #   print "waiting on user input.."
-   #   # echo lookup table
-   #   print "lookup tables"
-   #   #print "labeled %d voxels" % len(imageLabel)
-   #   print "labels"      , labelTable
-   #   print "counts"      , labelCount
-   #   print "conductivity", k_0Table  
-   #   print "perfusion"   , w_0Table  
-   #   print "absorption"  , mu_aTable  
-   #   print "scattering"  , mu_sTable  
-   #   print "anfact"      , anfactTable  
-   #   time.sleep(2)
+  while(True):
+    if(os.path.getmtime( SlicerIniFilename ) > timeStamp):
+        timeStamp = os.path.getmtime(SlicerIniFilename ) 
+        slicerconfig = ConfigParser.SafeConfigParser({})
+        slicerconfig.read( SlicerIniFilename )
+        fem_params['powerHistory']  = [[1,10],[0.0,slicerconfig.getfloat('timestep','power')]]
+        timePowerList = fem_params['powerHistory']  
+        # build ccode of power history
+        ccode = ''
+        controlstatement = 'if'
+        for iBound,powervalue in zip(timePowerList[0],timePowerList[1]):
+            ccode = ccode + '\t%s( time< %f  ) return %f;' % ( controlstatement,iBound*fem_params['deltat'],powervalue )
+            controlstatement = 'else if'
+        fem_params['ccode']         =  ccode
+        # set tissue lookup tables
+        k_0Table  = {"default":config.getfloat("thermal_conductivity","k_0_healthy")  ,
+                     "vessel" :config.getfloat("thermal_conductivity","k_0_healthy")  ,
+                     "grey"   :config.getfloat("thermal_conductivity","k_0_grey"   )  ,
+                     "white"  :config.getfloat("thermal_conductivity","k_0_white"  )  ,
+                     "csf"    :config.getfloat("thermal_conductivity","k_0_csf"    )  ,
+                     "tumor"  :config.getfloat("thermal_conductivity","k_0_tumor"  )  }
+        w_0Table  = {"default":config.getfloat("perfusion","w_0_healthy")  ,
+                     "vessel" :config.getfloat("perfusion","w_0_healthy")  ,
+                     "grey"   :config.getfloat("perfusion","w_0_grey"   )  ,
+                     "white"  :config.getfloat("perfusion","w_0_white"  )  ,
+                     "csf"    :config.getfloat("perfusion","w_0_csf"    )  ,
+                     "tumor"  :config.getfloat("perfusion","w_0_tumor"  )  }
+        mu_aTable = {"default":config.getfloat("optical","mu_a_healthy")  ,
+                     "vessel" :config.getfloat("optical","mu_a_healthy")  ,
+                     "grey"   :config.getfloat("optical","mu_a_grey"   )  ,
+                     "white"  :config.getfloat("optical","mu_a_white"  )  ,
+                     "csf"    :config.getfloat("optical","mu_a_csf"    )  ,
+                     "tumor"  :config.getfloat("optical","mu_a_tumor"  )  }
+        mu_sTable = {"default":config.getfloat("optical","mu_s_healthy")  ,
+                     "vessel" :config.getfloat("optical","mu_s_healthy")  ,
+                     "grey"   :config.getfloat("optical","mu_s_grey"   )  ,
+                     "white"  :config.getfloat("optical","mu_s_white"  )  ,
+                     "csf"    :config.getfloat("optical","mu_s_csf"    )  ,
+                     "tumor"  :config.getfloat("optical","mu_s_tumor"  )  }
+        anfactTable={"default":config.getfloat("optical","anfact_healthy")  ,
+                     "vessel" :config.getfloat("optical","anfact_healthy")  ,
+                     "grey"   :config.getfloat("optical","anfact_grey"   )  ,
+                     "white"  :config.getfloat("optical","anfact_white"  )  ,
+                     "csf"    :config.getfloat("optical","anfact_csf"    )  ,
+                     "tumor"  :config.getfloat("optical","anfact_tumor"  )  }
+        labelTable= {config.get("labels","greymatter" ):"grey" , 
+                     config.get("labels","whitematter"):"white", 
+                     config.get("labels","csf"        ):"csf"  , 
+                     config.get("labels","tumor"      ):"tumor", 
+                     config.get("labels","vessel"     ):"vessel"}
+        labelCount= {"default":0,
+                     "grey"   :0, 
+                     "white"  :0, 
+                     "csf"    :0, 
+                     "tumor"  :0, 
+                     "vessel" :0}
+        # store constitutive data
+        continuous_vars  = {}
+        continuous_vars['rho'    ]   =  1045.
+        continuous_vars['c_p'    ]   =  3640.
+        continuous_vars['c_blood']   =  3840.
+        continuous_vars['k_0'    ]   =  k_0Table["default"]
+        continuous_vars['w_0'    ]   =  w_0Table["default"]
+        continuous_vars['mu_a'   ]   =  mu_aTable["default"] 
+        continuous_vars['mu_s'   ]   =  mu_sTable["default"]
+        continuous_vars['anfact' ]   =  anfactTable["default"]
+        continuous_vars['body_temp'] = config.getfloat("initial_condition","u_init"  ) 
+        continuous_vars['probe_init'] = 21.0
+        continuous_vars['x_displace'] = 0.0
+        continuous_vars['y_displace'] = 0.0
+        continuous_vars['z_displace'] = 0.0
+        continuous_vars['x_rotate']   = 0.0
+        continuous_vars['y_rotate']   = 0.0
+        continuous_vars['z_rotate']   = 0.0
+        fem_params['cv']         = continuous_vars
+        # execute 
+        print "Running BrainNek..."
+        brainNekWrapper(**fem_params)
+        
+        # write objective function 
+        objfunction = ForwardSolve(**fem_params)
+    else:
+      print "waiting on user input..",SlicerIniFilename 
+      # echo lookup table
+      print "lookup tables"
+      #print "labeled %d voxels" % len(imageLabel)
+      print "labels"      , labelTable
+      print "counts"      , labelCount
+      print "conductivity", k_0Table  
+      print "perfusion"   , w_0Table  
+      print "absorption"  , mu_aTable  
+      print "scattering"  , mu_sTable  
+      print "anfact"      , anfactTable  
+      time.sleep(2)
 else:
   parser.print_help()
   print options

@@ -95,7 +95,7 @@ cdef class PyBrain3d:
         self.thisptr.GetElements(&elementarray[0])
     def PrintSelf(self):
         """
-        print class infor
+        print class info
         """
         self.thisptr.PrintSelf()
 

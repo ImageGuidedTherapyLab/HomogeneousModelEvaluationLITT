@@ -1,6 +1,8 @@
 import os
 import unittest
 import numpy
+import ConfigParser
+import time
 from __main__ import vtk, qt, ctk, slicer
 
 #
@@ -59,6 +61,7 @@ class PyLITTPlanWidget:
     self.ApplicatorModel           = None
     self.ApplicatorTrajectoryModel = None
     self.DamageTemplateModel       = None
+    self.SolverDamageModel         = None
     self.SourceLandmarkFileName    = "./SourceLandmarks.vtk"
     self.TargetLandmarkFileName    = "./TargetLandmarks.vtk"
 
@@ -231,15 +234,18 @@ class PyLITTPlanWidget:
   # write vtk points file
   def WriteVTKPoints(self,vtkpoints,OutputFileName):
      # loop over points an store in vtk data structure
-     #vtkpoints = vtk.vtkPoints()
+     # write in meters
+     MillimeterMeterConversion = .001;
+     scalevtkPoints = vtk.vtkPoints()
      vertices= vtk.vtkCellArray()
      for idpoint in range(vtkpoints.GetNumberOfPoints()):
-         #vertices.InsertNextCell( 1 ); vertices.InsertCellPoint( vtkpoints.InsertNextPoint(point) )
-         vertices.InsertNextCell( 1 ); vertices.InsertCellPoint( idpoint )
+         point = MillimeterMeterConversion * numpy.array(vtkpoints.GetPoint(idpoint))
+         vertices.InsertNextCell( 1 ); vertices.InsertCellPoint( scalevtkPoints.InsertNextPoint(point) )
+         #vertices.InsertNextCell( 1 ); vertices.InsertCellPoint( idpoint )
   
      # set polydata
      polydata = vtk.vtkPolyData()
-     polydata.SetPoints(vtkpoints)
+     polydata.SetPoints(scalevtkPoints )
      polydata.SetVerts( vertices )
   
      # write to file
@@ -424,7 +430,7 @@ class PyLITTPlanWidget:
     # TODO logic.run for brainNek
     #logic.run(self.inputSelector.currentNode(), self.outputSelector.currentNode(), enableScreenshotsFlag,screenshotScaleFactor)
 
-    # Create model node
+    # get slicer scene
     scene = slicer.mrmlScene
 
     # display applicator tip
@@ -451,6 +457,9 @@ class PyLITTPlanWidget:
       return
     print  "Model Params:", self.PowerValueSliderWidget.value, self.AbsorptionValueSliderWidget.value 
 
+    # get slicer scene
+    scene = slicer.mrmlScene
+
     # display ellipse if solver not available
     GPUSolverAvailable = False
     GPUSolverAvailable = True
@@ -459,8 +468,24 @@ class PyLITTPlanWidget:
       #logic.run(self.inputSelector.currentNode(), self.outputSelector.currentNode(), enableScreenshotsFlag,screenshotScaleFactor)
       self.WriteVTKPoints(LineLandmarkTransform.GetSourceLandmarks(),self.SourceLandmarkFileName )
       self.WriteVTKPoints(LineLandmarkTransform.GetTargetLandmarks(),self.TargetLandmarkFileName )
-      #x = slicer.util.loadModel("/Users/fuentes/fem.stl",True)
-      #print x[1].GetName() 
+      SlicerIniFilename = "./slicer.ini"
+      initialconfig = ConfigParser.SafeConfigParser({})
+      initialconfig.add_section("timestep")
+      initialconfig.set("timestep","power","%s" % self.PowerValueSliderWidget.value)
+      with open(SlicerIniFilename , 'w') as configfile:
+        initialconfig.write(configfile)
+      timeStamp = time.time()
+      WaitForSolver = True
+      while(WaitForSolver ):
+        if( os.path.getmtime( "./fem.finish" ) > timeStamp):
+          if ( self.SolverDamageModel !=  None):
+             print "removing", self.SolverDamageModel.GetName()
+             scene.RemoveNode(self.SolverDamageModel)
+          self.SolverDamageModel = slicer.util.loadModel("./fem.stl",True)[1]
+          WaitForSolver  = False
+        else:
+          print "waiting on solver time ..",os.path.getmtime( "./fem.finish" ) , timeStamp,time.time()
+          time.sleep(1)
 
   def onReload(self,moduleName="PyLITTPlan"):
     """Generic reload method for any scripted module.
