@@ -627,17 +627,17 @@ def ForwardSolve(**kwargs):
   # get registration parameters
   variableDictionary = kwargs['cv']
 
-  if ( DebugObjective ):
-     vtkSEMReader = vtk.vtkXMLUnstructuredGridReader()
-     SEMDataDirectory = outputDirectory % kwargs['UID']
-     SEMtimeID = 0 
-     vtufileName = "%s/%d.vtu" % (SEMDataDirectory,SEMtimeID)
-     print "reading ", vtufileName 
-     vtkSEMReader.SetFileName( vtufileName )
-     vtkSEMReader.SetPointArrayStatus("Temperature",1)
-     vtkSEMReader.Update()
-     fem_point_data= vtkSEMReader.GetOutput().GetPointData() 
-     tmparray = vtkNumPy.vtk_to_numpy(fem_point_data.GetArray('Temperature')) 
+  # if ( DebugObjective ):
+  #    vtkSEMReader = vtk.vtkXMLUnstructuredGridReader()
+  #    SEMDataDirectory = outputDirectory % kwargs['UID']
+  #    SEMtimeID = 0 
+  #    vtufileName = "%s/%d.vtu" % (SEMDataDirectory,SEMtimeID)
+  #    print "reading ", vtufileName 
+  #    vtkSEMReader.SetFileName( vtufileName )
+  #    vtkSEMReader.SetPointArrayStatus("Temperature",1)
+  #    vtkSEMReader.Update()
+  #    fem_point_data= vtkSEMReader.GetOutput().GetPointData() 
+  #    tmparray = vtkNumPy.vtk_to_numpy(fem_point_data.GetArray('Temperature')) 
 
   # loop over time steps
   tstep = 0
@@ -707,7 +707,7 @@ def ForwardSolve(**kwargs):
   # set the array to process at the temperature == bioheat 
   vtkContour.SetInputArrayToProcess(0,0,0,0,'bioheat')
   ## contourValuesList  = eval(newIni.get('exec','contours'))
-  contourValuesList  = [47. , 52.]
+  contourValuesList  = [57. , 62.]
   vtkContour.SetNumberOfContours( len(contourValuesList ) )
   print "plotting array:", vtkContour.GetArrayComponent( )
   for idContour,contourValue in enumerate(contourValuesList):
@@ -1538,10 +1538,6 @@ elif (options.config_ini != None):
   config.read(options.config_ini)
   
   fem_params = {}
-  fem_params['powerHistory']  = [[1,10],[0.0,config.getfloat('timestep','power')]]
-  fem_params['deltat']        =  5.0
-  fem_params['ntime']         =  fem_params['powerHistory'][0][-1]
-  fem_params['finaltime']     =  fem_params['deltat']  * fem_params['ntime']
   fem_params['UID']           =  0000
   fem_params['fileID']        = 0
   fem_params['segment_file']  = config.get('exec','segment_file')
@@ -1567,6 +1563,9 @@ elif (options.config_ini != None):
         slicerconfig.read( SlicerIniFilename )
         fem_params['powerHistory']  = [[1,10],[0.0,slicerconfig.getfloat('timestep','power')]]
         timePowerList = fem_params['powerHistory']  
+        fem_params['deltat']        =  5.0
+        fem_params['ntime']         =  fem_params['powerHistory'][0][-1]
+        fem_params['finaltime']     =  fem_params['deltat']  * fem_params['ntime']
         # build ccode of power history
         ccode = ''
         controlstatement = 'if'

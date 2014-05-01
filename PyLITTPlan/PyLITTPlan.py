@@ -484,7 +484,7 @@ class PyLITTPlanWidget:
           self.SolverDamageModel = slicer.util.loadModel("./fem.stl",True)[1]
           WaitForSolver  = False
         else:
-          print "waiting on solver time ..",os.path.getmtime( "./fem.finish" ) , timeStamp,time.time()
+          print "waiting on solver time ..",time.time(),os.path.getmtime( "./fem.finish" ) , timeStamp
           time.sleep(1)
 
   def onReload(self,moduleName="PyLITTPlan"):
