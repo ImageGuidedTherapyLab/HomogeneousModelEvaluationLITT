@@ -69,6 +69,12 @@ for ii = 1:num_studies
     mu_eff_index(ii) = find( mu_eff_data(:,1) == matching_num(ii));
     mu_eff_opt(ii) = mu_eff_data(mu_eff_index(ii),2);
 end
+clear ii
+total_path = cell(num_studies,2);
+
+mu_eff_opt = mu_eff_opt*(15000-10)+10;
+
 [ total, dice_values ] = Check_ablation22 ( Study_paths, mu_eff_opt );
+
 %[ H0, H1, dice_values ] = Check_ablation ( Study_paths, mu_eff_opt );
 toc

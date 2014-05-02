@@ -1,10 +1,11 @@
 % This script finds the best mu_eff for the different studies.
 tic;
-cell_data = csvimport('alt_datasummary.txt');
-headers = cell_data(1,1:3);
-mu_eff_data = cell2mat(cell_data(2:end,:));
+% cell_data = csvimport('datasummary.txt');
+% headers = cell_data(1,1:3);
+% mu_eff_data = cell2mat(cell_data(2:end,:));
 
 % Identify the studies to be examined.
+opt_type = 'mu_eff_pattern' ;
 
 Study_paths = cell (1,2);
 Study_paths {1,1} = 'Study0035';
@@ -60,15 +61,26 @@ Study_paths {25,2} = '0415';
 
 % From mu_eff_data, find the matching study's(ies') mu_eff value(s)
 num_studies = size(Study_paths,1);
-matching_num = zeros(1,num_studies);
-mu_eff_index = zeros(1,num_studies);
-mu_eff_opt   = zeros(1,num_studies);
+% matching_num = zeros(1,num_studies);
+% mu_eff_index = zeros(1,num_studies);
+% mu_eff_opt   = zeros(1,num_studies);
+% for ii = 1:num_studies
+%     
+%     matching_num(ii) = str2num(Study_paths{(ii),2});
+%     mu_eff_index(ii) = find( mu_eff_data(:,1) == matching_num(ii));
+%     mu_eff_opt(ii) = mu_eff_data(mu_eff_index(ii),2);
+% end
+% clear ii
+total_path = cell(num_studies,3);
+input_path = cell(1,2);
+
 for ii = 1:num_studies
-    
-    matching_num(ii) = str2num(Study_paths{(ii),2});
-    mu_eff_index(ii) = find( mu_eff_data(:,1) == matching_num(ii));
-    mu_eff_opt(ii) = mu_eff_data(mu_eff_index(ii),2);
+    disp('Start ')
+    disp(num2str(ii))
+    total_path{ii,1} = strcat(Study_paths{ii,1}, '/', Study_paths{ii,2});
+    input_path{1,1} = Study_paths{ii,1};
+    input_path{1,2} = Study_paths{ii,2};
+    [ total_path{ii,2}, total_path{ii,3} ] = Check_ablation44 ( input_path , opt_type);
 end
-[ total, dice_values ] = Check_ablation22 ( Study_paths, mu_eff_opt );
 %[ H0, H1, dice_values ] = Check_ablation ( Study_paths, mu_eff_opt );
 toc

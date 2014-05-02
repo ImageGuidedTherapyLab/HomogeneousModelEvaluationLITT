@@ -1,6 +1,6 @@
 % This function is shamelessly copied from Chris MacLellan's
 % /FUS4/data2/CJM/matlab/readVTK.m   but has a few edits to make its use
-% lucid, including an error message if fopen doens't work.
+% lucid, including an error message if fopen doesn't work.
 
 % E.g. input   array = readVTK_SJF('temperature',161);
 % For an series beginning with temperature.0000.vtk and ending with 0161.

@@ -1,17 +1,17 @@
 % y = f(x) for Rosenbrock
 function y = f(~)
-cd /FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation/
-setenv ( 'PATH22' , pwd);
-path22 = getenv ( 'PATH22' );
+% cd /FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation/
+% setenv ( 'PATH22' , pwd);
+% path22 = getenv ( 'PATH22' );
 
 inputdatavars = load('./TmpDataInput.mat');
 
-index = load ( 'index.txt' );
+% index = load ( 'index.txt' );
 
-[metric,~,~] =  fast_temperature_obj_fxn22 ( inputdatavars , index );
+[metric,~,~] =  fast_temperature_obj_fxn ( inputdatavars );
 
-index = index + 1;
-csvwrite ('index.txt' , index);
+% index = index + 1;
+% csvwrite ('index.txt' , index);
 
 y =  metric;
 

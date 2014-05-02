@@ -62,9 +62,9 @@ for ii = 1:n_patients
     intersection = intersection > 1;
     n_intersection = sum(sum( intersection ));
     dice_values (ii) = 2*n_intersection / (n_model + n_MRTI) ;
-    figure(1); imagesc(MRTI_crop,[30 80]);
-    figure(2);imagesc(thermal_model, [30 80]);
-    figure(3);imagesc(intersection);
+%     figure(1); imagesc(MRTI_crop,[30 80]);
+%     figure(2);imagesc(thermal_model, [30 80]);
+%     figure(3);imagesc(intersection);
 end
 
 H0 = 1;

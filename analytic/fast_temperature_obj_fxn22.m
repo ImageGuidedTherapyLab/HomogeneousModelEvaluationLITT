@@ -1,6 +1,8 @@
 % This is the updated Bioheat_script that should be used with DF's DAKOTA
 % run. The metric is based on temperature (not dose and isotherms).
 
+% modeled_domain; Bioheat1Dfast; readVTK_SJF;
+
 function [metric,tmap_model_scaled_to_MRTI,MRTI_crop] = fast_temperature_obj_fxn22 ( inputdatavars, index );
 % Record the working directory
 setenv ( 'PATH22' , pwd);
@@ -30,7 +32,7 @@ power_log = max(power_log); % Find the maximum power value
 clear diff
 
 cd(patient_opt_path);
-aaa = csvimport( strcat('optpp_pds.heating.in.',num2str(index))); %read in the mu_eff from DAKOTA .in files
+aaa = csvimport( strcat('optpp_pds.', inputdatavars.opttype, '.in.',num2str(index))); %read in the mu_eff from DAKOTA .in files
 bbb=strtrim(aaa{2,1});
 ccc=strread(bbb,'%s','delimiter',' ');
 ddd=strread(ccc{1,1},'%s','delimiter',' ');
@@ -97,13 +99,13 @@ scaling.z = 1;
 
 % Define the source; source.n must be greater than 1 to make sense. Odd is
 % better than even
-source.n=5;
-source.length=0.01;  %~0.033 is when n=5 is visible
-source.laser=linspace((-source.length/2),(source.length/2),source.n);
+source.n = 5;
+source.length = 0.01;  %~0.033 is when n=5 is visible
+source.laser = linspace((-source.length/2),(source.length/2),source.n);
 
 % Run the Bioheat model with the unique powers, and then scale it to MRTI
-[tmap_unique]=Bioheat1Dfast( power_log,dom,source,w_perf,k_cond,g_anisotropy,mu_a,mu_s,probe_u,robin_co);
-tmap_unique=tmap_unique+37;
+[tmap_unique] = Bioheat1Dfast( power_log,dom,source,w_perf,k_cond,g_anisotropy,mu_a,mu_s,probe_u,robin_co);
+tmap_unique = tmap_unique+37;
 tmap_model_scaled_to_MRTI = imresize (tmap_unique , 1/scaling.x); % Set the model's spacing to MRTI
  
 
