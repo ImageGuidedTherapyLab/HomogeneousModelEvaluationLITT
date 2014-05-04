@@ -77,14 +77,6 @@ occaDeviceFunction datafloat exactSolution(datafloat x, datafloat y, datafloat z
  *   - laserMaxPower      = reference laser power
  */
 
-/// Laser power as a function of time
-/**
- * @param time
- */
-occaDeviceFunction datafloat laserPower(datafloat time) {
-%s
-}
-
 /// Initial temperature
 /**
  * Boundary conditions will be enforced afterwards
@@ -652,7 +644,8 @@ def ForwardSolve(**kwargs):
   screenshotTol = 1e-10;
 
   ## loop over time
-  while( brainNek.timeStep(tstep * brainNek.dt() ) ) :
+  PowerLambdaFunction = kwargs['lambdacode']
+  while( brainNek.timeStep(tstep * brainNek.dt(), PowerLambdaFunction(currentTime )  ) ) :
     tstep = tstep + 1
     currentTime = tstep * brainNek.dt()
 
@@ -1103,7 +1096,7 @@ def brainNekWrapper(**kwargs):
   # occa case file
   outputOccaCaseFile = '%s/casefunctions.%04d.occa' % (workDirectory,kwargs['fileID'])
   print 'writing', outputOccaCaseFile 
-  with file(outputOccaCaseFile, 'w') as occaCaseFileName: occaCaseFileName.write(caseFunctionTemplate % kwargs['ccode'] )
+  with file(outputOccaCaseFile, 'w') as occaCaseFileName: occaCaseFileName.write(caseFunctionTemplate )
 
   # setuprc file
   outputSetupRCFile = '%s/setuprc.%04d' % (workDirectory,kwargs['fileID'])
@@ -1561,18 +1554,11 @@ elif (options.config_ini != None):
         timeStamp = os.path.getmtime(SlicerIniFilename ) 
         slicerconfig = ConfigParser.SafeConfigParser({})
         slicerconfig.read( SlicerIniFilename )
-        fem_params['powerHistory']  = [[1,10],[0.0,slicerconfig.getfloat('timestep','power')]]
-        timePowerList = fem_params['powerHistory']  
         fem_params['deltat']        =  5.0
-        fem_params['ntime']         =  fem_params['powerHistory'][0][-1]
+        fem_params['ntime']         =  10
         fem_params['finaltime']     =  fem_params['deltat']  * fem_params['ntime']
-        # build ccode of power history
-        ccode = ''
-        controlstatement = 'if'
-        for iBound,powervalue in zip(timePowerList[0],timePowerList[1]):
-            ccode = ccode + '\t%s( time< %f  ) return %f;' % ( controlstatement,iBound*fem_params['deltat'],powervalue )
-            controlstatement = 'else if'
-        fem_params['ccode']         =  ccode
+        # build lambda funtion for power history
+        fem_params['lambdacode']    =  lambda time:  0.0 if time < fem_params['deltat'] else slicerconfig.getfloat('timestep','power') if time < 10 * fem_params['deltat'] else 0.0
         # set tissue lookup tables
         k_0Table  = {"default":config.getfloat("thermal_conductivity","k_0_healthy")  ,
                      "vessel" :config.getfloat("thermal_conductivity","k_0_healthy")  ,

@@ -25,16 +25,16 @@ cdef class PyBrain3d:
          wrapper to brain3d class
         """
         self.thisptr = new wrapbrain3d( cython.operator.dereference(setup.thisptr) )
-    def timeStep( self,currentTime):
+    def timeStep( self,currentTime,currentPower):
         """
          advance solution 1 timestep
         """
-        return self.thisptr.timeStep(currentTime)
-    def heatStep( self,currentTime):
+        return self.thisptr.timeStep(currentTime,currentPower)
+    def heatStep( self,currentTime, currentPower):
         """
          advance solution 
         """
-        self.thisptr.heatStep(currentTime)
+        self.thisptr.heatStep(currentTime,currentPower)
     def GetNumberOfNodes( self):
         """
          get vtu number of nodes
