@@ -254,8 +254,6 @@ caseFileTemplate = \
 # case setup file
 # all physical quantities should be in MKS units and degrees Celsius
 
-# Data is for porcine liver (Roggan and Muller 1994)
-
 [FUNCTION FILE]
 %s/casefunctions.%04d.occa
 
@@ -264,7 +262,7 @@ caseFileTemplate = \
 
 # first row is center of probe, second row specifies direction
 [PROBE POSITION]
-./TargetLandmarks.vtk
+%s
 
 [LASER MAXIMUM POWER]
 15
@@ -972,11 +970,13 @@ def ComputeObjective(**kwargs):
   ## loop over time
   currentTime = fem_params['initialtime'] 
   ## FIXME timing errors
+  PowerLambdaFunction = kwargs['lambdacode']
   for MRTItimeID in range(fem_params['timeinterval'][0]+1,fem_params['timeinterval'][1]):
 
     while( currentTime  < (MRTItimeID +1)*MRTIInterval ) :
-      currentTime = currentTime + brainNek.dt()
-      brainNek.heatStep( currentTime )
+      currentTime  = currentTime + brainNek.dt()
+      currentPower = PowerLambdaFunction(currentTime   )
+      brainNek.heatStep( currentTime,currentPower  )
       ## if(currentTime+screenshotTol >= screenshotNum*screenshotInterval):
       ##    brainNek.getHostTemperature( bNekSoln )
       ##    screenshotNum = screenshotNum + 1;
@@ -1133,7 +1133,7 @@ def brainNekWrapper(**kwargs):
   # case file
   outputCaseFile = '%s/case.%04d.setup' % (workDirectory,kwargs['fileID'])
   print 'writing', outputCaseFile 
-  with file(outputCaseFile , 'w') as fileHandle: fileHandle.write(caseFileTemplate % (workDirectory,kwargs['fileID'],variableDictionary['body_temp'],variableDictionary['body_temp'],variableDictionary['probe_init'],variableDictionary['c_blood'],kwargs['segment_file'],workDirectory,kwargs['fileID'])  )
+  with file(outputCaseFile , 'w') as fileHandle: fileHandle.write(caseFileTemplate % (workDirectory,kwargs['fileID'],kwargs['target_landmarks'],variableDictionary['body_temp'],variableDictionary['body_temp'],variableDictionary['probe_init'],variableDictionary['c_blood'],kwargs['segment_file'],workDirectory,kwargs['fileID'])  )
 
   ## # build command to run brainNek
   ## brainNekCommand = "%s/main %s -heattransfercoefficient %s -coolanttemperature  %s > %s/run.%04d.log 2>&1 " % (brainNekDIR , outputSetupRCFile ,variableDictionary['robin_coeff'  ], variableDictionary['probe_init'   ], workDirectory ,kwargs['fileID'])
@@ -1281,7 +1281,9 @@ def ParseInput(paramfilename,VisualizeOutput):
   inisetupfile  = "/".join(locatemrti)+"/setup.ini"
   config = ConfigParser.SafeConfigParser({})
   config.read(inisetupfile)
-  fem_params['ccode']        = config.get('power','ccode')
+  fem_params['lambdacode']       = eval(config.get('power','lambdacode'))
+  fem_params['segment_file']     = config.get('exec','segment_file')
+  fem_params['target_landmarks'] = config.get('exec','target_landmarks')
   #fem_params['powerhistory'] = config.get('power','history')
   fulltimeinterval               = eval(config.get('mrti','fulltime') )
   cooltimeinterval               = eval(config.get('mrti','cooling')  )
@@ -1542,10 +1544,11 @@ elif (options.config_ini != None):
   initialconfig = ConfigParser.SafeConfigParser({})
   initialconfig.add_section("timestep")
   initialconfig.set("timestep","power",config.get('timestep','power'))
+  initialconfig.set("exec","target_landmarks","./TargetLandmarks.vtk")
+
   with open(SlicerIniFilename , 'w') as configfile:
     initialconfig.write(configfile)
   
-
   # time stamp
   import time
   timeStamp =0 
@@ -1559,6 +1562,7 @@ elif (options.config_ini != None):
         fem_params['finaltime']     =  fem_params['deltat']  * fem_params['ntime']
         # build lambda funtion for power history
         fem_params['lambdacode']    =  lambda time:  0.0 if time < fem_params['deltat'] else slicerconfig.getfloat('timestep','power') if time < 10 * fem_params['deltat'] else 0.0
+        fem_params['target_landmarks'] = slicerconfig.get('exec','target_landmarks')
         # set tissue lookup tables
         k_0Table  = {"default":config.getfloat("thermal_conductivity","k_0_healthy")  ,
                      "vessel" :config.getfloat("thermal_conductivity","k_0_healthy")  ,
