@@ -471,7 +471,9 @@ class PyLITTPlanWidget:
       SlicerIniFilename = "./slicer.ini"
       initialconfig = ConfigParser.SafeConfigParser({})
       initialconfig.add_section("timestep")
+      initialconfig.add_section("exec")
       initialconfig.set("timestep","power","%s" % self.PowerValueSliderWidget.value)
+      initialconfig.set("exec","target_landmarks","./TargetLandmarks.vtk")
       with open(SlicerIniFilename , 'w') as configfile:
         initialconfig.write(configfile)
       timeStamp = time.time()

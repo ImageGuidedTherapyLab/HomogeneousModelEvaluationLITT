@@ -1543,6 +1543,7 @@ elif (options.config_ini != None):
   SlicerIniFilename = "./slicer.ini"
   initialconfig = ConfigParser.SafeConfigParser({})
   initialconfig.add_section("timestep")
+  initialconfig.add_section("exec")
   initialconfig.set("timestep","power",config.get('timestep','power'))
   initialconfig.set("exec","target_landmarks","./TargetLandmarks.vtk")
 
