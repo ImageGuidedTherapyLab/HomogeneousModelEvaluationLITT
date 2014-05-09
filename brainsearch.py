@@ -1127,7 +1127,7 @@ def brainNekWrapper(**kwargs):
   fileHandle.write('# Name,      Type index, Density, Specific Heat, Conductivity, Perfusion, Absorption, Scattering, Anisotropy\n'  )
   fileHandle.write('Brain     0           %12.5f     %12.5f           %12.5f        %12.5f     %12.5f      %12.5f      %12.5f \n' % ( rho, c_p, k_0, w_0, mu_a, mu_s, anfact ))
   fileHandle.write('Tumor     1           %12.5f     %12.5f           %12.5f        %12.5f     %12.5f      %12.5f      %12.5f \n' % ( rho, c_p, k_0, w_0, mu_a, mu_s, anfact ))
-  fileHandle.write('CSF      25           %12.5f     %12.5f           %12.5f        %12.5f     %12.5f      %12.5f      %12.5f \n' % ( rho, c_p, 10.* k_0, w_0, mu_a, mu_s, anfact ))
+  fileHandle.write('CSF      25           %12.5f     %12.5f           %12.5f        %12.5f     %12.5f      %12.5f      %12.5f \n' % ( rho, c_p, k_0, 100.*w_0, mu_a, mu_s, anfact ))
   fileHandle.flush(); fileHandle.close()
 
   # case file
@@ -1545,6 +1545,7 @@ elif (options.config_ini != None):
   initialconfig.add_section("timestep")
   initialconfig.add_section("exec")
   initialconfig.set("timestep","power",config.get('timestep','power'))
+  initialconfig.set("timestep","finaltime","10.0")
   initialconfig.set("exec","target_landmarks","./TargetLandmarks.vtk")
 
   with open(SlicerIniFilename , 'w') as configfile:
@@ -1559,10 +1560,9 @@ elif (options.config_ini != None):
         slicerconfig = ConfigParser.SafeConfigParser({})
         slicerconfig.read( SlicerIniFilename )
         fem_params['deltat']        =  5.0
-        fem_params['ntime']         =  10
-        fem_params['finaltime']     =  fem_params['deltat']  * fem_params['ntime']
+        fem_params['finaltime']     =  slicerconfig.getfloat('timestep','finaltime')
         # build lambda funtion for power history
-        fem_params['lambdacode']    =  lambda time:  0.0 if time < fem_params['deltat'] else slicerconfig.getfloat('timestep','power') if time < 10 * fem_params['deltat'] else 0.0
+        fem_params['lambdacode']    =  lambda time:  0.0 if time < fem_params['deltat'] else slicerconfig.getfloat('timestep','power') if time < fem_params['finaltime'] else 0.0
         fem_params['target_landmarks'] = slicerconfig.get('exec','target_landmarks')
         # set tissue lookup tables
         k_0Table  = {"default":config.getfloat("thermal_conductivity","k_0_healthy")  ,

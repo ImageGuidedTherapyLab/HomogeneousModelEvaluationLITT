@@ -142,6 +142,17 @@ class PyLITTPlanWidget:
     reloadFormLayout.addRow("Power [W]", self.PowerValueSliderWidget)
 
     #
+    # Time Length Value
+    #
+    self.TimeValueSliderWidget = ctk.ctkSliderWidget()
+    self.TimeValueSliderWidget.singleStep = 5.0
+    self.TimeValueSliderWidget.minimum = 5.0
+    self.TimeValueSliderWidget.maximum = 300.0
+    self.TimeValueSliderWidget.value = 50.0
+    self.TimeValueSliderWidget.setToolTip("Laser On Duration")
+    reloadFormLayout.addRow("Time [s]", self.TimeValueSliderWidget)
+
+    #
     # Damage Iso Value
     #
     self.DamageValueSliderWidget = ctk.ctkSliderWidget()
@@ -167,6 +178,17 @@ class PyLITTPlanWidget:
     self.applyButton.toolTip = "Run the algorithm."
     self.applyButton.enabled = False
     reloadFormLayout.addRow(self.applyButton)
+
+    #
+    # Damage Iso Value
+    #
+    self.PullBackValueSliderWidget = ctk.ctkSliderWidget()
+    self.PullBackValueSliderWidget.singleStep = 0.5
+    self.PullBackValueSliderWidget.minimum = -80.0
+    self.PullBackValueSliderWidget.maximum =  80.0
+    self.PullBackValueSliderWidget.value = 0.0
+    self.PullBackValueSliderWidget.setToolTip("Set Pullback Length")
+    reloadFormLayout.addRow("Pullback [mm]", self.PullBackValueSliderWidget)
 
     #
     # Parameters Area
@@ -278,11 +300,12 @@ class PyLITTPlanWidget:
     # template laser distal ends  at coordinates (0, +/- DiffusingTipLength/2., 0. ) mm
     originalOrientation = vtk.vtkPoints()
     originalOrientation.SetNumberOfPoints(2)
-    originalOrientation.SetPoint(0,0.,0.,0.  )
+    originalOrientation.SetPoint(0,0.,                        0.,0.)
     originalOrientation.SetPoint(1,0.,self.DiffusingTipLength/2.,0.)
     slicerLength   = numpy.linalg.norm( numpy.array(pointentry) - numpy.array(pointtip) )
     unitdirection  = 1./slicerLength * (numpy.array(pointentry) - numpy.array(pointtip) ) 
-    pointscaled = pointtip + self.DiffusingTipLength/2. * unitdirection
+    pointtip    = pointtip - self.PullBackValueSliderWidget.value * unitdirection    
+    pointscaled = pointtip - self.PullBackValueSliderWidget.value * unitdirection + self.DiffusingTipLength/2. * unitdirection
     print "points", pointentry, pointtip, pointscaled, slicerLength, numpy.linalg.norm( unitdirection  ), numpy.linalg.norm( pointscaled - pointtip ) 
     slicerOrientation   = vtk.vtkPoints()
     slicerOrientation.SetNumberOfPoints(2)
@@ -473,6 +496,7 @@ class PyLITTPlanWidget:
       initialconfig.add_section("timestep")
       initialconfig.add_section("exec")
       initialconfig.set("timestep","power","%s" % self.PowerValueSliderWidget.value)
+      initialconfig.set("timestep","finaltime","%s" % self.TimeValueSliderWidget.value)
       initialconfig.set("exec","target_landmarks","./TargetLandmarks.vtk")
       with open(SlicerIniFilename , 'w') as configfile:
         initialconfig.write(configfile)
