@@ -255,14 +255,20 @@ class PyLITTPlanWidget:
 
   # write vtk points file
   def WriteVTKPoints(self,vtkpoints,OutputFileName):
+     # get data structures to convert to pixel ijk space
+     outnode = self.outputSelector.currentNode()
+     ras2ijk = vtk.vtkMatrix4x4()
+     outnode.GetRASToIJKMatrix(ras2ijk)
+
      # loop over points an store in vtk data structure
-     # write in meters
-     MillimeterMeterConversion = .001;
+     # write in pixel coordinates
      scalevtkPoints = vtk.vtkPoints()
      vertices= vtk.vtkCellArray()
      for idpoint in range(vtkpoints.GetNumberOfPoints()):
-         point = MillimeterMeterConversion * numpy.array(vtkpoints.GetPoint(idpoint))
-         vertices.InsertNextCell( 1 ); vertices.InsertCellPoint( scalevtkPoints.InsertNextPoint(point) )
+         currentpoint = vtkpoints.GetPoint(idpoint)
+         ijkpoint = ras2ijk.MultiplyPoint( (currentpoint[0],currentpoint[1],currentpoint[2],1.) )
+         print ijkpoint 
+         vertices.InsertNextCell( 1 ); vertices.InsertCellPoint( scalevtkPoints.InsertNextPoint(ijkpoint[0:3]) )
          #vertices.InsertNextCell( 1 ); vertices.InsertCellPoint( idpoint )
   
      # set polydata
@@ -296,6 +302,7 @@ class PyLITTPlanWidget:
     else:
       print("Unknown Class ")
       return None
+
     # diffusing applicator center at coordinate  (0,                        0., 0. ) mm
     # template laser distal ends  at coordinates (0, +/- DiffusingTipLength/2., 0. ) mm
     originalOrientation = vtk.vtkPoints()
@@ -318,6 +325,30 @@ class PyLITTPlanWidget:
     LaserLineTransform.SetModeToRigidBody()
     LaserLineTransform.Update()
     print LaserLineTransform.GetMatrix()
+
+    ## # Get RAS transformation
+    ## rasToXY = vtk.vtkMatrix4x4()
+
+
+    ## layoutManager = slicer.app.layoutManager() 
+    ## sliceWidget = layoutManager.sliceWidget('Red')
+    ## sliceLogic = sliceWidget.sliceLogic()
+    ## layerLogic = sliceLogic.GetBackgroundLayer()
+    ## xyToIJK = layerLogic.GetXYToIJKTransform().GetMatrix() 
+    ## rasToXY.DeepCopy( xyToIJK )
+    ## #rasToXY.Invert()
+    ## outnode = self.outputSelector.currentNode()
+    ## ras2ijk = vtk.vtkMatrix4x4()
+    ## ijk2ras = vtk.vtkMatrix4x4()
+    ## outnode.GetRASToIJKMatrix(ras2ijk)
+    ## outnode.GetIJKToRASMatrix(ijk2ras)
+    ## print ras2ijk 
+    ## print ijk2ras 
+    ## print rasToXY
+    ## print pointtip
+    ## print rasToXY.MultiplyPoint( (pointtip[0],pointtip[1],pointtip[2],1.) )
+    ## print ras2ijk.MultiplyPoint( (pointtip[0],pointtip[1],pointtip[2],1.) )
+
     return LaserLineTransform
 
   def AddApplicatorModel(self,scene,LineLandmarkTransform ):
