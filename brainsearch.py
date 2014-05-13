@@ -563,7 +563,6 @@ def ForwardSolve(**kwargs):
   setup = brainNekLibrary.PySetupAide(outputSetupRCFile )
   brainNek = brainNekLibrary.PyBrain3d(setup);
 
-
   # setup vtkUnstructuredGrid
   hexahedronGrid   = vtk.vtkUnstructuredGrid()
   numPoints = brainNek.GetNumberOfNodes( ) 
@@ -678,6 +677,27 @@ def ForwardSolve(**kwargs):
       # update counter
       MRTItimeID = MRTItimeID + 1;
 
+  # read landmarks to transform
+  SlicerLMReader   = vtk.vtkPolyDataReader()
+  ParaviewLMReader = vtk.vtkPolyDataReader()
+  ParaviewLMReader.SetFileName(  kwargs['target_landmarks']  )
+  SlicerLMReader.SetFileName(    kwargs['transformlandmarks'])
+  ParaviewLMReader.Update()
+  SlicerLMReader.Update(  )
+  # initialize transform
+  LaserLineTransform = vtk.vtkLandmarkTransform()
+  LaserLineTransform.SetSourceLandmarks(ParaviewLMReader.GetOutput().GetPoints())
+  LaserLineTransform.SetTargetLandmarks(SlicerLMReader.GetOutput().GetPoints())
+  LaserLineTransform.SetModeToRigidBody()
+  LaserLineTransform.Update()
+  print LaserLineTransform.GetMatrix()
+
+  # apply slicer transform
+  rastransformFilter = vtk.vtkTransformFilter()
+  rastransformFilter.SetInput( hexahedronGrid ) 
+  rastransformFilter.SetTransform(LaserLineTransform) 
+  rastransformFilter.Update()
+
   # scale to millimeter for vis
   ScaleAffineTransform = vtk.vtkTransform()
   ScaleAffineTransform.Translate([ 0.0,0.0,0.0])
@@ -687,7 +707,7 @@ def ForwardSolve(**kwargs):
   ScaleAffineTransform.Scale([1000.,1000.,1000.])
 
   scaletransformFilter = vtk.vtkTransformFilter()
-  scaletransformFilter.SetInput( hexahedronGrid ) 
+  scaletransformFilter.SetInput( rastransformFilter.GetOutput() ) 
   scaletransformFilter.SetTransform(ScaleAffineTransform ) 
   scaletransformFilter.Update()
 
@@ -1546,7 +1566,8 @@ elif (options.config_ini != None):
   initialconfig.add_section("exec")
   initialconfig.set("timestep","power",config.get('timestep','power'))
   initialconfig.set("timestep","finaltime","10.0")
-  initialconfig.set("exec","target_landmarks","./TargetLandmarks.vtk")
+  initialconfig.set("exec","target_landmarks"  ,"./TargetLandmarksvtk.vtk")
+  initialconfig.set("exec","transformlandmarks","./TargetLandmarksras.vtk")
 
   with open(SlicerIniFilename , 'w') as configfile:
     initialconfig.write(configfile)
@@ -1563,7 +1584,8 @@ elif (options.config_ini != None):
         fem_params['finaltime']     =  slicerconfig.getfloat('timestep','finaltime')
         # build lambda funtion for power history
         fem_params['lambdacode']    =  lambda time:  0.0 if time < fem_params['deltat'] else slicerconfig.getfloat('timestep','power') if time < fem_params['finaltime'] else 0.0
-        fem_params['target_landmarks'] = slicerconfig.get('exec','target_landmarks')
+        fem_params['target_landmarks']   = slicerconfig.get('exec','target_landmarks'  )
+        fem_params['transformlandmarks'] = slicerconfig.get('exec','transformlandmarks')
         # set tissue lookup tables
         k_0Table  = {"default":config.getfloat("thermal_conductivity","k_0_healthy")  ,
                      "vessel" :config.getfloat("thermal_conductivity","k_0_healthy")  ,

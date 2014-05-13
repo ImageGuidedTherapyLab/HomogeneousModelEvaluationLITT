@@ -62,8 +62,8 @@ class PyLITTPlanWidget:
     self.ApplicatorTrajectoryModel = None
     self.DamageTemplateModel       = None
     self.SolverDamageModel         = None
-    self.SourceLandmarkFileName    = "./SourceLandmarks.vtk"
-    self.TargetLandmarkFileName    = "./TargetLandmarks.vtk"
+    self.SourceLandmarkFileName    = "./SourceLandmarks"
+    self.TargetLandmarkFileName    = "./TargetLandmarks"
 
     # define constant parameters
     #  diffusing tip is 10. mm axial
@@ -259,29 +259,47 @@ class PyLITTPlanWidget:
      outnode = self.outputSelector.currentNode()
      ras2ijk = vtk.vtkMatrix4x4()
      outnode.GetRASToIJKMatrix(ras2ijk)
+     spacing = outnode.GetSpacing()
+     origin  = outnode.GetOrigin()
+
+     # write in meters
+     MillimeterMeterConversion = .001;
 
      # loop over points an store in vtk data structure
      # write in pixel coordinates
      scalevtkPoints = vtk.vtkPoints()
-     vertices= vtk.vtkCellArray()
+     vtkvertices= vtk.vtkCellArray()
      for idpoint in range(vtkpoints.GetNumberOfPoints()):
          currentpoint = vtkpoints.GetPoint(idpoint)
          ijkpoint = ras2ijk.MultiplyPoint( (currentpoint[0],currentpoint[1],currentpoint[2],1.) )
-         print ijkpoint 
-         vertices.InsertNextCell( 1 ); vertices.InsertCellPoint( scalevtkPoints.InsertNextPoint(ijkpoint[0:3]) )
-         #vertices.InsertNextCell( 1 ); vertices.InsertCellPoint( idpoint )
+         print 'ijkpoint %d' % idpoint, ijkpoint 
+         vtkvertices.InsertNextCell( 1 ); vtkvertices.InsertCellPoint( scalevtkPoints.InsertNextPoint(
+                [ MillimeterMeterConversion * (ijkpoint[0]*spacing[0] + origin[0])  , 
+                  MillimeterMeterConversion * (ijkpoint[1]*spacing[1] + origin[1])  , 
+                  MillimeterMeterConversion * (ijkpoint[2]*spacing[2] + origin[2])     ]
+                                                                                               ) )
+         #vtkvertices.InsertNextCell( 1 ); vtkvertices.InsertCellPoint( idpoint )
   
-     # set polydata
-     polydata = vtk.vtkPolyData()
-     polydata.SetPoints(scalevtkPoints )
-     polydata.SetVerts( vertices )
+     # loop over points an store in vtk data structure
+     scalerasPoints = vtk.vtkPoints()
+     rasvertices= vtk.vtkCellArray()
+     for idpoint in range(vtkpoints.GetNumberOfPoints()):
+         point = MillimeterMeterConversion * numpy.array(vtkpoints.GetPoint(idpoint))
+         rasvertices.InsertNextCell( 1 ); rasvertices.InsertCellPoint( scalerasPoints.InsertNextPoint(point) )
+         #rasvertices.InsertNextCell( 1 ); rasvertices.InsertCellPoint( idpoint )
+
+     for datapointsmeter,vertexofpoints,typeid in  [(scalerasPoints,rasvertices,'ras'),(scalevtkPoints,vtkvertices,'vtk')]:
+       # set polydata
+       polydata = vtk.vtkPolyData()
+       polydata.SetPoints(datapointsmeter)
+       polydata.SetVerts( vertexofpoints )
   
-     # write to file
-     print "WriteVTKPoints: writing",OutputFileName
-     polydatawriter = vtk.vtkDataSetWriter()
-     polydatawriter.SetFileName(OutputFileName)
-     polydatawriter.SetInput(polydata)
-     polydatawriter.Update()
+       # write to file
+       print "WriteVTKPoints: writing",OutputFileName
+       polydatawriter = vtk.vtkDataSetWriter()
+       polydatawriter.SetFileName( "%s%s.vtk" % (OutputFileName,typeid ))
+       polydatawriter.SetInput(polydata)
+       polydatawriter.Update()
 
   def GetDiffusingLaserTransform(self):
     fiducialsNode = self.inputFiducialsNodeSelector.currentNode();
@@ -306,18 +324,27 @@ class PyLITTPlanWidget:
     # diffusing applicator center at coordinate  (0,                        0., 0. ) mm
     # template laser distal ends  at coordinates (0, +/- DiffusingTipLength/2., 0. ) mm
     originalOrientation = vtk.vtkPoints()
-    originalOrientation.SetNumberOfPoints(2)
-    originalOrientation.SetPoint(0,0.,                        0.,0.)
-    originalOrientation.SetPoint(1,0.,self.DiffusingTipLength/2.,0.)
+    originalOrientation.SetNumberOfPoints(3)
+    originalOrientation.SetPoint(0,                         0.,                        0.,0.)
+    originalOrientation.SetPoint(1,                         0.,self.DiffusingTipLength/2.,0.)
+    originalOrientation.SetPoint(2,self.DiffusingTipLength/10.,                        0.,0.)
+
+    # compute target landmarks
     slicerLength   = numpy.linalg.norm( numpy.array(pointentry) - numpy.array(pointtip) )
     unitdirection  = 1./slicerLength * (numpy.array(pointentry) - numpy.array(pointtip) ) 
     pointtip    = pointtip - self.PullBackValueSliderWidget.value * unitdirection    
     pointscaled = pointtip - self.PullBackValueSliderWidget.value * unitdirection + self.DiffusingTipLength/2. * unitdirection
-    print "points", pointentry, pointtip, pointscaled, slicerLength, numpy.linalg.norm( unitdirection  ), numpy.linalg.norm( pointscaled - pointtip ) 
+    # compute cross product for other direction
+    appcross  = numpy.cross(pointtip ,pointscaled )
+    normcross = numpy.linalg.norm( appcross )
+    appcross  = pointtip + 1./normcross * appcross 
+
+    print "points", pointentry, pointtip, pointscaled, slicerLength, numpy.linalg.norm( unitdirection  ), numpy.linalg.norm( pointscaled - pointtip ) ,appcross  
     slicerOrientation   = vtk.vtkPoints()
-    slicerOrientation.SetNumberOfPoints(2)
+    slicerOrientation.SetNumberOfPoints(3)
     slicerOrientation.SetPoint(0,pointtip[   0],pointtip[   1],pointtip[   2] )
     slicerOrientation.SetPoint(1,pointscaled[0],pointscaled[1],pointscaled[2] )
+    slicerOrientation.SetPoint(2,appcross[   0],appcross[   1],appcross[   2] )
 
     LaserLineTransform = vtk.vtkLandmarkTransform()
     LaserLineTransform.SetSourceLandmarks(originalOrientation)
@@ -528,7 +555,8 @@ class PyLITTPlanWidget:
       initialconfig.add_section("exec")
       initialconfig.set("timestep","power","%s" % self.PowerValueSliderWidget.value)
       initialconfig.set("timestep","finaltime","%s" % self.TimeValueSliderWidget.value)
-      initialconfig.set("exec","target_landmarks","./TargetLandmarks.vtk")
+      initialconfig.set("exec","target_landmarks"  ,"./TargetLandmarksvtk.vtk")
+      initialconfig.set("exec","transformlandmarks","./TargetLandmarksras.vtk")
       with open(SlicerIniFilename , 'w') as configfile:
         initialconfig.write(configfile)
       timeStamp = time.time()
