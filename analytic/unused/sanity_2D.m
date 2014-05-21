@@ -12,7 +12,7 @@ Study_paths {1,2} = '0530';
 if ind_case ==1;
     Study_paths {1,3} = '1';
 elseif ind_case ==2;
-    Study_paths {1,3} = '43';
+    Study_paths {1,3} = '32';
 end
 param_file = strcat( 'workdir/', Study_paths{1,1}, '/', Study_paths{1,2}, '/opt/', opt_type, '.in.', Study_paths{1,3} );
 python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ''')');   % unix(''python test_saveFile.py'')
@@ -36,7 +36,7 @@ model = zeros(36,31,16);
 %     [~, model(:,:,ii),MRTI_crop] = fast_temperature_obj_fxn_sanity (aa,ii);
 % end
 
-[~, model,MRTI_crop] = fast_temperature_obj_fxn_sanity (aa,3);
+[~, model,MRTI_crop] = fast_temperature_obj_fxn_sanity (aa,1);
 
 model_deg57 = model >= 57;
 MRTI_deg57 = MRTI_crop >= 57;
