@@ -58,7 +58,9 @@ mod_point.x = abs ( VOI.x(1) - VOI.x(2) ) +1;  % x dimension distance
 % The '+ 1' is important becasue there are **51** pixels for
 % VOI.x(1):VOI.x(2) but only 50 for VOI.x(1)-VOI.x(2)
 mod_point.y = abs ( VOI.y(1) - VOI.y(2) ) +1;  % y dimension
+%mod_point.z = 1;
 mod_point.z = 1;
+mod_point.z_subslice = 5;
 
 % Set the matrix for the MRTI
 matrix.x = double(inputdatavars.dimensions(2)); % The indexing is to match ParaView, but all images are 256x256x1 so far, so x,y indexing can be swapped.
@@ -76,10 +78,10 @@ FOV.y = matrix.y * spacing.y;
 FOV.z = matrix.z * spacing.z;
 
 % For now, x and y scaling must be equal; z = 1
-scaling.x = 1;
-scaling.y = 1;
-% scaling.x = 5;
-% scaling.y = 5;
+% scaling.x = 1;
+% scaling.y = 1;
+scaling.x = 5;
+scaling.y = scaling.x;
 scaling.z = 1;
 
 % Build the domain
@@ -89,7 +91,11 @@ scaling.z = 1;
 % better than even
 source.n=sources;
 source.length=0.01;  %~0.033 is when n=5 is visible
-source.laser=linspace((-source.length/2),(source.length/2),source.n);
+if source.n == 1;
+    source.laser = 0;
+else
+    source.laser=linspace((-source.length/2),(source.length/2),source.n);
+end
 
 % Run the Bioheat model with the unique powers, and then scale it to MRTI
 [tmap_unique]=Bioheat1Dfast( power_log,dom,source,w_perf,k_cond,g_anisotropy,mu_a,mu_s,probe_u,robin_co);

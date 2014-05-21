@@ -10,7 +10,7 @@
 %the number of sources. The 'length' is the diffusing tip length, commonly
 %0.01 m.
 
-function [tmap]=Bioheat1Dfast (P,dom,source,w,k,g,mua,mus,probe_u,robin_co);
+function [t_avg]=Bioheat1Dfast (P,dom,source,w,k,g,mua,mus,probe_u,robin_co);
 
 %List of space and time details
 R1=0.0015/2; % (m) R1 is the distance from the isotropic laser source point and the edge of the fiber
@@ -27,13 +27,14 @@ P=P/source.n;  %Scales the power to the number of source points
 % g=0.88; % Unity
 % k=0.527; % W/(m * K)
 % w=6; % kg / (m^3 * s)
-u0=0; % K
-ua=0; % K
+u0 = probe_u - 37; % K
+ua = 0; % K
 
 %Points structure
 points.x=linspace(-dom.x/2,dom.x/2,dom.pointx);
 points.y=linspace(-dom.y/2,dom.y/2,dom.pointy);
-points.z=linspace(-dom.z/2,dom.z/2,dom.pointz);
+%points.z=linspace(-dom.z/2,dom.z/2,dom.pointz);
+points.z=linspace(0,dom.z/2,(dom.z_subslice-floor(dom.z_subslice/2)));
 
 %Initialize t_sample and r
 
@@ -50,19 +51,22 @@ for i=1:dom.pointx   %Spatial loop for i, ii, iii
     
     for ii=1:dom.pointy
         
-        for iii=1:dom.pointz
+        for iii=1:(dom.z_subslice-floor(dom.z_subslice/2)) % This takes advantage of symmetry
             
             for j=1:source.n    %Loop for the separate isotropic sources
                 
                 r(j)=sqrt(points.x(i)^2+(source.laser(j)-points.y(ii))^2+points.z(iii)^2);  %Distance for each isotropic source
-                [t_sample(i,ii,iii,j)]=sammodel1D(u0,ua,k,w,P,r(j),mua,mus,R1,R2,g); % Calculate the temperature from one source
-                
+                if r(j) <= R1
+                    t_sample(i,ii,iii,j) = u0;
+                else
+                    [t_sample(i,ii,iii,j)]=sammodel1D(u0,ua,k,w,P,r(j),mua,mus,R1,R2,g); % Calculate the temperature from one source
+                end
             end
         end
     end
 end
 
-
-tmap = sum(t_sample,4);  %sum(t_sample(j,jj,1));
+t_avg = (1/dom.z_subslice).*(t_sample(:,:,1)+2.*t_sample(:,:,2)+2.*t_sample(:,:,3));
+%tmap = sum(t_sample,4);  %sum(t_sample(j,jj,1));
 
 end

@@ -11,6 +11,7 @@ function [dom,MRTI_pix,mod_pix]=modeled_domain(FOV,matrix,scaling,mod_point)
 dom.x=FOV.x*mod_point.x/matrix.x;  %dom = FOV * (fraction modeled) = FOV *('modeled points'/'image matrix points')
 dom.y=FOV.y*mod_point.y/matrix.y;
 dom.z=FOV.z*mod_point.z/matrix.z;
+dom.z_subslice = mod_point.z_subslice;
 
 %Modeled domain points
 dom.pointy=floor(mod_point.x*scaling.x);
