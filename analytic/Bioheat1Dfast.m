@@ -10,12 +10,12 @@
 %the number of sources. The 'length' is the diffusing tip length, commonly
 %0.01 m.
 
-function [t_avg]=Bioheat1Dfast (P,dom,source,w,k,g,mua,mus,probe_u,robin_co);
+function [tmap]=Bioheat1Dfast (P,dom,source,w,k,g,mua,mus,probe_u,robin_co);
 
 %List of space and time details
 R1=0.0015/2; % (m) R1 is the distance from the isotropic laser source point and the edge of the fiber
 R2=1; % (m) R2 is the maximum edge of the domain;
-Npowers=size(P,1)+1; %Returns how many timesteps will be calculated
+%Npowers=size(P,1)+1; %Returns how many timesteps will be calculated
 % P(2:Npowers,:)=P(1:(Npowers-1),:); %Inserts the P=0 timestep
 % P(1,1)=1;
 % P(1,2)=0;
@@ -66,7 +66,30 @@ for i=1:dom.pointx   %Spatial loop for i, ii, iii
     end
 end
 
-t_avg = (1/dom.z_subslice).*(t_sample(:,:,1)+2.*t_sample(:,:,2)+2.*t_sample(:,:,3));
+clear i ii iii j
+
+aa = size(t_sample);
+
+if length(aa) == 3
+    t_summing = zeros(aa(1),aa(2),aa(3));
+    t_summing(:,:,1) = t_sample(:,:,1);
+    for ii = 2:aa(3)
+        t_summing(:,:,ii) = 2.*t_sample(:,:,ii);
+    end
+    tmap = (1/dom.z_subslice).*sum(t_summing,3);
+else
+    t_summing = zeros(aa(1),aa(2),aa(3),aa(4));
+    t_summing(:,:,1,:) = t_sample(:,:,1,:);
+    for ii = 2:aa(3)
+        t_summing(:,:,ii,:) = 2.*t_sample(:,:,ii,:);
+    end
+    t_avg = squeeze((1/dom.z_subslice).*sum(t_summing,3));
+    tmap = sum(t_avg,3);
+end
+%     
+% if j == 1
+%     t_avg = (1/dom.z_subslice).*(t_sample(:,:,1)+2.*t_sample(:,:,2)+2.*t_sample(:,:,3));
+% end
 %tmap = sum(t_sample,4);  %sum(t_sample(j,jj,1));
 
 end

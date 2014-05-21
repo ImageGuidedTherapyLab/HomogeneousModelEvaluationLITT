@@ -8,7 +8,7 @@ inputdatavars = load('./TmpDataInput.mat');
 
 % index = load ( 'index.txt' );
 
-[metric,~,~] =  fast_temperature_obj_fxn ( inputdatavars );
+[metric,~,~] =  fast_temperature_obj_fxn_sanity ( inputdatavars, 1 );
 
 % index = index + 1;
 % csvwrite ('index.txt' , index);

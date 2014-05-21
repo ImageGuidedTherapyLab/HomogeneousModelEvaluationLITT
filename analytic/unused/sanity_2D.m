@@ -31,19 +31,21 @@ end
 
 % Abbrev Run
 model = zeros(36,31,16);
-for ii = 1
-%for ii = 1:16
-    [~, model(:,:,ii),MRTI_crop] = fast_temperature_obj_fxn_sanity (aa,ii);
-end
+
+% for ii = 1:16
+%     [~, model(:,:,ii),MRTI_crop] = fast_temperature_obj_fxn_sanity (aa,ii);
+% end
+
+[~, model,MRTI_crop] = fast_temperature_obj_fxn_sanity (aa,3);
 
 model_deg57 = model >= 57;
 MRTI_deg57 = MRTI_crop >= 57;
-n_model = sum(sum( model_deg57(:,:,1) ));
+n_model = sum(sum( model_deg57));
 n_MRTI = sum(sum( MRTI_deg57 ));
 intersection = model_deg57(:,:,1) + MRTI_deg57;
 intersection = intersection > 1;
 n_intersection = sum(sum( intersection ));
-dice_values (ii) = 2*n_intersection / (n_model + n_MRTI) ;
+dice_values = 2*n_intersection / (n_model + n_MRTI) ;
 
 % Normal Run
 % [~,model1,~]  = fast_temperature_obj_fxn_sanity ( aa,1 );
