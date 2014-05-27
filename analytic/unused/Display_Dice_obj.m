@@ -33,7 +33,7 @@ cd /FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
 cell_data = csvimport('alt_datasummary.txt');
 headers = cell_data(1,1:3);
 data.opt = cell2mat(cell_data(2:end,:));
-data.opt(:,2) = data.opt(:,2)*(15000-10)+10; % Convert from DAKOTA's scaled to absolute mu_eff
+data.opt(:,2) = data.opt(:,2)*(6000-100)+100; % Convert from DAKOTA's scaled to absolute mu_eff
 
 
 % Question 1
