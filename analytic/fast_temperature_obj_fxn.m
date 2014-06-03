@@ -1,7 +1,7 @@
 % This is the updated Bioheat_script that should be used with DF's DAKOTA
 % run. The metric is based on temperature (not dose and isotherms).
 
-function [metric,tmap_model_scaled_to_MRTI,MRTI_crop] = fast_temperature_obj_fxn ( inputdatavars );
+function [metric,tmap_model_scaled_to_MRTI,MRTI_crop] = fast_temperature_obj_fxn_sanity ( inputdatavars, sources );
 % Record the working directory
 setenv ( 'PATH22' , pwd);
 path22 = getenv ( 'PATH22' );
@@ -32,7 +32,8 @@ clear diff
 % Read in the CVs from inputdatavars . Some need str2num coz they were
 % written as strings.
 probe_u = str2num(inputdatavars.cv.probe_init);
-g_anisotropy = str2num(inputdatavars.cv.gamma_healthy);
+%g_anisotropy = str2num(inputdatavars.cv.gamma_healthy);
+g_anisotropy = inputdatavars.cv.anfact;
 mu_a = inputdatavars.cv.mu_a;
 mu_s = inputdatavars.cv.mu_s;
 mu_eff = str2num(inputdatavars.cv.mu_eff_healthy);
@@ -77,6 +78,8 @@ FOV.z = matrix.z * spacing.z;
 % For now, x and y scaling must be equal; z = 1
 scaling.x = 1;
 scaling.y = 1;
+% scaling.x = 5;
+% scaling.y = 5;
 scaling.z = 1;
 
 % Build the domain
@@ -84,7 +87,7 @@ scaling.z = 1;
 
 % Define the source; source.n must be greater than 1 to make sense. Odd is
 % better than even
-source.n=5;
+source.n=sources;
 source.length=0.01;  %~0.033 is when n=5 is visible
 source.laser=linspace((-source.length/2),(source.length/2),source.n);
 

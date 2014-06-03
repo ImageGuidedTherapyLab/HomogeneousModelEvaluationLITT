@@ -30,7 +30,7 @@ dice_values = zeros( n_patients,1); % Initialize the number of DSC (dice) values
 for ii = 1:n_patients
     % This section prepares the varied parameters into a .mat file for the
     % thermal code to run
-    param_file = strcat( 'workdir/', Study_paths{ii,1}, '/', Study_paths{ii,2}, '/opt/optpp_pds.', opt_type, '.in.1');
+    param_file = strcat( 'workdir/', Study_paths{ii,1}, '/', Study_paths{ii,2}, '/opt/', opt_type, '.in.1');
     python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ''')');   % unix(''python test_saveFile.py'')
     evalc(python_command);
     
@@ -42,7 +42,7 @@ for ii = 1:n_patients
     params_iter.cv.mu_eff_healthy = num2str( mean ( mu_eff_iter )); % Average the training datasets' mu_eff; also make it a string coz the thermal code needs that format.
    
     % This section runs the thermal code
-    [metric, thermal_model, MRTI_crop] = fast_temperature_obj_fxn ( params_iter );
+    [metric, thermal_model, MRTI_crop] = fast_temperature_obj_fxn_sanity ( params_iter, 1 );
     model_deg57 = zeros( size(thermal_model,1), size(thermal_model,2) );
     MRTI_deg57 = zeros( size(MRTI_crop,1), size(MRTI_crop,2) );
     model_deg57 = thermal_model >= 57;
