@@ -101,4 +101,79 @@ $ cat ./workdir/Patient0006/007/opt/optpp_pds.in.1                            $ 
 
 
 
+README: This readme outlines critical tasks within the optpp_pds repo. The ###### statements are section headers or commands that should be executed
+
+#########1. Optimization: This section optimizes one or more data sets for mu_eff / mu_a. Then it can make the summary text file (step 9)
+
+
+
+Steps:
+1. Initialize DAKMATLAB:
+###### ./analytic/dakmatlab setup workspace
+
+2. Run a single data set or Bash script for multiple:
+./exe.sanity.txt
+
+3. dakota_sanity_1D.in analysis driver points to brainsearch.py
+
+4. brainsearch.py points to analytic/f.m if MATLAB flag is true
+
+5. f.m points to fast_temperature_obj_fxn_sanity.m:
+
+6. fast_temperature_obj_fxn_sanity.m returns 2-D temperature images for the model and MRTI; fast_temperature_obj_fxn_sanity.m contains many MATLAB scripts
+
+7. f.m computes the DSC; (1 - DSC) is the objective function that is returned to brainsearch.py
+
+8. brainsearch.py interacts with DAKOTA through sanity_1D.in.* and sanity_1D.out.* files
+
+9. Run alt_accumulatehistory.py to get alt_datasummary.txt
+###### python alt_accumulatehistory.py
+
+
+
+
+########2. Threshold by DSC to identify the best data sets, remove mu_eff outliers, do LOOCV t-test
+
+1. The primary file is ./analytic/unused/hist_plotting.m . In the MATLAB command line:
+###### hist_plotting
+
+2. Lines 1-103 define 3 things:
+opt_type string (line 46): The name of the DAKOTA .in and .out files (default opt_type is sanity_1D
+Study_paths cell of strings (lines 50-99): A long list of all the data sets paths.
+Load the optimized Dice values and mu_eff values (line 102; default file is alt_datasummary.txt)
+
+3. Lines 105-132 does: 
+organize the optimized data into variable mu_eff_opt
+Converts the normalized DAKOTA mu_eff values into real mu_eff values (line 131)
+Puts the optimized DSC values into dice_pre
+
+4. Lines 133-152 does:
+Thresholds the optimized DSC
+Keeps mu_eff that pass the DSC thresholds
+Computes statistical moments on the mu_eff values
+
+#######3. Use thresholded data sets in LOOCV t-test (hist_plotting.m lines 161 - 192)
+1. Lines 161 - 166 cut out the Study_paths that do not pass DSC threshold
+
+2. Lines 169 and 170 do the LOOCV t-test LOOCV_t_test_DiceTemp.m for data sets thresholded at DSC > 0.7 and DSC > 0.8;
+
+3. Lines 171 - 192 iteratively throws out mu_eff values that are furthest from the mean and reruns the LOOCV t-test until the t-test passes. The loop will also stop if there isnt any data left
+	
+#######4. Guts of LOOCV t-test file LOOCV_t_test_DiceTemp.m ; This section outlines how the LOOCV and t-test
+1. Receive:
+Paths: Study_paths
+mu_eff values corresponding to Study_paths : variable name: mu_eff_DpassT
+opt_type string: opt_type
+
+2. Lines 33-35: Make a new TmpDataInput.mat file for the correct Study_paths data set
+
+3. Lines 39 - 45: This is the LOOCV section:
+Remove one mu_eff value (line 40)
+Average the remaining mu_eff values (line 41)
+Compute mu_a_iter as a function of mu_s, mu_eff, g (lines 42 and 43)
+Plug in the mu_a and mu_eff values for the particular LOOCV iteration (lines 44 and 45)
+
+4. Lines 48-60 compute the DSC for the particular LOOCV iteration
+
+5. Line 62 uses MATLABs built-in t-test
 

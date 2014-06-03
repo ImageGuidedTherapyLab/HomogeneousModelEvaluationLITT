@@ -43,7 +43,6 @@ close all
 % The output: The output is a binary acceptance/rejection of the null and alternative hypotheses.
 
 % This script finds the best mu_eff for the different studies.
-MATLAB_on_off = 1; % 0 = off/false; 1 = on/true
 opt_type = 'sanity_1D' ;
 
 
