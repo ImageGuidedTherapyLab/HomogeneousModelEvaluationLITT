@@ -21,32 +21,63 @@
 % mu_eff_opt is a vector of the inverse problem optimized mu_eff values in
 %   1/m units
 
-function [ hh, dice_values ] = LOOCV_t_test_DiceTemp ( Study_paths, mu_eff_DpassT, opt_type );
+function [ hh, dice_values ] = LOOCV_t_test_DF ( Study_paths, mu_eff_opt, alpha_opt, opt_type );
 
 % Make the LOOCV iteration system
-n_patients = length( mu_eff_DpassT); % This is the number of patients
+n_patients = length( mu_eff_opt); % This is the number of patients
 % n_patients = 1;
 dice_values = zeros( n_patients,1); % Initialize the number of DSC (dice) values
 for ii = 1:n_patients
+    % Set up LOOCV for mu_eff
+    mu_eff_iter = mu_eff_opt; % Make a copy of both the mu_eff values and the paths
+    mu_eff_iter ( ii ) = []; % Remove
+    mu_eff_iter = mean ( mu_eff_iter );           % Add alpha to LOOCV here; write *.in.* file; run brainsearch.py; brainsearch.py makes *.out.* file; read in *.out.* file
+%     mu_s_p = params_iter.cv.mu_s * ( 1 - params_iter.cv.anfact );
+%     mu_a_iter = (-3*mu_s_p + sqrt( 9*mu_s_p^2 + 12 * mu_eff_iter^2))/6; % Used quadratic equation to solve for mu_a in terms of g, mu_s, and mu_eff
+    
+    alpha_iter = alpha_opt;
+    alpha_iter (ii) = [];
+    alpha_iter = mean (alpha_iter);
+    
+    input_file = cell (18,1);
+    input_file {1,1} = '12 variables';
+    input_file {2,1} = strcat ( num2str(mu_eff_iter),' mu_eff_healthy');
+    input_file {3,1} = strcat ( num2str(alpha_iter), ' alpha_healthy');
+    input_file {4,1} = '-9.000000000000000e+01 y_rotate';
+    input_file {5,1} = '2.287330000000000e-05 gamma_healthy';
+    input_file {6,1} = '1.600000000000000e-01 x_displace';
+    input_file {7,1} = '1.450000000000000e-01 y_displace';
+    input_file {8,1} = '0.000000000000000e+00 z_displace';
+    input_file {9,1} = '3.700000000000000e+01 body_temp';
+    input_file{10,1} = '0.000000000000000e+00 x_rotate';
+    input_file{11,1} = '0.000000000000000e+00 z_rotate';
+    input_file{12,1} = '2.100000000000000e+01 probe_init';
+    input_file{13,1} = '0.000000000000000e+00 robin_coeff';
+    input_file{14,1} = '1 functions';
+    input_file{15,1} = '1 ASV_1:obj_fn';
+    input_file{16,1} = '1 derivative_variables';
+    input_file{17,1} = '1 DVV_1:mu_eff_healthy';
+    input_file{18,1} = '0 analysis_components';
+    
+    % write the *.in.* file
+    num_file_length = length (input_file);
+    fid = fopen('alt_testing_DF.in.1', 'w');
+    for ii = 1 : num_file_length
+        fprintf (fid, '%s\n' , input_file{ii,1});
+    end
+    fclose(fid);
+    
+    
+    
     
     % This section prepares the varied parameters into a .mat file for the
     % thermal code to run
     param_file = strcat( 'workdir/', Study_paths { ii,1 }, '/', Study_paths { ii,2 }, '/opt/', opt_type, '.in.1');
     python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ''')');   % unix(''python test_saveFile.py'')
-    evalc(python_command);
-    % Set up LOOCV for mu_eff
-    mu_eff_iter = mu_eff_DpassT; % Make a copy of both the mu_eff values and the paths
-    mu_eff_iter ( ii ) = []; % Remove the 0
-    mu_eff_iter = mean ( mu_eff_iter );           % Add alpha to LOOCV here; write *.in.* file; run brainsearch.py; brainsearch.py makes *.out.* file; read in *.out.* file
-    mu_s_p = params_iter.cv.mu_s * ( 1 - params_iter.cv.anfact );
-    mu_a_iter = (-3*mu_s_p + sqrt( 9*mu_s_p^2 + 12 * mu_eff_iter^2))/6; % Used quadratic equation to solve for mu_a in terms of g, mu_s, and mu_eff
-    
-    params_iter.cv.mu_a = mu_a_iter;
-    params_iter.cv.mu_eff_healthy = num2str( mu_eff_iter ); % Average the training datasets' mu_eff; also make it a string coz the thermal code needs that format.
-    params_iter = load( 'TmpDataInput.mat' ); % Read in one dakota.in file to find the constant parameters
+    evalc(python_command); 
    
     % This section runs the thermal code
-    [metric, dice_iter, thermal_model, MRTI_crop] = fast_temperature_obj_fxn_sanity ( params_iter, 1 );
+%     [metric, dice_iter, thermal_model, MRTI_crop] = fast_temperature_obj_fxn_sanity ( params_iter, 1 );
     dice_values (ii) = dice_iter ;
     clear mu_eff_iter;
 end
