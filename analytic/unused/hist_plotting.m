@@ -100,7 +100,8 @@ Study_paths {25,2} = '0415';
 
 num_studies = size(Study_paths,1);
 %cell_data = csvimport('alt_datasummary.txt');
-dlm_data=dlmread('alt_datasummary.txt',',',1,0);
+%dlm_data=dlmread('alt_datasummary.txt',',',1,0);
+dlm_data=dlmread('ex_datasummary.txt',',',1,0);
 %headers = cell_data(1,1:3);
 
 for ii = 1:num_studies

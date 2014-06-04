@@ -28,21 +28,25 @@ n_patients = length( mu_eff_DpassT); % This is the number of patients
 % n_patients = 1;
 dice_values = zeros( n_patients,1); % Initialize the number of DSC (dice) values
 for ii = 1:n_patients
+    % Set up LOOCV for mu_eff
+    mu_eff_iter = mu_eff_DpassT; % Make a copy of both the mu_eff values and the paths
+    mu_eff_iter ( ii ) = []; % Remove the 0
+    mu_eff_iter = mean ( mu_eff_iter );           % Add alpha to LOOCV here; write *.in.* file; run brainsearch.py; brainsearch.py makes *.out.* file; read in *.out.* file
+    mu_s_p = params_iter.cv.mu_s * ( 1 - params_iter.cv.anfact );
+    mu_a_iter = (-3*mu_s_p + sqrt( 9*mu_s_p^2 + 12 * mu_eff_iter^2))/6; % Used quadratic equation to solve for mu_a in terms of g, mu_s, and mu_eff
+    
+    % Set up LOOCV for alpha
+    
+    
     % This section prepares the varied parameters into a .mat file for the
     % thermal code to run
     param_file = strcat( 'workdir/', Study_paths { ii,1 }, '/', Study_paths { ii,2 }, '/opt/', opt_type, '.in.1');
     python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ''')');   % unix(''python test_saveFile.py'')
     evalc(python_command);
     
-    params_iter = load( 'TmpDataInput.mat' ); % Read in one dakota.in file to find the constant parameters
-    %single_path = strcat( 'workdir/', Study_paths{ii,1}, '/', Study_paths{ii,2}, '/opt/');
-    mu_eff_iter = mu_eff_DpassT; % Make a copy of both the mu_eff values and the paths
-    mu_eff_iter ( ii ) = []; % Remove the 0
-    mu_eff_iter = mean ( mu_eff_iter );           % Add alpha to LOOCV here; write *.in.* file; run brainsearch.py; brainsearch.py makes *.out.* file; read in *.out.* file
-    mu_s_p = params_iter.cv.mu_s * ( 1 - params_iter.cv.anfact );
-    mu_a_iter = (-3*mu_s_p + sqrt( 9*mu_s_p^2 + 12 * mu_eff_iter^2))/6; % Used quadratic equation to solve for mu_a in terms of g, mu_s, and mu_eff
     params_iter.cv.mu_a = mu_a_iter;
     params_iter.cv.mu_eff_healthy = num2str( mu_eff_iter ); % Average the training datasets' mu_eff; also make it a string coz the thermal code needs that format.
+    params_iter = load( 'TmpDataInput.mat' ); % Read in one dakota.in file to find the constant parameters
    
     % This section runs the thermal code
     [metric, dice_iter, thermal_model, MRTI_crop] = fast_temperature_obj_fxn_sanity ( params_iter, 1 );
