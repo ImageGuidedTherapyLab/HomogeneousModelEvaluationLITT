@@ -16,27 +16,24 @@ import vtk
 import vtk.util.numpy_support as vtkNumPy 
 print "using vtk version", vtk.vtkVersion.GetVTKVersion()
 
-brainNekDIR     = '/Users/fuentes/MyProjects/braincode/tym1'
-brainNekDIR     = '/workarea/fuentes/braincode/tym1' 
 if( os.getenv("GPUWORKDIR") ) :
   workDirectory   = os.getenv("GPUWORKDIR") 
 else:
   workDirectory   = 'optpp_pds/1'
 os.system('mkdir -p %s' % workDirectory )
 
-outputDirectory = '/dev/shm/outputs/dakota/%04d'
-outputDirectory = '/tmp/outputs/dakota/%04d'
-
-# image processing tool
-c3dexe = '/opt/apps/itksnap/c3d-1.0.0-Linux-x86_64/bin/c3d'
+#FIXME global vars
+globalconfig = ConfigParser.SafeConfigParser({})
+globalconfig.read('./global.ini')
+databaseDIR     = globalconfig.get('exec','databaseDIR')
+c3dexe          = globalconfig.get('exec','c3dexe')
+brainNekDIR     = globalconfig.get('exec','brainNekDIR')
+outputDirectory = globalconfig.get('exec','outputDirectory')
+MatlabDriver    = globalconfig.getboolean('exec','MatlabDriver')
 
 # FIXME quick hack for 180deg flip 
 FIXMEHackTransform = vtk.vtkTransform()
 FIXMEHackTransform.RotateY( 180. )
-
-# database and run directory have the same structure
-databaseDIR     = 'database/'
-databaseDIR     = 'StudyDatabase/'
 
 # $ ls database workdir/
 # database:
@@ -742,6 +739,7 @@ def ForwardSolve(**kwargs):
 ##################################################################
 def ComputeObjective(**kwargs):
   ObjectiveFunction = 0.0
+  dicevalue = 0.0
   # Debugging flags
   DebugObjective = False
   DebugObjective = True
@@ -1082,9 +1080,12 @@ def ComputeObjective(**kwargs):
        WriteVTKOutputFile ( vtkmrtiDose ,"%s/roimrtidose.%s.%04d.vtk"  % (SEMDataDirectory,kwargs['opttype'],MRTItimeID))
 
        # write dice coefficient
-       dicecmd = "%s -verbose %s/roisemdose.%s.%04d.vtk -thresh 1 inf 1 0 -type uchar -as SEM %s/roimrtidose.%s.%04d.vtk -thresh 1 inf 1 0 -type uchar -push SEM -overlap 1 > %s/dice.%s.%04d.txt  2>&1" % (c3dexe,SEMDataDirectory,kwargs['opttype'],MRTItimeID,SEMDataDirectory,kwargs['opttype'],MRTItimeID,SEMDataDirectory,kwargs['opttype'],MRTItimeID)
-       print dicecmd
+       dicefilename = "%s/dice.%s.%04d.txt" % ( SEMDataDirectory,kwargs['opttype'],MRTItimeID)
+       dicecmd = "%s -verbose %s/roisemdose.%s.%04d.vtk -thresh 1 inf 1 0 -type uchar -as SEM %s/roimrtidose.%s.%04d.vtk -thresh 1 inf 1 0 -type uchar -push SEM -overlap 1 > %s  2>&1" % (c3dexe,SEMDataDirectory,kwargs['opttype'],MRTItimeID,SEMDataDirectory,kwargs['opttype'],MRTItimeID,dicefilename)
+       print dicecmd, dicefilename 
        os.system(dicecmd)
+       if (  MRTItimeID == fem_params['maxheatid'] ):
+         dicevalue = DiceTxtFileParse(dicefilename)
        ##if (MRTItimeID > 20):
        ##  raise 
 
@@ -1106,7 +1107,7 @@ def ComputeObjective(**kwargs):
     diffsq =  diff**2
     ObjectiveFunction = ObjectiveFunction + diff.sum()
 
-  return ObjectiveFunction 
+  return (ObjectiveFunction ,dicevalue)
 # end def ComputeObjective:
 ##################################################################
 def brainNekWrapper(**kwargs):
@@ -1223,7 +1224,7 @@ def ParseInput(paramfilename,VisualizeOutput):
   # for this simple example, put all the variables into a single hardwired array
   continuous_vars = {} 
 
-  DescriptorList = ['robin_coeff','probe_init','mu_eff_healthy','body_temp','anfact_healthy', 'mu_a_healthy','mu_s_healthy','gamma_healthy','alpha_healthy','k_0_healthy','w_0_healthy','x_displace','y_displace','z_displace','x_rotate','y_rotate','z_rotate']
+  DescriptorList = ['robin_coeff','probe_init','mu_eff_healthy','body_temp','anfact_healthy', 'mu_a_healthy','mu_s_healthy','c_blood_healthy','c_p_healthy','rho_healthy','alpha_healthy','k_0_healthy','w_0_healthy','x_displace','y_displace','z_displace','x_rotate','y_rotate','z_rotate']
   for paramname in DescriptorList:
     try:
       continuous_vars[paramname  ] = paramsdict[paramname ]
@@ -1233,7 +1234,10 @@ def ParseInput(paramfilename,VisualizeOutput):
   try:
     active_set_vector = [ int(paramsdict['ASV_%d:response_fn_%d' % (i,i) ]) for i in range(1,num_fns+1)  ] 
   except KeyError:
-    active_set_vector = [ int(paramsdict['ASV_%d:obj_fn' % (i) ]) for i in range(1,num_fns+1)  ] 
+    try:
+      active_set_vector = [ int(paramsdict['ASV_%d:obj_fn' % (i) ]) for i in range(1,num_fns+1)  ] 
+    except KeyError:
+      active_set_vector = [ int(paramsdict['ASV_%d:obj_fn_%d' % (i,i) ]) for i in range(1,num_fns+1)  ] 
   
   ################################
   # convert to uniform interface
@@ -1245,22 +1249,20 @@ def ParseInput(paramfilename,VisualizeOutput):
   #  sqrt( 3 * 5.e-1 * 5.e-1 )  <        mu_eff          < sqrt( 3 * 600. * (600. + .3 * 50000.) ) 
   #            8.e-1            <        mu_eff          <    5.3e3
   import math
-  mu_s   = 8.e3
-  anfact = .9
+  mu_s   = float(continuous_vars['mu_s_healthy'])
+  anfact = float(continuous_vars['anfact_healthy'])
   mu_s_p = mu_s * (1.-anfact) 
   # mu_tr  = mu_a + (1-g) mu_s 
   # mu_eff = sqrt( 3 mu_a  mu_tr )
   mu_eff = float(continuous_vars['mu_eff_healthy'])
   mu_a   =  0.5*( -mu_s_p + math.sqrt( mu_s_p * mu_s_p  + 4. * mu_eff * mu_eff  /3. ) )
   # alpha  == k / rho / c_p   W/m/K * m^3/kg * kg*K/W/s = m^2/s
-  # gamma  == k / w   / c_blood
-  alpha  = float(continuous_vars['alpha_healthy'])
-  gamma  = float(continuous_vars['gamma_healthy'])
-  rho     = 1045.
-  c_p     = 3640.
-  c_blood = 3840.
+  alpha   = float(continuous_vars['alpha_healthy'])
+  rho     = float(continuous_vars['rho_healthy'])
+  c_p     = float(continuous_vars['c_p_healthy'])
+  c_blood = float(continuous_vars['c_blood_healthy'])
   k_0    = alpha * c_p * rho 
-  w_0    = k_0 / c_blood / gamma
+  w_0    = float(continuous_vars['w_0_healthy'])
 
   # store dakota vars
   continuous_vars['rho'    ]   =  rho   
@@ -1393,8 +1395,6 @@ if (options.param_file != None):
   # parse the dakota input file
   fem_params = ParseInput(options.param_file,options.vis_out)
 
-  MatlabDriver = True
-  MatlabDriver = False
   if(MatlabDriver):
     import scipy.io as scipyio
     # write out for debug
@@ -1402,7 +1402,7 @@ if (options.param_file != None):
     MatlabDataDictionary['patientID'] = options.param_file.split('/')[2]
     MatlabDataDictionary['UID']       = options.param_file.split('/')[3]
     MatlabDataDictionary['vtkNumber'] = 4312
-    scipyio.savemat( 'TmpDataInput.mat' , MatlabDataDictionary )
+    scipyio.savemat( '%s.mat' % options.param_file, MatlabDataDictionary )
 
     # FIXME setup any needed paths
     # FIXME this nees to have a clean matlab env for dakmatlab
@@ -1411,7 +1411,6 @@ if (options.param_file != None):
     matlabcommand  = './analytic/dakmatlab %s %s' %  (options.param_file,sys.argv[3])
     print matlabcommand  
     os.system( matlabcommand )
-    objfunction = 0.0
   else:
     # FIXME link needed directories
     linkDirectoryList = ['occa','libocca','meshes']
@@ -1425,11 +1424,12 @@ if (options.param_file != None):
     brainNekWrapper(**fem_params)
     
     # write objective function back to Dakota
-    objfunction = ComputeObjective(**fem_params)
+    objfunctionlist = ComputeObjective(**fem_params)
 
-    print "current objective function: ",objfunction 
+    print "current objective function: ",objfunctionlist 
     fileHandle = file(sys.argv[3],'w')
-    fileHandle.write('%f\n' % objfunction )
+    for objfncvalue in objfunctionlist:
+      fileHandle.write('%f\n' % objfncvalue )
     fileHandle.flush(); fileHandle.close();
 
 # find the best point for each run

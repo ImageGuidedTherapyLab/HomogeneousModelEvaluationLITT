@@ -32,13 +32,13 @@ interface,
           parameters_file = './workdir/Study0026/0455/opt/optpp_pds.heating.in'
           results_file    = './workdir/Study0026/0455/opt/optpp_pds.heating.out'
 
-# data quality   1
 #        discrete_state_range = 1
 #          initial_state    0
-#          descriptors      'powerhistory:[[7, 16, 34, 54, 63], [0, 3, 9.15, 11.85, 0], 5.0, [54, 63], [0, 54]]'
+#          descriptors      'powerhistory:[[7, 16, 34, 54, 63], [0, 3, 9.1500000000000004, 11.85, 0], 5.0, [54, 63], [0, 54]]'
 
 responses,
-        objective_functions = 1
+        objective_functions = 2
+        multi_objective_weights  = 1. 0.
         numerical_gradients
         fd_gradient_step_size 1.
         # no_gradients
@@ -50,8 +50,11 @@ variables,
           lower_bounds  =   8.00000e-01 
           upper_bounds  =   5.30000e+03 
           descriptors  =  'mu_eff_healthy' 
-        continuous_state = 11
-          initial_state  =   2.70000e+02   2.28733e-05   1.06860e-01   1.16300e-01   0.00000e+00   3.70000e+01   0.00000e+00   1.38546e-07   3.45000e+02   2.10000e+01   0.00000e+00 
-          #lower_bounds  =   2.65000e+02   1.37787e-05   1.05860e-01   1.15300e-01  -1.00000e-03   3.40000e+01  -5.00000e+00   1.19227e-07   3.40000e+02   2.00000e+01   0.00000e+00 
-          #upper_bounds  =   2.75000e+02   9.13743e-05   1.07860e-01   1.17300e-01   1.00000e-03   4.00000e+01   5.00000e+00   2.91296e-07   3.50000e+02   4.00000e+01   1.00000e+04 
-          descriptors  =  'y_rotate'  'gamma_healthy'  'x_displace'  'y_displace'  'z_displace'  'body_temp'  'x_rotate'  'alpha_healthy'  'z_rotate'  'probe_init'  'robin_coeff' 
+        continuous_state = 16
+          initial_state  =   2.70000e+02   1.16300e-01   1.04500e+03   9.00000e-01   1.06860e-01   6.00000e+00   0.00000e+00   3.70000e+01   0.00000e+00   1.38546e-07   3.45000e+02   2.10000e+01   8.00000e+03   3.64000e+03   0.00000e+00   3.84000e+03 
+          #lower_bounds  =   2.65000e+02   1.15300e-01   9.92750e+02   7.00000e-01   1.05860e-01   3.00000e+00  -1.00000e-03   3.40000e+01  -5.00000e+00   1.19227e-07   3.40000e+02   2.00000e+01   8.00000e+02   3.45800e+03   0.00000e+00   3.64800e+03 
+          #upper_bounds  =   2.75000e+02   1.17300e-01   1.09725e+03   1.00000e+00   1.07860e-01   9.00000e+00   1.00000e-03   4.00000e+01   5.00000e+00   2.91296e-07   3.50000e+02   4.00000e+01   5.00000e+04   3.82200e+03   1.00000e+04   4.03200e+03 
+          descriptors  =  'y_rotate'  'y_displace'  'rho_healthy'  'anfact_healthy'  'x_displace'  'w_0_healthy'  'z_displace'  'body_temp'  'x_rotate'  'alpha_healthy'  'z_rotate'  'probe_init'  'mu_s_healthy'  'c_p_healthy'  'robin_coeff'  'c_blood_healthy' 
+        discrete_state_set_integer = 3
+          set_values  = 26 455 1 
+          descriptors  = 'study' 'series' 'quality'
