@@ -45,17 +45,8 @@ for ii = 1:n_patients
     params_iter.cv.mu_eff_healthy = num2str( mu_eff_iter ); % Average the training datasets' mu_eff; also make it a string coz the thermal code needs that format.
    
     % This section runs the thermal code
-    [metric, thermal_model, MRTI_crop] = fast_temperature_obj_fxn_sanity ( params_iter, 1 );
-    model_deg57 = zeros( size(thermal_model,1), size(thermal_model,2) );
-    MRTI_deg57 = zeros( size(MRTI_crop,1), size(MRTI_crop,2) );
-    model_deg57 = thermal_model >= 57;
-    MRTI_deg57 = MRTI_crop >= 57;
-    n_model = sum(sum( model_deg57 ));
-    n_MRTI = sum(sum( MRTI_deg57 ));
-    intersection = model_deg57 + MRTI_deg57;
-    intersection = intersection > 1;
-    n_intersection = sum(sum( intersection ));
-    dice_values (ii) = 2*n_intersection / (n_model + n_MRTI) ;
+    [metric, dice_iter, thermal_model, MRTI_crop] = fast_temperature_obj_fxn_sanity ( params_iter, 1 );
+    dice_values (ii) = dice_iter ;
     clear mu_eff_iter;
 end
 

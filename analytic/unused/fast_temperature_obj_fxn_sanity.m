@@ -1,7 +1,7 @@
 % This is the updated Bioheat_script that should be used with DF's DAKOTA
 % run. The metric is based on temperature (not dose and isotherms).
 
-function [metric,tmap_model_scaled_to_MRTI,MRTI_crop] = fast_temperature_obj_fxn_sanity ( inputdatavars, sources );
+function [metric, dice, tmap_model_scaled_to_MRTI,MRTI_crop] = fast_temperature_obj_fxn_sanity ( inputdatavars, sources );
 % Record the working directory
 setenv ( 'PATH22' , pwd);
 path22 = getenv ( 'PATH22' );
@@ -147,6 +147,16 @@ MRTI_crop = MRTI_hottest( (VOI.y(1) ):(VOI.y(2) ) , (VOI.x(1) ):(VOI.x(2) ) ); %
 temperature_diff = tmap_model_scaled_to_MRTI - MRTI_crop;
 metric = ( norm ( temperature_diff , 2 ) )^2;
 cd (path22);
+
+model_deg_threshold = tmap_model_scaled_to_MRTI >= 57;
+MRTI_deg_threshold = MRTI_crop >= 57;
+n_model = sum(sum( model_deg_threshold ));
+n_MRTI = sum(sum( MRTI_deg_threshold ));
+intersection = model_deg57 + MRTI_deg57;
+intersection = intersection > 1;
+n_intersection = sum(sum( intersection ));
+dice = 2*n_intersection / (n_model + n_MRTI) ;
+
 % %%%%% The remaining code is exclusively for testing / debugging / checking
 % %%%%% the registration.
 % MRTI_size = size ( MRTI );
