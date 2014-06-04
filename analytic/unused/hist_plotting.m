@@ -99,36 +99,28 @@ Study_paths {25,1} = 'Study0021';
 Study_paths {25,2} = '0415';
 
 num_studies = size(Study_paths,1);
-cell_data = csvimport('alt_datasummary.txt');
-headers = cell_data(1,1:3);
+%cell_data = csvimport('alt_datasummary.txt');
+dlm_data=dlmread('alt_datasummary.txt',',',1,0);
+%headers = cell_data(1,1:3);
 
 for ii = 1:num_studies
-    if  strcmp(strtrim(cell_data{ii,3}),'nan') == 1
-        cell_data{ii,3} = ' 1.00000e+00';
+    if  isnan(dlm_data(ii,3)) == 1
+        dlm_data(ii,3) =  1;
     end
 end
 clear ii
-
-
-for ii = 2:num_studies+1
-    cell_data{ii,3} = str2num(cell_data{ii,3});
-end
-clear ii
-mu_eff_data = cell2mat(cell_data(2:end,:));
-
-
 
 matching_num = zeros(1,num_studies);
 mu_eff_index = zeros(1,num_studies);
 mu_eff_opt   = zeros(1,num_studies);
 for ii = 1:num_studies
     matching_num(ii) = str2num(Study_paths{(ii),2});
-    mu_eff_index(ii) = find( mu_eff_data(:,1) == matching_num(ii));
-    mu_eff_opt(ii) = mu_eff_data(mu_eff_index(ii),2);
+    mu_eff_index(ii) = find( dlm_data(:,1) == matching_num(ii));
+    mu_eff_opt(ii) = dlm_data(mu_eff_index(ii),2);
 end
 clear ii
 
-mu_eff_opt22 = mu_eff_opt*(6000-100)+100;
+mu_eff_opt22 = mu_eff_opt*(6000-100)+100; %This line converts the normalized value into absolute. It's very import to get the converion correct
 dice_pre = 1 - mu_eff_data(:,3);
 toss_index7 = find(dice_pre<0.7);
 toss_index8 = find(dice_pre<0.8);

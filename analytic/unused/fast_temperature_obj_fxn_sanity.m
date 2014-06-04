@@ -152,7 +152,7 @@ model_deg_threshold = tmap_model_scaled_to_MRTI >= 57;
 MRTI_deg_threshold = MRTI_crop >= 57;
 n_model = sum(sum( model_deg_threshold ));
 n_MRTI = sum(sum( MRTI_deg_threshold ));
-intersection = model_deg57 + MRTI_deg57;
+intersection = model_deg_threshold + MRTI_deg_threshold;
 intersection = intersection > 1;
 n_intersection = sum(sum( intersection ));
 dice = 2*n_intersection / (n_model + n_MRTI) ;
