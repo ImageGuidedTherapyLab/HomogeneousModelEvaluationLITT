@@ -100,42 +100,44 @@ Study_paths {25,2} = '0415';
 
 num_studies = size(Study_paths,1);
 %cell_data = csvimport('alt_datasummary.txt');
-dlm_data=dlmread('alt_datasummary.txt',',',1,0);
+dlm_data=dlmread('sample_datasummary.txt',',',1,0);
 %headers = cell_data(1,1:3);
 
 for ii = 1:num_studies
-    if  isnan(dlm_data(ii,3)) == 1
-        dlm_data(ii,3) =  1;
+    if  isnan(dlm_data(ii,7)) == 1
+        dlm_data(ii,7) =  0;
     end
 end
 clear ii
 
-matching_num = zeros(1,num_studies);
-mu_eff_index = zeros(1,num_studies);
-mu_eff_opt   = zeros(1,num_studies);
-for ii = 1:num_studies
-    matching_num(ii) = str2num(Study_paths{(ii),2});
-    mu_eff_index(ii) = find( dlm_data(:,1) == matching_num(ii));
-    mu_eff_opt(ii) = dlm_data(mu_eff_index(ii),2);
-end
-clear ii
+% matching_num = zeros(1,num_studies);
+% mu_eff_index = zeros(1,num_studies);
+% mu_eff_opt   = zeros(1,num_studies);
+% alpha_opt    = zeros(1,num_studies);
+% for ii = 1:num_studies
+%     matching_num(ii) = str2num(Study_paths{(ii),2});
+%     mu_eff_index(ii) = find( dlm_data(:,1) == matching_num(ii));
+%     mu_eff_opt(ii) = dlm_data(mu_eff_index(ii),3);
+%     alpha_opt(ii) = dlm_data(mu_eff_index(ii),4);
+% end
+% clear ii
 
-mu_eff_opt22 = mu_eff_opt*(6000-100)+100; %This line converts the normalized value into absolute. It's very import to get the converion correct
-dice_pre = 1 - mu_eff_data(:,3);
-toss_index7 = find(dice_pre<0.7);
-toss_index8 = find(dice_pre<0.8);
+%mu_eff_opt22 = mu_eff_opt*(6000-100)+100; %This line converts the normalized value into absolute. It's very import to get the converion correct
 
-mu_eff7 = mu_eff_opt22;
+toss_index7 = find(dlm_data(:,7)<0.7);
+toss_index8 = find(dlm_data(:,7)<0.8);
+
+mu_eff7 = dlm_data(:,3);
 mu_eff7 (toss_index7) = [];
-mu_eff8 = mu_eff_opt22;
+mu_eff8 = dlm_data(:,3);
 mu_eff8 (toss_index8) = [];
 
-dice7 = dice_pre;
+dice7 = dlm_data(:,7);
 dice7(toss_index7) = [];
-dice8 = dice_pre;
+dice8 = dlm_data(:,7);
 dice8(toss_index8) = [];
 
-stats_pre = Descriptive_statistics(mu_eff_opt22);
+stats_pre = Descriptive_statistics(dlm_data(:,3));
 stats7 = Descriptive_statistics(mu_eff7);
 stats8 = Descriptive_statistics(mu_eff8);
 
@@ -147,7 +149,7 @@ stats8
 % figure; hist(mu_eff7);
 % figure; hist(mu_eff8);
 
-[ hh_pre, dice_values_pre ] = LOOCV_t_test_DiceTemp ( Study_paths, mu_eff_opt22, opt_type );
+[ hh_pre, dice_values_pre ] = LOOCV_t_test_DF ( Study_paths, dlm_data(:,3), dlm_data(:,4), opt_type );
 
 % Remove Study_paths indices
 temp_paths = Study_paths;

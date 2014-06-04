@@ -21,7 +21,7 @@
 % mu_eff_opt is a vector of the inverse problem optimized mu_eff values in
 %   1/m units
 
-function [ hh, dice_values ] = LOOCV_t_test_DiceTemp ( Study_paths, mu_eff_DpassT, opt_type );
+function [ hh, dice_values ] = LOOCV_t_test_DF ( Study_paths, mu_eff_DpassT, opt_type );
 
 % Make the LOOCV iteration system
 n_patients = length( mu_eff_DpassT); % This is the number of patients
