@@ -59,7 +59,13 @@ for ii = 1:n_patients
     input_file{17,1} = '1 DVV_1:mu_eff_healthy';
     input_file{18,1} = '0 analysis_components';
     
-    
+    % write the *.in.* file
+    num_file_length = length (input_file);
+    fid = fopen('alt_testing_DF.in.1', 'w');
+    for ii = 1 : num_file_length
+        fprintf (fid, '%s\n' , input_file{ii,1});
+    end
+    fclose(fid);
     
     
     
