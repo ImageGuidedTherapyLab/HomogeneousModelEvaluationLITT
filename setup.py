@@ -4,7 +4,17 @@ from Cython.Distutils import build_ext
 
 import subprocess
 import os
-brainnek_dir = '/workarea/fuentes/braincode/tym1'
+
+MacOSXBuild = True 
+MacOSXBuild = False 
+#FIXME - can we automate the paths ? 
+
+if ( MacOSXBuild ):
+  brainnek_dir = '/Users/fuentes/MyProjects/braincode/tym1'
+else:
+  brainnek_dir = '/workarea/fuentes/braincode/tym1'
+
+
 build_dir   = "build.tmp" 
 
 # local includes
@@ -13,10 +23,15 @@ brainnek_include.append( "."  )
 brainnek_include.append( "%s/src"      % brainnek_dir )
 brainnek_include.append( "%s/include"  % brainnek_dir )
 brainnek_include.append( "%s/libocca"  % brainnek_dir )
-#FIXME - can we automate the paths ? 
-brainnek_include.append( "/opt/apps/khronos/1.1")
-brainnek_include.append( "/usr/include/mpich2")
-brainnek_include.append( "/opt/apps/EPD/epd-7.3-1-rh5-x86_64/lib/python2.7/site-packages/numpy/core/include")
+
+
+if ( MacOSXBuild ):
+  brainnek_include.append( "/Applications/Xcode.app/Contents//Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk//System/Library/Frameworks/OpenCL.framework/" )
+  brainnek_include.append( "/Applications/Xcode.app/Contents//Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy/core/include/")
+else:
+  brainnek_include.append( "/opt/apps/khronos/1.1")
+  brainnek_include.append( "/opt/apps/EPD/epd-7.3-1-rh5-x86_64/lib/python2.7/site-packages/numpy/core/include")
+  brainnek_include.append( "/opt/apps/EPD/epd-7.3-1-rh5-x86_64/include/vtk-5.6")
 
 
 # cxx flags
@@ -24,7 +39,7 @@ brainnek_cxxflags = []
 # FIXME why is this flag needed ??
 brainnek_cxxflags.append( "-DCYTHON_CCOMPLEX=0"     )
 
-brainnek_cxxflags.append( "-DMPI_ENABLED=1"      )
+brainnek_cxxflags.append( "-DMPI_ENABLED=0"      )
 brainnek_cxxflags.append( "-Ddatafloat=float"    )
 brainnek_cxxflags.append( "-DGL_ENABLED=0"       )
 brainnek_cxxflags.append( "-DSCREENSHOT=1"       )
@@ -36,16 +51,19 @@ brainnek_cxxflags.append( "-DOCCA_USE_ALL=0"     )
 brainnek_cxxflags.append( "-DOCCA_USE_CPU=1"     )
 brainnek_cxxflags.append( "-O0"     )
 
+if ( MacOSXBuild ):
+  brainnek_cxxflags.append( "-Wno-error=unused-command-line-argument-hard-error-in-future")
+
 brainnek_libraries=[
 "lapack",
 "blas",
 "m",
-"gfortran",
-"mpichcxx",
-"mpich",
-"opa",
+#"gfortran",
+#"mpichcxx",
+#"mpich",
+#"opa",
 "pthread",
-"rt",
+#"rt",
 "dl",
 #"glut",
 #"GL",
@@ -53,6 +71,12 @@ brainnek_libraries=[
 #"GLEW",
 "OpenCL"
                ]
+if ( MacOSXBuild ):
+  brainnek_library_dirs=[
+  "/Applications/Xcode.app/Contents//Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk//System/Library/Frameworks/OpenCL.framework/"
+      ] 
+else:
+  brainnek_library_dirs=[]
 
 # source filenames
 source_files = ["wrapbrainNek.pyx",
@@ -85,7 +109,7 @@ ext_modules_list=[
     language="c++",              # this causes Cython to create C++ source
     include_dirs= brainnek_include, # include directories
     extra_compile_args = brainnek_cxxflags, # cxx flags
-    #library_dirs =brainnek_library_dirs, 
+    library_dirs =brainnek_library_dirs, 
     #runtime_library_dirs=brainnek_library_dirs ,
     libraries=brainnek_libraries
     ) # Unix-like specific

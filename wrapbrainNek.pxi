@@ -35,8 +35,8 @@ cdef extern from "wrapbrainNek.h":
         int GetNumberOfNodes()
         void GetElements(int*)
         void GetNodes(brainNekdatafloat*)
-        int  timeStep(double)
-        void heatStep(brainNekdatafloat)
+        int  timeStep(double,double)
+        void heatStep(brainNekdatafloat,brainNekdatafloat)
         brainNekdatafloat dt
         void screenshot(  brainNekdatafloat )
         void getHostTemperature(  size_t , void *)

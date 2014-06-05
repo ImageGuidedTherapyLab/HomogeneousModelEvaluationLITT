@@ -1,4 +1,8 @@
 #include "brain3d.hpp"
+#include <vtkSmartPointer.h>
+#include <vtkPolyData.h>
+#include <vtkPolyDataReader.h>
+#include <vtkLandmarkTransform.h>
 
 class wrapbrain3d : public brain3d {
 public:
