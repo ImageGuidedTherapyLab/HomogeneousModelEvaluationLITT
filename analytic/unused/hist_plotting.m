@@ -7,7 +7,10 @@
 %           (mu_eff@Opt - mu_eff@maxDice)
 % 4. How does the maxDice depend on isotherm choice (temperature).
 
-cd /FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
+% run run PlanningValidation directory
+
+% path(path,'/workarea/fuentes/github/DakotaApplications/PlanningValidation/analytic/unused')
+% cd /FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
 % load all_new_Tmp_files.mat
 % 
 % data.labels = total_path(:,1);
@@ -43,7 +46,7 @@ close all
 % The output: The output is a binary acceptance/rejection of the null and alternative hypotheses.
 
 % This script finds the best mu_eff for the different studies.
-opt_type = 'sanity_1D' ;
+opt_type = 'bestfit' ;
 
 
 % Identify the studies to be examined.
@@ -99,23 +102,14 @@ Study_paths {25,1} = 'Study0021';
 Study_paths {25,2} = '0415';
 
 num_studies = size(Study_paths,1);
-cell_data = csvimport('alt_datasummary.txt');
-headers = cell_data(1,1:3);
 
-for ii = 1:num_studies
-    if  strcmp(strtrim(cell_data{ii,3}),'nan') == 1
-        cell_data{ii,3} = ' 1.00000e+00';
-    end
-end
-clear ii
+% read  best_fit optimization data and store mu_eff and alpha
+cell_data = dlmread('datasummary.txt',',',1,0);
+mu_eff_data = cell_data(:,3);
+alpha_data  = cell_data(:,4);
 
-
-for ii = 2:num_studies+1
-    cell_data{ii,3} = str2num(cell_data{ii,3});
-end
-clear ii
-mu_eff_data = cell2mat(cell_data(2:end,:));
-
+% TODO testing for now
+[ hh7, dice_values7 ] = LOOCV_t_test_DiceTemp ( Study_paths, mu_eff_data ,alpha_data , opt_type );
 
 
 matching_num = zeros(1,num_studies);
