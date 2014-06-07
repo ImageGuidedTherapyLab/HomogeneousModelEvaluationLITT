@@ -8,19 +8,12 @@ inputdatavars = load('./TmpDataInput.mat');
 
 % index = load ( 'index.txt' );
 
-[~,model,MRTI_crop] =  fast_temperature_obj_fxn_sanity ( inputdatavars, 1 );
+[~,dice, ~,~] =  fast_temperature_obj_fxn_sanity ( inputdatavars, 1 );
 
 % index = index + 1;
 % csvwrite ('index.txt' , index);
 
-model_deg57 = model >= 57;
-MRTI_deg57 = MRTI_crop >= 57;
-n_model = sum(sum( model_deg57));
-n_MRTI = sum(sum( MRTI_deg57 ));
-intersection = model_deg57(:,:,1) + MRTI_deg57;
-intersection = intersection > 1;
-n_intersection = sum(sum( intersection ));
-metric = 1 - 2*n_intersection / (n_model + n_MRTI) ;
+metric = 1 - dice;
 
 
 y =  metric;

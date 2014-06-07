@@ -28,7 +28,6 @@ n_patients = length( mu_eff_DpassT); % This is the number of patients
 % n_patients = 1;
 dice_values = zeros( n_patients,1); % Initialize the number of DSC (dice) values
 for ii = 1:n_patients
-
     % TODO add alpha, write new param_file
     mu_eff_iter = mu_eff_DpassT; % Make a copy of both the mu_eff values and the paths
     mu_eff_iter ( ii ) = []; % Remove the 0
