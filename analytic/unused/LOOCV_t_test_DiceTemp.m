@@ -77,7 +77,7 @@ for ii = 1:n_patients
     %n_intersection = sum(sum( intersection ));
     %dice_values (ii) = 2*n_intersection / (n_model + n_MRTI) ;
     %clear mu_eff_iter;
->>>>>>> 9ea201e51fb06620d72bff82c2fb52efea076c09
+
 end
 
 %[hh.H, hh.ptest] = ttest( dice_values, 0.7, 0.05, 'right');
