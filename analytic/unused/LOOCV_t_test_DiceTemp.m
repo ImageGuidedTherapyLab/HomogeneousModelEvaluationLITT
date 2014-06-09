@@ -21,17 +21,17 @@
 % mu_eff_opt is a vector of the inverse problem optimized mu_eff values in
 %   1/m units
 
-function [ hh, dice_values ] = LOOCV_t_test_DiceTemp ( Study_paths, mu_eff_DpassT, opt_type );
+function [ hh, dice_values ] = LOOCV_t_test_DiceTemp ( Study_paths, mu_eff_DpassT, alpha_DpassT, opt_type );
 
 % Make the LOOCV iteration system
 n_patients = length( mu_eff_DpassT); % This is the number of patients
 % n_patients = 1;
 dice_values = zeros( n_patients,1); % Initialize the number of DSC (dice) values
 for ii = 1:n_patients
-        
     % This section prepares the varied parameters into a .mat file for the
     % thermal code to run
-    param_file = strcat( 'workdir/', Study_paths { ii,1 }, '/', Study_paths { ii,2 }, '/opt/', opt_type, '.in.1');
+    param_file  = strcat( 'workdir/', Study_paths { ii,1 }, '/', Study_paths { ii,2 }, '/opt/optpp_pds.', opt_type, '.in.1');
+    result_file = strcat( 'workdir/', Study_paths { ii,1 }, '/', Study_paths { ii,2 }, '/opt/optpp_pds.', opt_type, '.out.1');
     python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ''')');   % unix(''python test_saveFile.py'')
     evalc(python_command);
     % Set up LOOCV for mu_eff
@@ -48,9 +48,39 @@ for ii = 1:n_patients
     [metric, dice_iter, thermal_model, MRTI_crop] = fast_temperature_obj_fxn_sanity ( params_iter, 1 );
     dice_values (ii) = dice_iter ;
     clear mu_eff_iter;
+    disp(python_command );
+    %evalc(python_command);
+
+    % the  result_file  is written by the python command
+    metrics = dlmread(result_file );
+    l2diff          = metrics (1)
+    dice_values(ii) = metrics (2)
+    
+    % TODO move to your kernel
+    %params_iter = load( 'TmpDataInput.mat' ); % Read in one dakota.in file to find the constant parameters
+    %%single_path = strcat( 'workdir/', Study_paths{ii,1}, '/', Study_paths{ii,2}, '/opt/');
+    %mu_s_p = params_iter.cv.mu_s * ( 1 - params_iter.cv.anfact );
+    %mu_a_iter = (-3*mu_s_p + sqrt( 9*mu_s_p^2 + 12 * mu_eff_iter^2))/6; % Used quadratic equation to solve for mu_a in terms of g, mu_s, and mu_eff
+    %params_iter.cv.mu_a = mu_a_iter;
+    %params_iter.cv.mu_eff_healthy = num2str( mu_eff_iter ); % Average the training datasets' mu_eff; also make it a string coz the thermal code needs that format.
+   
+    %% This section runs the thermal code
+    %[metric, thermal_model, MRTI_crop] = fast_temperature_obj_fxn_sanity ( params_iter, 1 );
+    %model_deg57 = zeros( size(thermal_model,1), size(thermal_model,2) );
+    %MRTI_deg57 = zeros( size(MRTI_crop,1), size(MRTI_crop,2) );
+    %model_deg57 = thermal_model >= 57;
+    %MRTI_deg57 = MRTI_crop >= 57;
+    %n_model = sum(sum( model_deg57 ));
+    %n_MRTI = sum(sum( MRTI_deg57 ));
+    %intersection = model_deg57 + MRTI_deg57;
+    %intersection = intersection > 1;
+    %n_intersection = sum(sum( intersection ));
+    %dice_values (ii) = 2*n_intersection / (n_model + n_MRTI) ;
+    %clear mu_eff_iter;
+>>>>>>> 9ea201e51fb06620d72bff82c2fb52efea076c09
 end
 
-[hh.H, hh.ptest] = ttest( dice_values, 0.7, 0.05, 'right');
+%[hh.H, hh.ptest] = ttest( dice_values, 0.7, 0.05, 'right');
 
 % mean_dice = mean ( dice_values ); % Average Dice values
 % std_dice = std ( dice_values ); % Stardard deviation of Dice values.
