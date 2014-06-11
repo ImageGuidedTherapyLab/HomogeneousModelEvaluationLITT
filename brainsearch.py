@@ -1303,7 +1303,8 @@ def ParseInput(paramfilename,VisualizeOutput):
   inisetupfile  = "/".join(locatemrti)+"/setup.ini"
   config = ConfigParser.SafeConfigParser({})
   config.read(inisetupfile)
-  fem_params['lambdacode']       = eval(config.get('power','lambdacode'))
+  if (not MatlabDriver):
+       fem_params['lambdacode']       = eval(config.get('power','lambdacode'))
   fem_params['segment_file']     = config.get('exec','segment_file')
   fem_params['target_landmarks'] = config.get('exec','target_landmarks')
   #fem_params['powerhistory'] = config.get('power','history')
@@ -1396,14 +1397,13 @@ if (options.param_file != None):
   fem_params = ParseInput(options.param_file,options.vis_out)
 
   if(MatlabDriver):
+    print fem_params
     import scipy.io as scipyio
     # write out for debug
-    MatlabDataDictionary  = fem_params
-    MatlabDataDictionary['patientID'] = options.param_file.split('/')[2]
-    MatlabDataDictionary['UID']       = options.param_file.split('/')[3]
-    MatlabDataDictionary['vtkNumber'] = 4312
+    fem_params['patientID'] = options.param_file.split('/')[2]
+    fem_params['UID']       = options.param_file.split('/')[3]
     #scipyio.savemat( '%s.mat' % options.param_file, MatlabDataDictionary )
-    scipyio.savemat( 'TmpDataInput.mat' , MatlabDataDictionary )
+    scipyio.savemat( './TmpDataInput.mat' , fem_params )
     # FIXME setup any needed paths
     # FIXME this nees to have a clean matlab env for dakmatlab
     # FIXME then setup ONCE
