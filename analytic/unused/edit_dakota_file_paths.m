@@ -53,17 +53,19 @@ Study_paths {25,1} = 'Study0021';
 Study_paths {25,2} = '0415';
 num_studies = size(Study_paths,1);
 
-dakota_filename_in = 'dakota_sanity_1D';
-dakota_filename_out= 'dakota_test_text';
-shell_command = strcat( 'unix(''cp workdir/',Study_paths{1,1},'/',Study_paths{1,2},'/opt/',dakota_filename_in,'.in workdir/',Study_paths{1,1},'/',Study_paths{1,2},'/opt/',dakota_filename_out,'.txt'')');   % unix(''python test_saveFile.py'')
-evalc(shell_command);
+dakota_filename_in = 'dakota_bestfit1';
+dakota_filename_out= 'dakota_bestfit1';
+%file_base = strcat( './workdir/',Study_paths{1,1},'/',Study_paths{1,2},'/opt/');
+%copyfile( strcat( file_base,dakota_filename_in,'.in' ), strcat( file_base, dakota_filename_out, '.txt') );   % unix(''python test_sa
+% shell_command = strcat( 'unix(''cp workdir/',Study_paths{1,1},'/',Study_paths{1,2},'/opt/',dakota_filename_in,'.in workdir/',Study_paths{1,1},'/',Study_paths{1,2},'/opt/',dakota_filename_out,'.txt'')');   % unix(''python test_saveFile.py'')
+% evalc(shell_command);
 
 
 
 for ii = 2:num_studies
 
-    fin  = fopen(strcat('workdir/',Study_paths{1,1},'/',Study_paths{1,2},'/opt/', dakota_filename_out,'.txt'));
-    fout = fopen(strcat('workdir/',Study_paths{ii,1},'/',Study_paths{ii,2},'/opt/', dakota_filename_out,'.in'),'w');
+    fin  = fopen(strcat('./workdir/',Study_paths{1,1},'/',Study_paths{1,2},'/opt/', dakota_filename_out,'.in'));
+    fout = fopen(strcat('./workdir/',Study_paths{ii,1},'/',Study_paths{ii,2},'/opt/', dakota_filename_out,'.in'),'w');
     
     while ~feof(fin)
         f_line = fgetl(fin);
@@ -76,4 +78,4 @@ for ii = 2:num_studies
     fclose(fout);
     
 end
-delete(strcat('workdir/',Study_paths{1,1},'/',Study_paths{1,2},'/opt/', dakota_filename_out, '.txt'));
+%delete(strcat('workdir/',Study_paths{1,1},'/',Study_paths{1,2},'/opt/', dakota_filename_out, '.txt'));
