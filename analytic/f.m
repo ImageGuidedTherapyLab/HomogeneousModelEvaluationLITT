@@ -27,7 +27,7 @@ fclose(fout);
 
 save ( strcat( file_base,'.in.',num2str(inputdatavars.fileID), '.mat'), 'inputdatavars');
 
-y =  metric(2);
+y =  metric;
 
 
 % patientID = strcat ( inputdatavars.patientID, '/', inputdatavars.patientID, '/');

@@ -38,7 +38,8 @@ interface,
 
 responses,
         objective_functions = 2
-        multi_objective_weights  = 1. 0.
+#        multi_objective_weights  = 1. 0.
+        multi_objective_weights  = 0. 1.
         numerical_gradients
         fd_gradient_step_size 1.
         # no_gradients

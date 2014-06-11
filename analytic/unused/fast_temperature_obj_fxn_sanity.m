@@ -34,10 +34,13 @@ clear diff
 probe_u = str2num(inputdatavars.cv.probe_init);
 %g_anisotropy = str2num(inputdatavars.cv.gamma_healthy);
 g_anisotropy = inputdatavars.cv.anfact;
-mu_a = inputdatavars.cv.mu_a;
+%mu_a = inputdatavars.cv.mu_a;
 mu_s = inputdatavars.cv.mu_s;
 mu_eff = str2num(inputdatavars.cv.mu_eff_healthy);
-k_cond = inputdatavars.cv.k_0;
+%k_cond = inputdatavars.cv.k_0;
+alpha = str2num(inputdatavars.cv.alpha_healthy);
+rho = inputdatavars.cv.rho;
+c_p = str2num(inputdatavars.cv.c_p_healthy);
 w_perf = inputdatavars.cv.w_0;
 x_disp = str2num(inputdatavars.cv.x_displace);
 y_disp = str2num(inputdatavars.cv.y_displace);
@@ -45,6 +48,11 @@ z_disp = str2num(inputdatavars.cv.z_displace);
 x_rot  = str2num(inputdatavars.cv.x_rotate);
 y_rot  = str2num(inputdatavars.cv.y_rotate);
 z_rot  = str2num(inputdatavars.cv.z_rotate);
+
+mu_s_p = mu_s * ( 1 - g_anisotropy );
+mu_a = (-3*mu_s_p + sqrt( 9*mu_s_p^2 + 12 * mu_eff^2))/6;
+
+k_cond = alpha * rho * c_p;
 
 robin_co=0; %dummy var
 
