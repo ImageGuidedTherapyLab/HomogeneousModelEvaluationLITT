@@ -1402,8 +1402,8 @@ if (options.param_file != None):
     MatlabDataDictionary['patientID'] = options.param_file.split('/')[2]
     MatlabDataDictionary['UID']       = options.param_file.split('/')[3]
     MatlabDataDictionary['vtkNumber'] = 4312
-    scipyio.savemat( '%s.mat' % options.param_file, MatlabDataDictionary )
-
+    #scipyio.savemat( '%s.mat' % options.param_file, MatlabDataDictionary )
+    scipyio.savemat( 'TmpDataInput.mat' , MatlabDataDictionary )
     # FIXME setup any needed paths
     # FIXME this nees to have a clean matlab env for dakmatlab
     # FIXME then setup ONCE

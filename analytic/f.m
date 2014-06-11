@@ -4,6 +4,8 @@ function y = f(~)
 % setenv ( 'PATH22' , pwd);
 % path22 = getenv ( 'PATH22' );
 
+file_loading_script
+
 inputdatavars = load('./TmpDataInput.mat');
 
 % index = load ( 'index.txt' );
