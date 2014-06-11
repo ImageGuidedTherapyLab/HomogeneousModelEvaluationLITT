@@ -4,21 +4,28 @@ function y = f(~)
 % setenv ( 'PATH22' , pwd);
 % path22 = getenv ( 'PATH22' );
 
-file_loading_script
+%file_loading_script
 
 inputdatavars = load('./TmpDataInput.mat');
 
 % index = load ( 'index.txt' );
 
-[~,dice, ~,~] =  fast_temperature_obj_fxn_sanity ( inputdatavars, 1 );
+[L2norm,dice, ~,~] =  fast_temperature_obj_fxn_sanity ( inputdatavars, 1 );
 
 % index = index + 1;
 % csvwrite ('index.txt' , index);
+metric(1) = L2norm;
+metric(2) = 1 - dice;
 
-metric = 1 - dice;
+file_base = strcat( './workdir/',inputdatavars.patientID,'/',inputdatavars.UID,'/opt/optpp_pds.',inputdatavars.opttype);
+fout = fopen( strcat( file_base,'.out.',num2str(inputdatavars.fileID) ), 'w' );
+fprintf(fout, '%s\n', num2str(metric(1)) );
+fprintf(fout, '%s'  , num2str(metric(2)) );
+fclose(fout);
 
+save ( strcat( file_base,'.in.',num2str(inputdatavars.fileID), '.mat'), 'inputdatavars');
 
-y =  metric;
+y =  metric(2);
 
 
 % patientID = strcat ( inputdatavars.patientID, '/', inputdatavars.patientID, '/');
