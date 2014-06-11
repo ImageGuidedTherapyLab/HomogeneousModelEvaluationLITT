@@ -55,7 +55,7 @@ for i=1:dom.pointx   %Spatial loop for i, ii, iii
             
             for j=1:source.n    %Loop for the separate isotropic sources
                 
-                r(j)=sqrt(points.x(i)^2+(source.laser(j)-points.y(ii))^2+points.z(iii)^2);  %Distance for each isotropic source
+                r(j)=sqrt( (source.laser(j,1)-points.x(i))^2 + (source.laser(j,2)-points.y(ii))^2+(source.laser(j,3)-points.z(iii))^2);  %Distance for each isotropic source
                 if r(j) <= R1
                     t_sample(i,ii,iii,j) = u0;
                 else

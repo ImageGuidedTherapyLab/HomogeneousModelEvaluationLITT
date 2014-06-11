@@ -42,12 +42,30 @@ alpha = str2num(inputdatavars.cv.alpha_healthy);
 rho = inputdatavars.cv.rho;
 c_p = str2num(inputdatavars.cv.c_p_healthy);
 w_perf = inputdatavars.cv.w_0;
-x_disp = str2num(inputdatavars.cv.x_displace);
-y_disp = str2num(inputdatavars.cv.y_displace);
-z_disp = str2num(inputdatavars.cv.z_displace);
-x_rot  = str2num(inputdatavars.cv.x_rotate);
-y_rot  = str2num(inputdatavars.cv.y_rotate);
-z_rot  = str2num(inputdatavars.cv.z_rotate);
+geometry.x_disp = str2num(inputdatavars.cv.x_displace);
+geometry.y_disp = str2num(inputdatavars.cv.y_displace);
+geometry.z_disp = str2num(inputdatavars.cv.z_displace);
+geometry.x_rot  = str2num(inputdatavars.cv.x_rotate);
+geometry.y_rot  = str2num(inputdatavars.cv.y_rotate);
+geometry.z_rot  = str2num(inputdatavars.cv.z_rotate);
+
+if inputdatavars.fileID == 1
+    geometry.x_disp = 0;
+    geometry.y_disp = 0;
+    geometry.z_disp = 0;
+    geometry.x_rot  = 0;
+    geometry.y_rot  = 0;
+    geometry.z_rot  = 0;
+else
+    aaa = load( strcat( patient_opt_path, 'optpp_pds.', inputdatavars.opttype, '.in.1.mat') );
+    
+    geometry.x_disp = geometry.x_disp - str2num(aaa.inputdatavars.cv.x_displace);
+    geometry.y_disp = geometry.y_disp - str2num(aaa.inputdatavars.cv.y_displace);
+    geometry.z_disp = geometry.z_disp - str2num(aaa.inputdatavars.cv.z_displace);
+    geometry.x_rot  = geometry.x_rot - str2num(aaa.inputdatavars.cv.x_rotate);
+    geometry.y_rot  = geometry.y_rot - str2num(aaa.inputdatavars.cv.y_rotate);
+    geometry.z_rot  = geometry.z_rot - str2num(aaa.inputdatavars.cv.z_rotate);
+end
 
 mu_s_p = mu_s * ( 1 - g_anisotropy );
 mu_a = (-3*mu_s_p + sqrt( 9*mu_s_p^2 + 12 * mu_eff^2))/6;
@@ -99,10 +117,19 @@ scaling.z = 1;
 % better than even
 source.n=sources;
 source.length=0.01;  %~0.033 is when n=5 is visible
-if source.n == 1;
-    source.laser = 0;
+if source.n > 1;
+    source.base = linspace((-source.length/2),(source.length/2),source.n)
+   % source.laser = [geometry.x_disp, geometry.y_disp, geometry.z_disp];
 else
-    source.laser=linspace((-source.length/2),(source.length/2),source.n);
+    source.base = 0;
+end
+    
+source.laser = zeros(source.n,3);
+
+for jj = 1:source.n
+    
+    source.laser(jj,:) = [ source.base(jj)+geometry.x_disp, geometry.y_disp, geometry.z_disp ]; % Columns are for x,y,z displacement; Rows are for different sources
+    
 end
 
 % Run the Bioheat model with the unique powers, and then scale it to MRTI
