@@ -324,8 +324,9 @@ laserTip  1.0      4180           0.5985        500         14000       0.88
 """
 # Convenience Routine
 def GetMinJobID(FileNameTemplate):
-    MinID     = 1  
-    MinObjVal = 1.e99
+    MinID      = 1  
+    MinObjVal  = 1.e99
+    MinDiceVal = 1.e99
     # get a list of all output files in the directory 
     DirectoryLocation = FileNameTemplate.split('/')
     FileTypeID = DirectoryLocation.pop() 
@@ -334,10 +335,11 @@ def GetMinJobID(FileNameTemplate):
     for dakotaoutfile in DirectoryOutList:
       obj_fn_data = numpy.loadtxt('%s/%s'  % (DirectoryLocation ,dakotaoutfile ) )
       #print '%s/%s'  % (DirectoryLocation, dakotaoutfile), obj_fn_data 
-      if(obj_fn_data < MinObjVal ): 
-        MinObjVal = obj_fn_data
+      if(obj_fn_data[0] < MinObjVal ): 
+        MinObjVal  = obj_fn_data[0]
+        MinDiceVal = obj_fn_data[1]
         MinID     = int(dakotaoutfile.split(".").pop()) 
-    return (MinID,MinObjVal)
+    return (MinID,MinObjVal,MinDiceVal )
 
 # Convenience Routine
 def DiceTxtFileParse(DiceInputFilename):
@@ -1488,7 +1490,7 @@ elif (options.accum_history ):
   texHandle  = open('datasummary.tex' , 'w') 
   fileHandle = open('datasummary.txt' , 'w') 
   # write header
-  fileHandle.write("iddata,idmin,mu_eff,alpha,robin,gamma,dice,obj\n")
+  fileHandle.write("iddata,idmin,mu_eff,alpha,robin,dice,obj\n")
   # loop over files and extract optimal value
   opttype = 'bestfit1'
   for filenamebase in resultfileList:
@@ -1498,8 +1500,8 @@ elif (options.accum_history ):
     config.read(inisetupfile)
   
     # get min value
-    (idmin,minobjval) = GetMinJobID( '%s/opt/optpp_pds.%s' % (filenamebase,opttype))
-    print (idmin,minobjval) 
+    (idmin,minobjval,dicevalue ) = GetMinJobID( '%s/opt/optpp_pds.%s' % (filenamebase,opttype))
+    print (idmin,minobjval,dicevalue ) 
     
     dataid = int(filenamebase.split('/')[3])
     # count the file lines
@@ -1509,16 +1511,11 @@ elif (options.accum_history ):
     # get arrhenius dice value
     heattimeinterval               = eval(config.get('mrti','heating')  )
     SEMDataDirectory               = outputDirectory % int(filenamebase.split('/')[-2]) 
-    dicefilename = "%s/dice.%s.%04d.txt" % (SEMDataDirectory,opttype,heattimeinterval[1])
-    print dicefilename 
-    dicevalue = DiceTxtFileParse(dicefilename)
-  
     #dataarray = numpy.loadtxt(filename,skiprows=1,usecols=(0,1,2,3,4,6)
-    fileHandle.write("%05d,%05d,%s,%s,%s,%s,%12.5e,%12.5e\n" %( dataid, idmin     ,
+    fileHandle.write("%05d,%05d,%s,%s,%s,%12.5e,%12.5e\n" %( dataid, idmin     ,
                                                                     simvariable['mu_eff_healthy'],
                                                                     simvariable['alpha_healthy'],
                                                                     simvariable['robin_coeff'],
-                                                                    simvariable['gamma_healthy'],
                                                                     dicevalue,
                                                                     minobjval))
     # format latex ouput
