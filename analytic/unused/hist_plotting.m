@@ -50,82 +50,116 @@ opt_type = 'bestfit' ;
 
 
 % Identify the studies to be examined.
-Study_paths {1,1} = 'Study0035';
-Study_paths {1,2} = '0530';
-Study_paths {2,1} = 'Study0030';
-Study_paths {2,2} = '0495';
-Study_paths {3,1} = 'Study0030';
-Study_paths {3,2} = '0497';
-Study_paths {4,1} = 'Study0030';
-Study_paths {4,2} = '0491';
-Study_paths {5,1} = 'Study0030';
-Study_paths {5,2} = '0496';
-Study_paths {6,1} = 'Study0030';
-Study_paths {6,2} = '0490';
-Study_paths {7,1} = 'Study0017';
-Study_paths {7,2} = '0378';
-Study_paths {8,1} = 'Study0025';
-Study_paths {8,2} = '0438';
-Study_paths {9,1} = 'Study0025';
-Study_paths {9,2} = '0435';
-Study_paths {10,1} = 'Study0025';
-Study_paths {10,2} = '0440';
-Study_paths {11,1} = 'Study0025';
-Study_paths {11,2} = '0436';
-Study_paths {12,1} = 'Study0028';
-Study_paths {12,2} = '0466';
-Study_paths {13,1} = 'Study0028';
-Study_paths {13,2} = '0468';
-Study_paths {14,1} = 'Study0028';
-Study_paths {14,2} = '0471';
-Study_paths {15,1} = 'Study0026';
-Study_paths {15,2} = '0447';
-Study_paths {16,1} = 'Study0026';
-Study_paths {16,2} = '0457';
-Study_paths {17,1} = 'Study0026';
-Study_paths {17,2} = '0455';
-Study_paths {18,1} = 'Study0026';
-Study_paths {18,2} = '0453';
-Study_paths {19,1} = 'Study0026';
-Study_paths {19,2} = '0450';
-Study_paths {20,1} = 'Study0026';
-Study_paths {20,2} = '0451';
-Study_paths {21,1} = 'Study0022';
-Study_paths {21,2} = '0418';
-Study_paths {22,1} = 'Study0022';
-Study_paths {22,2} = '0417';
-Study_paths {23,1} = 'Study0021';
-Study_paths {23,2} = '0409';
-Study_paths {24,1} = 'Study0021';
-Study_paths {24,2} = '0414';
-Study_paths {25,1} = 'Study0021';
-Study_paths {25,2} = '0415';
+% Study_paths {1,1} = 'Study0035';
+% Study_paths {1,2} = '0530';
+% Study_paths {2,1} = 'Study0023';
+% Study_paths {2,2} = '0430';
+% Study_paths {3,1} = 'Study0023';
+% Study_paths {3,2} = '0428';
+% Study_paths {4,1} = 'Study0030';
+% Study_paths {4,2} = '0495';
+% Study_paths {5,1} = 'Study0030';
+% Study_paths {5,2} = '0497';
+% Study_paths {6,1} = 'Study0030';
+% Study_paths {6,2} = '0488';
+% Study_paths {7,1} = 'Study0030';
+% Study_paths {7,2} = '0491';
+% Study_paths {8,1} = 'Study0030';
+% Study_paths {8,2} = '0496';
+% Study_paths {9,1} = 'Study0030';
+% Study_paths {9,2} = '0490';
+% Study_paths {10,1} = 'Study0017';
+% Study_paths {10,2} = '0378';
+% Study_paths {11,1} = 'Study0018';
+% Study_paths {11,2} = '0402';
+% Study_paths {12,1} = 'Study0018';
+% Study_paths {12,2} = '0389';
+% Study_paths {13,1} = 'Study0018';
+% Study_paths {13,2} = '0385';
+% Study_paths {14,1} = 'Study0029';
+% Study_paths {14,2} = '0476';
+% Study_paths {15,1} = 'Study0029';
+% Study_paths {15,2} = '0477';
+% 
+% Study_paths {8,1} = 'Study0025';
+% Study_paths {8,2} = '0438';
+% Study_paths {9,1} = 'Study0025';
+% Study_paths {9,2} = '0435';
+% Study_paths {10,1} = 'Study0025';
+% Study_paths {10,2} = '0440';
+% Study_paths {11,1} = 'Study0025';
+% Study_paths {11,2} = '0436';
+% Study_paths {12,1} = 'Study0028';
+% Study_paths {12,2} = '0466';
+% Study_paths {13,1} = 'Study0028';
+% Study_paths {13,2} = '0468';
+% Study_paths {14,1} = 'Study0028';
+% Study_paths {14,2} = '0471';
+% Study_paths {15,1} = 'Study0026';
+% Study_paths {15,2} = '0447';
+% Study_paths {16,1} = 'Study0026';
+% Study_paths {16,2} = '0457';
+% Study_paths {17,1} = 'Study0026';
+% Study_paths {17,2} = '0455';
+% Study_paths {18,1} = 'Study0026';
+% Study_paths {18,2} = '0453';
+% Study_paths {19,1} = 'Study0026';
+% Study_paths {19,2} = '0450';
+% Study_paths {20,1} = 'Study0026';
+% Study_paths {20,2} = '0451';
+% Study_paths {21,1} = 'Study0022';
+% Study_paths {21,2} = '0418';
+% Study_paths {22,1} = 'Study0022';
+% Study_paths {22,2} = '0417';
+% Study_paths {23,1} = 'Study0021';
+% Study_paths {23,2} = '0409';
+% Study_paths {24,1} = 'Study0021';
+% Study_paths {24,2} = '0414';
+% Study_paths {25,1} = 'Study0021';
+% Study_paths {25,2} = '0415';
 
-num_studies = size(Study_paths,1);
+
 % read  best_fit optimization data and store mu_eff and alpha
+%datasummary = dlmread('ex_datasummary.txt',',',1,0);
 datasummary = dlmread('ex_datasummary.txt',',',1,0);
+num_studies = size(datasummary,1);
 
-num_datasummary = size(datasummary,1);
-
-matching_num = zeros(1,num_studies);
-mu_eff_index = zeros(1,num_studies);
-mu_eff_opt   = zeros(1,num_studies);
-copy_summary = zeros(num_studies,8);
+Study_paths = cell (num_studies,2);
 for ii = 1:num_studies
-    matching_num(ii) = str2num(Study_paths{(ii),2});
-    mu_eff_index(ii) = find( datasummary(:,1) == matching_num(ii));
-    copy_summary(ii,:) = datasummary( mu_eff_index(ii) , : );
-    %mu_eff_opt(ii) = dlm_data(mu_eff_index(ii),2);
+    
+    Study_paths{ii,1} = strcat( 'Study00',num2str(datasummary(ii,1)));
+    Study_paths{ii,2} = strcat( '0',num2str(datasummary(ii,2)));
+    
 end
-clear ii
 
-copy_summary( isnan( copy_summary ) ) = 0;
-best_iter   = copy_summary(:,2);
-mu_eff_data = copy_summary(:,3);
-alpha_data  = copy_summary(:,4);
+best_iter = datasummary(:,3);
+mu_eff_data = datasummary(:,4);
+alpha_data = datasummary(:,5);
+
+
+
+
+% num_datasummary = size(datasummary,1);
+% 
+% matching_num = zeros(1,num_studies);
+% mu_eff_index = zeros(1,num_studies);
+% mu_eff_opt   = zeros(1,num_studies);
+% copy_summary = zeros(num_studies,8);
+% for ii = 1:num_studies
+%     matching_num(ii) = str2num(Study_paths{(ii),2});
+%     mu_eff_index(ii) = find( datasummary(:,1) == matching_num(ii));
+%     copy_summary(ii,:) = datasummary( mu_eff_index(ii) , : );
+%     %mu_eff_opt(ii) = dlm_data(mu_eff_index(ii),2);
+% end
+% clear ii
+% 
+% copy_summary( isnan( copy_summary ) ) = 0;
+% best_iter   = copy_summary(:,2);
+% mu_eff_data = copy_summary(:,3);
+% alpha_data  = copy_summary(:,4);
 
 % TODO testing for now
-[ hh7, dice_values7 ] = LOOCV_t_test_DiceTemp ( Study_paths, mu_eff_data ,alpha_data , best_iter, opt_type );
+[ hh7, dice_values7 ] = LOOCV_t_test_DiceTemp ( Study_paths, datasummary(:,4) ,datasummary(:,5) , datasummary(:,3), opt_type );
 
 matching_num = zeros(1,num_datasummary);
 mu_eff_index = matching_num;
