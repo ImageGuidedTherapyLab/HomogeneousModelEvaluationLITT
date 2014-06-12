@@ -27,6 +27,7 @@ function [ hh, dice_values ] = LOOCV_t_test_DiceTemp ( Study_paths, mu_eff_opt, 
 n_patients = length( mu_eff_opt); % This is the number of patients
 % n_patients = 1;
 path_iter = cell(1,2);
+L2norm = zeros( n_patients,1);
 dice_values = zeros( n_patients,1); % Initialize the number of DSC (dice) values
 for ii = 1:n_patients
     
@@ -52,9 +53,15 @@ for ii = 1:n_patients
     %     result_file = strcat( 'workdir/', Study_paths { ii,1 }, '/', Study_paths { ii,2 }, '/opt/optpp_pds.', opt_type, '.out.1');
     path_base = strcat( 'workdir/',path_iter{1,1},'/',path_iter{1,2},'/opt/');
     param_file = strcat( path_base,'optpp_pds.LOOCV.in.1');
-    result_file = strcat( path_base, 'optpp.pds.LOOCV.out.1');
+    result_file = strcat( path_base, 'optpp_pds.LOOCV.out.1');
     python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ' ./', result_file, ''')');   % unix(''python test_saveFile.py'')
     evalc(python_command);
+    
+    output = dlmread( strcat( './',result_file));
+    L2norm (ii) = output(1);
+    dice_values (ii) = output(2);
+    
+    
 
 
 %     params_iter = load( 'TmpDataInput.mat' ); % Read in one dakota.in file to find the constant parameters
@@ -96,19 +103,18 @@ for ii = 1:n_patients
 
 end
 
-%[hh.H, hh.ptest] = ttest( dice_values, 0.7, 0.05, 'right');
+[hh.H, hh.ptest] = ttest( dice_values, 0.7, 0.05, 'right');
 
-% mean_dice = mean ( dice_values ); % Average Dice values
-% std_dice = std ( dice_values ); % Stardard deviation of Dice values.
-%test_statistic = ( mean_dice - 0.7 ) ./ ( std_dice ./ sqrt ( n_patients )); % Calculate the test_statistic
-%p_value = tcdf ( test_statistic , n_patients , 'lower' );
-% H0.p_value = p_value;
-% H0.result = 1;
-% if p_value <= 0.05
-%     H0.result = 0 ;
-% else
-%     H0.result = 1;
-% end
-hh = 1;
-dice_values = 1;
+mean_dice = mean ( dice_values ); % Average Dice values
+std_dice = std ( dice_values ); % Stardard deviation of Dice values.
+test_statistic = ( mean_dice - 0.7 ) ./ ( std_dice ./ sqrt ( n_patients )); % Calculate the test_statistic
+p_value = tcdf ( test_statistic , n_patients , 'lower' );
+H0.p_value = p_value;
+H0.result = 1;
+if p_value <= 0.05
+    H0.result = 0 ;
+else
+    H0.result = 1;
+end
+
 end
