@@ -1490,7 +1490,7 @@ elif (options.accum_history ):
   # write header
   fileHandle.write("iddata,idmin,mu_eff,alpha,robin,gamma,dice,obj\n")
   # loop over files and extract optimal value
-  opttype = 'bestfit'
+  opttype = 'bestfit1'
   for filenamebase in resultfileList:
     # get latex command
     config = ConfigParser.SafeConfigParser({})

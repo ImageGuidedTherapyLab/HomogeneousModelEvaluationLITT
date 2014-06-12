@@ -103,12 +103,38 @@ Study_paths {25,2} = '0415';
 
 num_studies = size(Study_paths,1);
 % read  best_fit optimization data and store mu_eff and alpha
-cell_data = dlmread('datasummary.txt',',',1,0);
-mu_eff_data = cell_data(:,3);
-alpha_data  = cell_data(:,4);
+datasummary = dlmread('ex_datasummary.txt',',',1,0);
 
+num_datasummary = size(datasummary,1);
+
+matching_num = zeros(1,num_studies);
+mu_eff_index = zeros(1,num_studies);
+mu_eff_opt   = zeros(1,num_studies);
+copy_summary = zeros(num_studies,8);
+for ii = 1:num_studies
+    matching_num(ii) = str2num(Study_paths{(ii),2});
+    mu_eff_index(ii) = find( datasummary(:,1) == matching_num(ii));
+    copy_summary(ii,:) = datasummary( mu_eff_index(ii) , : );
+    %mu_eff_opt(ii) = dlm_data(mu_eff_index(ii),2);
+end
+clear ii
+
+copy_summary( isnan( copy_summary ) ) = 0;
+mu_eff_data = copy_summary(:,3);
+alpha_data  = copy_summary(:,4);
 % TODO testing for now
 [ hh7, dice_values7 ] = LOOCV_t_test_DiceTemp ( Study_paths, mu_eff_data ,alpha_data , opt_type );
+
+matching_num = zeros(1,num_datasummary);
+mu_eff_index = matching_num;
+mu_eff_opt   = matching_num;
+for ii = 1:num_studies
+    matching_num(ii) = str2num(Study_paths{(ii),2});
+    mu_eff_index(ii) = find( datasummary(:,1) == matching_num(ii));
+    mu_eff_opt(ii) = data_summary(mu_eff_index(ii));
+end
+clear ii
+
 
 
 for ii = 1:num_studies

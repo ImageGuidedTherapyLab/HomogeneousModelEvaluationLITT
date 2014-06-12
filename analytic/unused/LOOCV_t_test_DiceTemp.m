@@ -21,10 +21,10 @@
 % mu_eff_opt is a vector of the inverse problem optimized mu_eff values in
 %   1/m units
 
-function [ hh, dice_values ] = LOOCV_t_test_DiceTemp ( Study_paths, mu_eff_DpassT, alpha_DpassT, opt_type );
+function [ hh, dice_values ] = LOOCV_t_test_DiceTemp ( Study_paths, mu_eff_opt, alpha_opt, opt_type );
 
 % Make the LOOCV iteration system
-n_patients = length( mu_eff_DpassT); % This is the number of patients
+n_patients = length( mu_eff_opt); % This is the number of patients
 % n_patients = 1;
 dice_values = zeros( n_patients,1); % Initialize the number of DSC (dice) values
 for ii = 1:n_patients
@@ -35,7 +35,7 @@ for ii = 1:n_patients
     python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ''')');   % unix(''python test_saveFile.py'')
     evalc(python_command);
     % Set up LOOCV for mu_eff
-    mu_eff_iter = mu_eff_DpassT; % Make a copy of both the mu_eff values and the paths
+    mu_eff_iter = mu_eff_opt; % Make a copy of both the mu_eff values and the paths
     mu_eff_iter ( ii ) = []; % Remove the 0
     mu_eff_iter = mean ( mu_eff_iter );           % Add alpha to LOOCV here; write *.in.* file; run brainsearch.py; brainsearch.py makes *.out.* file; read in *.out.* file
     mu_s_p = params_iter.cv.mu_s * ( 1 - params_iter.cv.anfact );
