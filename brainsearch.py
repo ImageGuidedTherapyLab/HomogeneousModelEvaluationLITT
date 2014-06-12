@@ -1408,8 +1408,6 @@ if (options.param_file != None):
     # FIXME this nees to have a clean matlab env for dakmatlab
     # FIXME then setup ONCE
     #os.system( './analytic/dakmatlab setup workspace ' )
-    #print options.param_file
-    #print sys.argv[3]
     matlabcommand  = './analytic/dakmatlab %s %s' %  (options.param_file,sys.argv[3])
     print matlabcommand  
     os.system( matlabcommand )
