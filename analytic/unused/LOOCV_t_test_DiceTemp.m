@@ -50,26 +50,26 @@ for ii = 1:n_patients
     % thermal code to run
     %     param_file  = strcat( 'workdir/', Study_paths { ii,1 }, '/', Study_paths { ii,2 }, '/opt/optpp_pds.', opt_type, '.in.1');
     %     result_file = strcat( 'workdir/', Study_paths { ii,1 }, '/', Study_paths { ii,2 }, '/opt/optpp_pds.', opt_type, '.out.1');
-    param_file = strcat( 'optpp.pds.LOOCV.in.3');
+    param_file = strcat( 'optpp.pds_LOOCV.in.3');
     %result_file = strcat( 'optpp.pds.LOOCV.out.3');
     python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ''')');   % unix(''python test_saveFile.py'')
     evalc(python_command);
 
 
-    params_iter = load( 'TmpDataInput.mat' ); % Read in one dakota.in file to find the constant parameters
-    params_iter.cv.mu_a = mu_a_iter;
-    params_iter.cv.mu_eff_healthy = num2str( mu_eff_iter ); % Average the training datasets' mu_eff; also make it a string coz the thermal code needs that format.   
-    % This section runs the thermal code
-    [metric, dice_iter, thermal_model, MRTI_crop] = fast_temperature_obj_fxn_sanity ( params_iter, 1 );
-    dice_values (ii) = dice_iter ;
-    clear mu_eff_iter;
-    disp(python_command );
-    %evalc(python_command);
-
-    % the  result_file  is written by the python command
-    metrics = dlmread(result_file );
-    l2diff          = metrics (1)
-    dice_values(ii) = metrics (2)
+%     params_iter = load( 'TmpDataInput.mat' ); % Read in one dakota.in file to find the constant parameters
+%     params_iter.cv.mu_a = mu_a_iter;
+%     params_iter.cv.mu_eff_healthy = num2str( mu_eff_iter ); % Average the training datasets' mu_eff; also make it a string coz the thermal code needs that format.   
+%     % This section runs the thermal code
+%     [metric, dice_iter, thermal_model, MRTI_crop] = fast_temperature_obj_fxn_sanity ( params_iter, 1 );
+%     dice_values (ii) = dice_iter ;
+%     clear mu_eff_iter;
+%     disp(python_command );
+%     %evalc(python_command);
+% 
+%     % the  result_file  is written by the python command
+%     metrics = dlmread(result_file );
+%     l2diff          = metrics (1)
+%     dice_values(ii) = metrics (2)
     
     % TODO move to your kernel
     %params_iter = load( 'TmpDataInput.mat' ); % Read in one dakota.in file to find the constant parameters
