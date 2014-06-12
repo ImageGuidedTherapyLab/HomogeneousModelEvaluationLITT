@@ -120,10 +120,12 @@ end
 clear ii
 
 copy_summary( isnan( copy_summary ) ) = 0;
+best_iter   = copy_summary(:,2);
 mu_eff_data = copy_summary(:,3);
 alpha_data  = copy_summary(:,4);
+
 % TODO testing for now
-[ hh7, dice_values7 ] = LOOCV_t_test_DiceTemp ( Study_paths, mu_eff_data ,alpha_data , opt_type );
+[ hh7, dice_values7 ] = LOOCV_t_test_DiceTemp ( Study_paths, mu_eff_data ,alpha_data , best_iter, opt_type );
 
 matching_num = zeros(1,num_datasummary);
 mu_eff_index = matching_num;
