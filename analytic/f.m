@@ -1,10 +1,13 @@
 % y = f(x) for Rosenbrock
-function y = f(~)
+function y = f(x)
 % cd /FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation/
 % setenv ( 'PATH22' , pwd);
 % path22 = getenv ( 'PATH22' );
 
 %file_loading_script
+
+save('./superTemp.mat','x');
+disp(x)
 
 inputdatavars = load('./TmpDataInput.mat');
 

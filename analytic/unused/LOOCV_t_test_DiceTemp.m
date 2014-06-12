@@ -50,9 +50,10 @@ for ii = 1:n_patients
     % thermal code to run
     %     param_file  = strcat( 'workdir/', Study_paths { ii,1 }, '/', Study_paths { ii,2 }, '/opt/optpp_pds.', opt_type, '.in.1');
     %     result_file = strcat( 'workdir/', Study_paths { ii,1 }, '/', Study_paths { ii,2 }, '/opt/optpp_pds.', opt_type, '.out.1');
-    param_file = strcat( 'optpp_pds.LOOCV.in.3');
-    %result_file = strcat( 'optpp.pds.LOOCV.out.3');
-    python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ''')');   % unix(''python test_saveFile.py'')
+    path_base = strcat( 'workdir/',path_iter{1,1},'/',path_iter{1,2},'/opt/');
+    param_file = strcat( path_base,'optpp_pds.LOOCV.in.1');
+    result_file = strcat( path_base, 'optpp.pds.LOOCV.out.1');
+    python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ' ./', result_file, ''')');   % unix(''python test_saveFile.py'')
     evalc(python_command);
 
 
@@ -108,5 +109,6 @@ end
 % else
 %     H0.result = 1;
 % end
-
+hh = 1;
+dice_values = 1;
 end
