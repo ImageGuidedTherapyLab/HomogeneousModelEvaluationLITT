@@ -1309,7 +1309,7 @@ def ParseInput(paramfilename,VisualizeOutput):
        fem_params['lambdacode']       = eval(config.get('power','lambdacode'))
   fem_params['segment_file']     = config.get('exec','segment_file')
   fem_params['target_landmarks'] = config.get('exec','target_landmarks')
-  #fem_params['powerhistory']     = config.get('power','history')
+  fem_params['powerhistory']     = config.get('power','history')
   fulltimeinterval               = eval(config.get('mrti','fulltime') )
   cooltimeinterval               = eval(config.get('mrti','cooling')  )
   heattimeinterval               = eval(config.get('mrti','heating')  )
