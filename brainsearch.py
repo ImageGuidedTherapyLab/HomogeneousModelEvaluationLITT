@@ -1438,8 +1438,8 @@ if (options.param_file != None):
 elif (options.accum_history ):
   resultfileList = [
   './workdir/Study0035/0530/',
-  './workdir/Study0023/0433/',
-  './workdir/Study0023/0428/',
+  #'./workdir/Study0023/0433/',
+  #'./workdir/Study0023/0428/',
   ##'./workdir/Study0023/0425/',
   './workdir/Study0030/0495/',
   './workdir/Study0030/0497/',
