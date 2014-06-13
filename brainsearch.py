@@ -1490,7 +1490,7 @@ elif (options.accum_history ):
   texHandle  = open('datasummary.tex' , 'w') 
   fileHandle = open('datasummary.txt' , 'w') 
   # write header
-  fileHandle.write("iddata,idmin,mu_eff,alpha,robin,dice,obj\n")
+  fileHandle.write("idstudy,iddata,idmin,mu_eff,alpha,robin,dice,obj\n")
   # loop over files and extract optimal value
   opttype = 'bestfit1'
   for filenamebase in resultfileList:
@@ -1503,6 +1503,7 @@ elif (options.accum_history ):
     (idmin,minobjval,dicevalue ) = GetMinJobID( '%s/opt/optpp_pds.%s' % (filenamebase,opttype))
     print (idmin,minobjval,dicevalue ) 
     
+    studyid= int(filenamebase.split('/')[2].replace('Study'))
     dataid = int(filenamebase.split('/')[3])
     # count the file lines
     dakotafilename = '%s/opt/optpp_pds.%s.in.%d' % (filenamebase,opttype,idmin)
@@ -1512,7 +1513,7 @@ elif (options.accum_history ):
     heattimeinterval               = eval(config.get('mrti','heating')  )
     SEMDataDirectory               = outputDirectory % int(filenamebase.split('/')[-2]) 
     #dataarray = numpy.loadtxt(filename,skiprows=1,usecols=(0,1,2,3,4,6)
-    fileHandle.write("%05d,%05d,%s,%s,%s,%12.5e,%12.5e\n" %( dataid, idmin     ,
+    fileHandle.write("%05d,%05d,%05d,%s,%s,%s,%12.5e,%12.5e\n" %( studyid, dataid, idmin     ,
                                                                     simvariable['mu_eff_healthy'],
                                                                     simvariable['alpha_healthy'],
                                                                     simvariable['robin_coeff'],
