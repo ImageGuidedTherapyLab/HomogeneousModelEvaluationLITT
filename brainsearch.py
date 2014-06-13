@@ -1309,7 +1309,7 @@ def ParseInput(paramfilename,VisualizeOutput):
        fem_params['lambdacode']       = eval(config.get('power','lambdacode'))
   fem_params['segment_file']     = config.get('exec','segment_file')
   fem_params['target_landmarks'] = config.get('exec','target_landmarks')
-  fem_params['powerhistory'] = config.get('power','history')
+  #fem_params['powerhistory']     = config.get('power','history')
   fulltimeinterval               = eval(config.get('mrti','fulltime') )
   cooltimeinterval               = eval(config.get('mrti','cooling')  )
   heattimeinterval               = eval(config.get('mrti','heating')  )
@@ -1438,8 +1438,8 @@ if (options.param_file != None):
 elif (options.accum_history ):
   resultfileList = [
   './workdir/Study0035/0530/',
-  './workdir/Study0023/0433/',
-  './workdir/Study0023/0428/',
+  #'./workdir/Study0023/0433/',
+  #'./workdir/Study0023/0428/',
   ##'./workdir/Study0023/0425/',
   './workdir/Study0030/0495/',
   './workdir/Study0030/0497/',
@@ -1449,11 +1449,11 @@ elif (options.accum_history ):
   './workdir/Study0030/0490/',
   './workdir/Study0017/0378/',
   ##'./workdir/Study0018/0388/',
-  './workdir/Study0018/0402/',
-  './workdir/Study0018/0389/',
-  './workdir/Study0018/0385/',
-  './workdir/Study0029/0476/',
-  './workdir/Study0029/0477/',
+  #'./workdir/Study0018/0402/',
+  #'./workdir/Study0018/0389/',
+  #'./workdir/Study0018/0385/',
+  #'./workdir/Study0029/0476/',
+  #'./workdir/Study0029/0477/',
   './workdir/Study0025/0438/',
   './workdir/Study0025/0435/',
   './workdir/Study0025/0440/',
@@ -1461,8 +1461,8 @@ elif (options.accum_history ):
   './workdir/Study0028/0466/',
   './workdir/Study0028/0468/',
   './workdir/Study0028/0471/',
-  './workdir/Study0052/0725/',
-  './workdir/Study0052/0720/',
+  #'./workdir/Study0052/0725/',
+  #'./workdir/Study0052/0720/',
   './workdir/Study0026/0447/',
   './workdir/Study0026/0457/',
   './workdir/Study0026/0455/',
