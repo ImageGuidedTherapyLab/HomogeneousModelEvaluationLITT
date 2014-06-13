@@ -46,7 +46,7 @@ close all
 % The output: The output is a binary acceptance/rejection of the null and alternative hypotheses.
 
 % This script finds the best mu_eff for the different studies.
-opt_type = 'bestfit' ;
+opt_type = 'bestfit1' ;
 
 
 % Identify the studies to be examined.
@@ -121,7 +121,7 @@ opt_type = 'bestfit' ;
 
 % read  best_fit optimization data and store mu_eff and alpha
 %datasummary = dlmread('ex_datasummary.txt',',',1,0);
-datasummary = dlmread('ex_datasummary.txt',',',1,0);
+datasummary = dlmread('datasummary.txt',',',1,0);
 num_studies = size(datasummary,1);
 
 Study_paths = cell (num_studies,2);
@@ -132,9 +132,11 @@ for ii = 1:num_studies
     
 end
 
-best_iter = datasummary(:,3);
-mu_eff_data = datasummary(:,4);
-alpha_data = datasummary(:,5);
+% best_iter = datasummary(:,3);
+% mu_eff_data = datasummary(:,4);
+% alpha_data = datasummary(:,5);
+% dice_opt = datasummary(:,7);
+% L2norm_opt = datasummary(:,8);
 
 
 
