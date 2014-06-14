@@ -335,10 +335,14 @@ def GetMinJobID(FileNameTemplate):
     for dakotaoutfile in DirectoryOutList:
       obj_fn_data = numpy.loadtxt('%s/%s'  % (DirectoryLocation ,dakotaoutfile ) )
       #print '%s/%s'  % (DirectoryLocation, dakotaoutfile), obj_fn_data 
-      if(obj_fn_data[0] < MinObjVal ): 
-        MinObjVal  = obj_fn_data[0]
-        MinDiceVal = obj_fn_data[1]
-        MinID     = int(dakotaoutfile.split(".").pop()) 
+      # FIXME: find the best one, ignore errors
+      try:
+        if(obj_fn_data[0] < MinObjVal ): 
+          MinObjVal  = obj_fn_data[0]
+          MinDiceVal = obj_fn_data[1]
+          MinID     = int(dakotaoutfile.split(".").pop()) 
+      except:
+        pass
     return (MinID,MinObjVal,MinDiceVal )
 
 # Convenience Routine
