@@ -194,7 +194,6 @@ end
 
 %mu_eff_opt22 = mu_eff_opt*(6000-100)+100; %This line converts the normalized value into absolute. It's very import to get the converion correct
 dice_raw = 1 - datasummary(:,7);
-dice_raw_nan = isnan(dice_raw);
 toss_index7 = find(dice_raw<0.7);
 toss_index8 = find(dice_raw<0.8);
 
@@ -202,6 +201,16 @@ mu_eff7 = datasummary(:,4);
 mu_eff7 (toss_index7) = [];
 mu_eff8 = datasummary(:,4);
 mu_eff8 (toss_index8) = [];
+
+alpha7 = datasummary(:,5);
+alpha7 (toss_index7) = [];
+alpha8 = datasummary(:,5);
+alpha8 (toss_index8) = [];
+
+best_iter7 = datasummary(:,3);
+best_iter7 (toss_index7) = [];
+best_iter8 = datasummary(:,3);
+best_iter8 (toss_index8) = [];
 
 dice7 = dice_raw;
 dice7(toss_index7) = [];
@@ -224,9 +233,9 @@ temp_paths = Study_paths;
 temp_paths(toss_index8,:) = [];
 Study_paths8 = temp_paths;
 
-% [ hh_raw, dice_values_LOOCV ] = LOOCV_t_test_DiceTemp ( Study_paths, datasummary(:,4) ,datasummary(:,5) , datasummary(:,3), opt_type );
-% [ hh7, dice_LOOCV7 ] = LOOCV_t_test_DiceTemp ( Study_paths7, mu_eff7, opt_type );
-% [ hh8, dice_LOOCV8 ] = LOOCV_t_test_DiceTemp ( Study_paths8, mu_eff8, opt_type );
+%[ hh_raw, dice_values_LOOCV ] = LOOCV_t_test_DiceTemp ( Study_paths, datasummary(:,4) ,datasummary(:,5) , datasummary(:,3), opt_type );
+%[ hh7, dice_LOOCV7 ] = LOOCV_t_test_DiceTemp ( Study_paths7, mu_eff7, alpha7, best_iter7, opt_type );
+[ hh8, dice_LOOCV8 ] = LOOCV_t_test_DiceTemp ( Study_paths8, mu_eff8, alpha8, best_iter8, opt_type );
 mu_eff_iter = mu_eff8;
 stats_iter = stats8;
 paths_iter = Study_paths8;
