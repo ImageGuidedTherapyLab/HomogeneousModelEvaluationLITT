@@ -122,6 +122,7 @@ opt_type = 'bestfit1' ;
 % read  best_fit optimization data and store mu_eff and alpha
 %datasummary = dlmread('ex_datasummary.txt',',',1,0);
 datasummary = dlmread('datasummary.txt',',',1,0);
+datasummary(any(isnan(datasummary), 2), :) = [];
 num_studies = size(datasummary,1);
 
 Study_paths = cell (num_studies,2);
@@ -161,65 +162,59 @@ end
 % alpha_data  = copy_summary(:,4);
 
 % TODO testing for now
-[ hh7, dice_values7 ] = LOOCV_t_test_DiceTemp ( Study_paths, datasummary(:,4) ,datasummary(:,5) , datasummary(:,3), opt_type );
 
-matching_num = zeros(1,num_datasummary);
-mu_eff_index = matching_num;
-mu_eff_opt   = matching_num;
-for ii = 1:num_studies
-    matching_num(ii) = str2num(Study_paths{(ii),2});
-    mu_eff_index(ii) = find( datasummary(:,1) == matching_num(ii));
-    mu_eff_opt(ii) = data_summary(mu_eff_index(ii));
-end
-clear ii
-
+% matching_num = zeros(1,num_datasummary);
+% mu_eff_index = matching_num;
+% mu_eff_opt   = matching_num;
+% for ii = 1:num_studies
+%     matching_num(ii) = str2num(Study_paths{(ii),2});
+%     mu_eff_index(ii) = find( datasummary(:,1) == matching_num(ii));
+%     mu_eff_opt(ii) = data_summary(mu_eff_index(ii));
+% end
+% clear ii
 
 
-for ii = 1:num_studies
-    if  isnan(dlm_data(ii,3)) == 1
-        dlm_data(ii,3) =  1;
-    end
-end
-clear ii
 
-matching_num = zeros(1,num_studies);
-mu_eff_index = zeros(1,num_studies);
-mu_eff_opt   = zeros(1,num_studies);
-for ii = 1:num_studies
-    matching_num(ii) = str2num(Study_paths{(ii),2});
-    mu_eff_index(ii) = find( dlm_data(:,1) == matching_num(ii));
-    mu_eff_opt(ii) = dlm_data(mu_eff_index(ii),2);
-end
-clear ii
+% for ii = 1:num_studies
+%     if  isnan(dlm_data(ii,3)) == 1
+%         dlm_data(ii,3) =  1;
+%     end
+% end
+% clear ii
 
-mu_eff_opt22 = mu_eff_opt*(6000-100)+100; %This line converts the normalized value into absolute. It's very import to get the converion correct
-dice_pre = 1 - mu_eff_data(:,3);
-toss_index7 = find(dice_pre<0.7);
-toss_index8 = find(dice_pre<0.8);
+% matching_num = zeros(1,num_studies);
+% mu_eff_index = zeros(1,num_studies);
+% mu_eff_opt   = zeros(1,num_studies);
+% for ii = 1:num_studies
+%     matching_num(ii) = str2num(Study_paths{(ii),2});
+%     mu_eff_index(ii) = find( dlm_data(:,1) == matching_num(ii));
+%     mu_eff_opt(ii) = dlm_data(mu_eff_index(ii),2);
+% end
+% clear ii
 
-mu_eff7 = mu_eff_opt22;
+%mu_eff_opt22 = mu_eff_opt*(6000-100)+100; %This line converts the normalized value into absolute. It's very import to get the converion correct
+dice_raw = 1 - datasummary(:,7);
+dice_raw_nan = isnan(dice_raw);
+toss_index7 = find(dice_raw<0.7);
+toss_index8 = find(dice_raw<0.8);
+
+mu_eff7 = datasummary(:,4);
 mu_eff7 (toss_index7) = [];
-mu_eff8 = mu_eff_opt22;
+mu_eff8 = datasummary(:,4);
 mu_eff8 (toss_index8) = [];
 
-dice7 = dice_pre;
+dice7 = dice_raw;
 dice7(toss_index7) = [];
-dice8 = dice_pre;
+dice8 = dice_raw;
 dice8(toss_index8) = [];
 
-stats_pre = Descriptive_statistics(mu_eff_opt22);
+stats_raw = Descriptive_statistics( datasummary(:,4) );
 stats7 = Descriptive_statistics(mu_eff7);
 stats8 = Descriptive_statistics(mu_eff8);
-
-stats_pre
-stats7
-stats8
 
 % figure; hist(mu_eff_opt22);
 % figure; hist(mu_eff7);
 % figure; hist(mu_eff8);
-
-[ hh_pre, dice_values_pre ] = LOOCV_t_test_DiceTemp ( Study_paths, mu_eff_opt22, opt_type );
 
 % Remove Study_paths indices
 temp_paths = Study_paths;
@@ -229,9 +224,9 @@ temp_paths = Study_paths;
 temp_paths(toss_index8,:) = [];
 Study_paths8 = temp_paths;
 
-
-[ hh7, dice_values7 ] = LOOCV_t_test_DiceTemp ( Study_paths7, mu_eff7, opt_type );
-[ hh8, dice_values8 ] = LOOCV_t_test_DiceTemp ( Study_paths8, mu_eff8, opt_type );
+% [ hh_raw, dice_values_LOOCV ] = LOOCV_t_test_DiceTemp ( Study_paths, datasummary(:,4) ,datasummary(:,5) , datasummary(:,3), opt_type );
+% [ hh7, dice_LOOCV7 ] = LOOCV_t_test_DiceTemp ( Study_paths7, mu_eff7, opt_type );
+% [ hh8, dice_LOOCV8 ] = LOOCV_t_test_DiceTemp ( Study_paths8, mu_eff8, opt_type );
 mu_eff_iter = mu_eff8;
 stats_iter = stats8;
 paths_iter = Study_paths8;
