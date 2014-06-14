@@ -1503,7 +1503,7 @@ elif (options.accum_history ):
     (idmin,minobjval,dicevalue ) = GetMinJobID( '%s/opt/optpp_pds.%s' % (filenamebase,opttype))
     print (idmin,minobjval,dicevalue ) 
     
-    studyid= int(filenamebase.split('/')[2].replace('Study'))
+    studyid= int(filenamebase.split('/')[2].replace('Study',''))
     dataid = int(filenamebase.split('/')[3])
     # count the file lines
     dakotafilename = '%s/opt/optpp_pds.%s.in.%d' % (filenamebase,opttype,idmin)
