@@ -1533,8 +1533,8 @@ elif (options.run_min != None):
 
   templatefilename = options.run_min
   # get min value
-  (idmin,minobjval) = GetMinJobID( templatefilename )
-  print (idmin,minobjval) 
+  (idmin,minobjval,dicevalue) = GetMinJobID( templatefilename )
+  print (idmin,minobjval,dicevalue) 
 
   # build execution command
   runcmd = "vglrun python ./brainsearch.py --param_file  %s.in.%d %s.out.%d --vis_out" % (templatefilename,idmin,templatefilename,idmin)
