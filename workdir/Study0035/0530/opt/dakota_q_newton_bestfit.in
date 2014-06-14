@@ -3,7 +3,7 @@
 strategy,
         single_method
           tabular_graphics_data
-          tabular_graphics_file = './workdir/Study0035/0530/opt/dakota_q_newton_bestfit_L2.in.tabular.dat'
+          tabular_graphics_file = './workdir/Study0035/0530/opt/dakota_q_newton_bestfit.in.tabular.dat'
 
 method,
         optpp_q_newton
@@ -29,8 +29,8 @@ interface,
         fork                                    #1,#4,#5,#7,#8,#11,#16,#19
           file_save file_tag
           analysis_driver = 'python ./brainsearch.py --param_file '
-          parameters_file = './workdir/Study0035/0530/opt/optpp_pds.bestfit_L2.in'
-          results_file    = './workdir/Study0035/0530/opt/optpp_pds.bestfit_L2.out'
+          parameters_file = './workdir/Study0035/0530/opt/optpp_pds.bestfit.in'
+          results_file    = './workdir/Study0035/0530/opt/optpp_pds.bestfit.out'
 
 #        discrete_state_range = 1
 #          initial_state    0
@@ -38,7 +38,6 @@ interface,
 
 responses,
         objective_functions = 2
-#        multi_objective_weights  = 1. 0.
         multi_objective_weights  = 1. 0.
         numerical_gradients
         fd_gradient_step_size 1.
