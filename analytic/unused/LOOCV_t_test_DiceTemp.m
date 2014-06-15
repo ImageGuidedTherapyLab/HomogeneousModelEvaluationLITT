@@ -59,7 +59,7 @@ for ii = 1:n_patients
     
     output = dlmread( strcat( './',result_file));
     L2norm (ii) = output(1);
-    dice_values (ii) = output(2);
+    dice_values (ii) = 1-output(2);
     
     
 
@@ -105,16 +105,16 @@ end
 
 [hh.H, hh.ptest] = ttest( dice_values, 0.7, 0.05, 'right');
 
-mean_dice = mean ( dice_values ); % Average Dice values
-std_dice = std ( dice_values ); % Stardard deviation of Dice values.
-test_statistic = ( mean_dice - 0.7 ) ./ ( std_dice ./ sqrt ( n_patients )); % Calculate the test_statistic
-p_value = tcdf ( test_statistic , n_patients , 'lower' );
-H0.p_value = p_value;
-H0.result = 1;
-if p_value <= 0.05
-    H0.result = 0 ;
-else
-    H0.result = 1;
-end
+% mean_dice = mean ( dice_values ); % Average Dice values
+% std_dice = std ( dice_values ); % Stardard deviation of Dice values.
+% test_statistic = ( mean_dice - 0.7 ) ./ ( std_dice ./ sqrt ( n_patients )); % Calculate the test_statistic
+% p_value = tcdf ( test_statistic , n_patients , 'lower' );
+% H0.p_value = p_value;
+% H0.result = 1;
+% if p_value <= 0.05
+%     H0.result = 0 ;
+% else
+%     H0.result = 1;
+% end
 
 end

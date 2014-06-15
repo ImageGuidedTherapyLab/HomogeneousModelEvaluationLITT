@@ -94,6 +94,7 @@ for ii = 2:num_studies
     while ~feof(fin)
         f_line = fgetl(fin);
         f_line = strrep(f_line, 'Study0035/0530', strcat(Study_paths{ii,1},'/',Study_paths{ii,2}));
+        f_line = strrep(f_line, '35 530', [Study_paths{ii,1}( (end-1):end) ' ' Study_paths{ii,2}( (end-2):end)] );
         fprintf(fout,'%s\n',f_line);
 
     end
