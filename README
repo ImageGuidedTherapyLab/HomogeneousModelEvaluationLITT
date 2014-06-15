@@ -4,7 +4,10 @@ all registration parameters are WRT workdir/meshTemplateFull1.e
 
 # run analysis
 make -f exe.makefile -j 6 &
-# python brainsearch.py --accum_history
+
+# decide at run time which run to accumulate stats
+python brainsearch.py --accum_history bestfit
+python brainsearch.py --accum_history bestfit1
 
 ------------------------- Running with MATLAB ------------------------------------
 
