@@ -256,7 +256,7 @@ while hh_iter.ptest > 0.05 && stats_iter.n > 3
     paths_iter (toss_index) = [];
     best_iter_iter (toss_index) = [];
     
-    [ hh_iter, dice_values_iter ] = LOOCV_t_test_DiceTemp ( Study_paths_iter, mu_eff_iter, alpha_iter, best_iter_iter, opt_type );
+    [ hh_iter, dice_values_iter ] = LOOCV_t_test_DiceTemp ( paths_iter, mu_eff_iter, alpha_iter, best_iter_iter, opt_type );
     
 end
 
