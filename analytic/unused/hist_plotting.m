@@ -46,7 +46,7 @@ close all
 % The output: The output is a binary acceptance/rejection of the null and alternative hypotheses.
 
 % This script finds the best mu_eff for the different studies.
-opt_type = 'bestfit1' ;
+opttype = 'bestfit1' ;
 
 
 % Identify the studies to be examined.
@@ -217,9 +217,12 @@ dice7(toss_index7) = [];
 dice8 = dice_raw;
 dice8(toss_index8) = [];
 
-stats_raw = Descriptive_statistics( datasummary(:,4) );
-stats7 = Descriptive_statistics(mu_eff7);
-stats8 = Descriptive_statistics(mu_eff8);
+stats_mu_raw = Descriptive_statistics( datasummary(:,4) );
+stats_alpha_raw = Descriptive_statistics( datasummary(:, 5) );
+stats_mu7 = Descriptive_statistics(mu_eff7);
+stats_alpha7 = Descriptive_statistics(alpha7);
+stats_mu8 = Descriptive_statistics(mu_eff8);
+stats_alpha8 = Descriptive_statistics(alpha8);
 
 % figure; hist(mu_eff_opt22);
 % figure; hist(mu_eff7);
@@ -233,30 +236,46 @@ temp_paths = Study_paths;
 temp_paths(toss_index8,:) = [];
 Study_paths8 = temp_paths;
 
-%[ hh_raw, dice_values_LOOCV ] = LOOCV_t_test_DiceTemp ( Study_paths, datasummary(:,4) ,datasummary(:,5) , datasummary(:,3), opt_type );
-%[ hh7, dice_LOOCV7 ] = LOOCV_t_test_DiceTemp ( Study_paths7, mu_eff7, alpha7, best_iter7, opt_type );
-[ hh8, dice_LOOCV8 ] = LOOCV_t_test_DiceTemp ( Study_paths8, mu_eff8, alpha8, best_iter8, opt_type );
+%[ hh_raw, dice_values_LOOCV ] = LOOCV_t_test_DiceTemp ( Study_paths, datasummary(:,4) ,datasummary(:,5) , datasummary(:,3), opttype );
+%[ hh7, dice_LOOCV7 ] = LOOCV_t_test_DiceTemp ( Study_paths7, mu_eff7, alpha7, best_iter7, opttype );
+[ hh8, dice_LOOCV8 ] = LOOCV_t_test_DiceTemp ( Study_paths8, mu_eff8, alpha8, best_iter8, opttype );
+
+%hh8.ptest = .5;
+
+% mu_eff_iter = mu_eff7;
+% paths_iter = Study_paths7;
+% alpha_iter = alpha7;
+% best_iter_iter = best_iter7;
+% hh_iter.ptest = hh7.ptest;
+% stats_mu_iter = stats_mu7;
+% iteration_tracker = stats_mu_iter.n;
+
 mu_eff_iter = mu_eff8;
-stats_iter = stats8;
 paths_iter = Study_paths8;
-hh_iter.ptest = 0.5;
-stats_iter.n = 40;
+alpha_iter = alpha8;
+best_iter_iter = best_iter8;
+hh_iter.ptest = hh8.ptest;
+stats_mu_iter = stats_mu8;
+iteration_tracker = stats_mu_iter.n;
 
-while hh_iter.ptest > 0.05 && stats_iter.n > 3
+while hh_iter.ptest > 0.05 && stats_mu_iter.n > 3
     
-    residual8 = abs( mu_eff_iter - stats_iter.mean ); % Find the largest residual
+    disp( iteration_tracker );
+    disp( hh_iter.ptest );
+    residual8 = abs( mu_eff_iter - stats_mu_iter.mean ); % Find the largest residual
     [~,toss_index] = max( residual8 );
-    temp_mu_eff = mu_eff_iter; % Toss the mu_eff value that is the largest residual
-    temp_mu_eff(toss_index) = [];
-    mu_eff_iter = temp_mu_eff;
-    temp_paths = paths_iter; % Toss the path
-    temp_paths(toss_index,:) = [];
-    paths_iter = temp_paths;
-    stats_iter = Descriptive_statistics( mu_eff_iter );
-    Study_paths_iter = temp_paths;
+    mu_eff_iter(toss_index) = [];
+    alpha_iter (toss_index) = [];
+    paths_iter (toss_index,:) = [];
+    best_iter_iter (toss_index) = [];
+    stats_mu_iter = Descriptive_statistics( mu_eff_iter);
+    iteration_tracker = stats_mu_iter;
     
-    [ hh_iter, dice_values_iter ] = LOOCV_t_test_DiceTemp ( Study_paths_iter, mu_eff_iter, opt_type );
-
+    [ hh_iter, dice_values_iter ] = LOOCV_t_test_DiceTemp ( paths_iter, mu_eff_iter, alpha_iter, best_iter_iter, opttype );
+    
 end
 
-    
+if hh_iter.ptest < 0.05 && stats_mu_iter.n > 3
+    stats_mu_iter = Descriptive_statistics( mu_eff_iter);
+    stats_alpha_iter = Descriptive_statistics( alpha_iter );
+end

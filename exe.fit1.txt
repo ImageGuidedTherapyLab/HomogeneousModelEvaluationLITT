@@ -21,8 +21,8 @@ echo 436; dakota ./workdir/Study0025/0436/opt/dakota_bestfit1.in > ./workdir/Stu
 echo 466; dakota ./workdir/Study0028/0466/opt/dakota_bestfit1.in > ./workdir/Study0028/0466/opt/dakota_bestfit1.in.log 2>&1 
 echo 468; dakota ./workdir/Study0028/0468/opt/dakota_bestfit1.in > ./workdir/Study0028/0468/opt/dakota_bestfit1.in.log 2>&1 
 echo 471; dakota ./workdir/Study0028/0471/opt/dakota_bestfit1.in > ./workdir/Study0028/0471/opt/dakota_bestfit1.in.log 2>&1 
-echo 725; dakota ./workdir/Study0052/0725/opt/dakota_bestfit1.in > ./workdir/Study0052/0725/opt/dakota_bestfit1.in.log 2>&1
-echo 720; dakota ./workdir/Study0052/0720/opt/dakota_bestfit1.in > ./workdir/Study0052/0720/opt/dakota_bestfit1.in.log 2>&1
+#echo 725; dakota ./workdir/Study0052/0725/opt/dakota_bestfit1.in > ./workdir/Study0052/0725/opt/dakota_bestfit1.in.log 2>&1
+#echo 720; dakota ./workdir/Study0052/0720/opt/dakota_bestfit1.in > ./workdir/Study0052/0720/opt/dakota_bestfit1.in.log 2>&1
 echo 447; dakota ./workdir/Study0026/0447/opt/dakota_bestfit1.in > ./workdir/Study0026/0447/opt/dakota_bestfit1.in.log 2>&1 
 echo 457; dakota ./workdir/Study0026/0457/opt/dakota_bestfit1.in > ./workdir/Study0026/0457/opt/dakota_bestfit1.in.log 2>&1 
 echo 455; dakota ./workdir/Study0026/0455/opt/dakota_bestfit1.in > ./workdir/Study0026/0455/opt/dakota_bestfit1.in.log 2>&1 
