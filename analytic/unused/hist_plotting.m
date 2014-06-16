@@ -217,9 +217,12 @@ dice7(toss_index7) = [];
 dice8 = dice_raw;
 dice8(toss_index8) = [];
 
-stats_raw = Descriptive_statistics( datasummary(:,4) );
-stats7 = Descriptive_statistics(mu_eff7);
-stats8 = Descriptive_statistics(mu_eff8);
+stats_mu_raw = Descriptive_statistics( datasummary(:,4) );
+stats_alpha_raw = Descriptive_statistics( datasummary(:, 5) );
+stats_mu7 = Descriptive_statistics(mu_eff7);
+stats_alpha7 = Descriptive_statistics(alpha7);
+stats_mu8 = Descriptive_statistics(mu_eff8);
+stats_alpha8 = Descriptive_statistics(alpha8);
 
 % figure; hist(mu_eff_opt22);
 % figure; hist(mu_eff7);
@@ -239,6 +242,8 @@ Study_paths8 = temp_paths;
 mu_eff_iter = mu_eff8;
 stats_iter = stats8;
 paths_iter = Study_paths8;
+alpha_iter = alpha8;
+best_iter_iter = best_iter8;
 hh_iter.ptest = 0.5;
 stats_iter.n = 40;
 
@@ -246,17 +251,19 @@ while hh_iter.ptest > 0.05 && stats_iter.n > 3
     
     residual8 = abs( mu_eff_iter - stats_iter.mean ); % Find the largest residual
     [~,toss_index] = max( residual8 );
-    temp_mu_eff = mu_eff_iter; % Toss the mu_eff value that is the largest residual
-    temp_mu_eff(toss_index) = [];
-    mu_eff_iter = temp_mu_eff;
-    temp_paths = paths_iter; % Toss the path
-    temp_paths(toss_index,:) = [];
-    paths_iter = temp_paths;
-    stats_iter = Descriptive_statistics( mu_eff_iter );
-    Study_paths_iter = temp_paths;
+    mu_eff_iter(toss_index) = [];
+    alpha_iter (toss_index) = [];
+    paths_iter (toss_index) = [];
+    best_iter_iter (toss_index) = [];
     
-    [ hh_iter, dice_values_iter ] = LOOCV_t_test_DiceTemp ( Study_paths_iter, mu_eff_iter, opt_type );
-
+    [ hh_iter, dice_values_iter ] = LOOCV_t_test_DiceTemp ( Study_paths_iter, mu_eff_iter, alpha_iter, best_iter_iter, opt_type );
+    
 end
+
+
+stats_mu_iter = Descriptive_statistics( mu_eff_iter);
+stats_alpha_iter = Descriptive_statistics( alpha_iter );
+
+
 
     
