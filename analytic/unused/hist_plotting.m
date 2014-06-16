@@ -244,26 +244,26 @@ stats_iter = stats8;
 paths_iter = Study_paths8;
 alpha_iter = alpha8;
 best_iter_iter = best_iter8;
-hh_iter.ptest = 0.5;
-stats_iter.n = 40;
+hh_iter.ptest = hh8.ptest;
+stats_iter.n = stats_mu8.n;
+iteration_tracker = stats_iter;
 
-while hh_iter.ptest > 0.05 && stats_iter.n > 3
+while hh_iter.ptest > 0.05 && stats_mu_iter.n > 3
     
+    disp( iteration_tracker );
+    disp( hh_iter.ptest );
     residual8 = abs( mu_eff_iter - stats_iter.mean ); % Find the largest residual
     [~,toss_index] = max( residual8 );
     mu_eff_iter(toss_index) = [];
     alpha_iter (toss_index) = [];
     paths_iter (toss_index) = [];
     best_iter_iter (toss_index) = [];
+    stats_mu_iter = Descriptive_statistics( mu_eff_iter);
+    iteration_tracker = stats_mu_iter;
     
     [ hh_iter, dice_values_iter ] = LOOCV_t_test_DiceTemp ( paths_iter, mu_eff_iter, alpha_iter, best_iter_iter, opt_type );
     
 end
 
-
 stats_mu_iter = Descriptive_statistics( mu_eff_iter);
 stats_alpha_iter = Descriptive_statistics( alpha_iter );
-
-
-
-    

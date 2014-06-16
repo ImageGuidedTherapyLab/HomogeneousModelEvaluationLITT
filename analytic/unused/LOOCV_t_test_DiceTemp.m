@@ -31,8 +31,8 @@ L2norm = zeros( n_patients,1);
 dice_values = zeros( n_patients,1); % Initialize the number of DSC (dice) values
 for ii = 1:n_patients
     
-    path_iter {1,1} = Study_paths{ii,1};
-    path_iter {1,2} = Study_paths{ii,2};
+    disp( ii );
+    path_iter(ii,:) = Study_paths(ii,:);
     
     % Set up LOOCV for mu_eff
     mu_eff_iter = mu_eff_opt; % Make a copy of both the mu_eff values and the paths
