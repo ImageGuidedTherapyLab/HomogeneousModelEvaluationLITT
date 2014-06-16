@@ -240,23 +240,23 @@ Study_paths8 = temp_paths;
 %[ hh7, dice_LOOCV7 ] = LOOCV_t_test_DiceTemp ( Study_paths7, mu_eff7, alpha7, best_iter7, opt_type );
 [ hh8, dice_LOOCV8 ] = LOOCV_t_test_DiceTemp ( Study_paths8, mu_eff8, alpha8, best_iter8, opt_type );
 mu_eff_iter = mu_eff8;
-stats_iter = stats8;
 paths_iter = Study_paths8;
 alpha_iter = alpha8;
 best_iter_iter = best_iter8;
 hh_iter.ptest = hh8.ptest;
-stats_iter.n = stats_mu8.n;
-iteration_tracker = stats_iter;
+stats_mu_iter = stats_mu8;
+iteration_tracker = stats_mu_iter.n;
 
 while hh_iter.ptest > 0.05 && stats_mu_iter.n > 3
     
     disp( iteration_tracker );
     disp( hh_iter.ptest );
-    residual8 = abs( mu_eff_iter - stats_iter.mean ); % Find the largest residual
+    
+    residual8 = abs( mu_eff_iter - stats_mu_iter.mean ); % Find the largest residual
     [~,toss_index] = max( residual8 );
     mu_eff_iter(toss_index) = [];
     alpha_iter (toss_index) = [];
-    paths_iter (toss_index) = [];
+    paths_iter (toss_index,:) = [];
     best_iter_iter (toss_index) = [];
     stats_mu_iter = Descriptive_statistics( mu_eff_iter);
     iteration_tracker = stats_mu_iter;
