@@ -45,7 +45,7 @@ for ii = 1:n_patients
     alpha_iter (ii) = [];
     alpha_iter = mean ( alpha_iter );
     
-    DAKOTA_in_writer ( path_iter, mu_eff_iter, alpha_iter, best_iter(ii), opttype  );
+    DAKOTA_in_writer ( Study_paths(ii,:), mu_eff_iter, alpha_iter, best_iter(ii), opttype  );
     % This section prepares the varied parameters into a .mat file for the
     % thermal code to run
     %     param_file  = strcat( 'workdir/', Study_paths { ii,1 }, '/', Study_paths { ii,2 }, '/opt/optpp_pds.', opt_type, '.in.1');

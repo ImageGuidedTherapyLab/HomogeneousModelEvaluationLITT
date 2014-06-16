@@ -242,6 +242,14 @@ Study_paths8 = temp_paths;
 
 %hh8.ptest = .5;
 
+% mu_eff_iter = mu_eff7;
+% paths_iter = Study_paths7;
+% alpha_iter = alpha7;
+% best_iter_iter = best_iter7;
+% hh_iter.ptest = hh7.ptest;
+% stats_mu_iter = stats_mu7;
+% iteration_tracker = stats_mu_iter.n;
+
 mu_eff_iter = mu_eff8;
 paths_iter = Study_paths8;
 alpha_iter = alpha8;
