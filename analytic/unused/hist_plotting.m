@@ -240,7 +240,6 @@ Study_paths8 = temp_paths;
 %[ hh7, dice_LOOCV7 ] = LOOCV_t_test_DiceTemp ( Study_paths7, mu_eff7, alpha7, best_iter7, opt_type );
 [ hh8, dice_LOOCV8 ] = LOOCV_t_test_DiceTemp ( Study_paths8, mu_eff8, alpha8, best_iter8, opt_type );
 mu_eff_iter = mu_eff8;
-stats_iter = stats8;
 paths_iter = Study_paths8;
 alpha_iter = alpha8;
 best_iter_iter = best_iter8;
