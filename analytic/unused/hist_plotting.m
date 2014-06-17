@@ -279,3 +279,15 @@ if hh_iter.ptest < 0.05 && stats_mu_iter.n > 3
     stats_mu_iter = Descriptive_statistics( mu_eff_iter);
     stats_alpha_iter = Descriptive_statistics( alpha_iter );
 end
+
+thresholds = linspace ( 0.0, 1, 10001);
+passes_LOOCV8 = zeros (10001,1);
+passes_iter = passes_LOOCV8;
+for ii = 1:10001
+    passes_iter   (ii) = sum ( dice_values_iter > thresholds(ii));
+    passes_LOOCV8 (ii) = sum ( dice_LOOCV8 > thresholds(ii));
+end
+
+figure(1); plot (thresholds, passes_LOOCV8);
+figure(2); plot (thresholds, passes_iter);
+figure(3); hist (mu_eff8);
