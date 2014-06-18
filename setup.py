@@ -5,12 +5,13 @@ from Cython.Distutils import build_ext
 import subprocess
 import os
 
-MacOSXBuild = True 
 MacOSXBuild = False 
-#FIXME - can we automate the paths ? 
+MacOSXBuild = True 
 
+#FIXME - can we automate the paths ? 
 if ( MacOSXBuild ):
   brainnek_dir = '/Users/fuentes/MyProjects/braincode/tym1'
+  print "export PYTHONPATH=/Users/fuentes/MyProjects/Slicer4-SuperBuild-Debug/VTKv5-build/Wrapping/Python/:/Users/fuentes/MyProjects/Slicer4-SuperBuild-Debug/VTKv5-build/bin/:/Users/fuentes/github/DakotaApplications/PlanningValidation/build.tmp/"
 else:
   brainnek_dir = '/workarea/fuentes/braincode/tym1'
 
@@ -26,8 +27,14 @@ brainnek_include.append( "%s/libocca"  % brainnek_dir )
 
 
 if ( MacOSXBuild ):
+  #FIXME - can we automate the paths ? 
   brainnek_include.append( "/Applications/Xcode.app/Contents//Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk//System/Library/Frameworks/OpenCL.framework/" )
   brainnek_include.append( "/Applications/Xcode.app/Contents//Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/numpy/core/include/")
+  brainnek_include.append( "/Users/fuentes/MyProjects/Slicer4-SuperBuild-Debug/VTKv5/Common/" ) 
+  brainnek_include.append( "/Users/fuentes/MyProjects/Slicer4-SuperBuild-Debug/VTKv5/Filtering/" ) 
+  brainnek_include.append( "/Users/fuentes/MyProjects/Slicer4-SuperBuild-Debug/VTKv5/IO/" ) 
+  brainnek_include.append( "/Users/fuentes/MyProjects/Slicer4-SuperBuild-Debug/VTKv5/Hybrid/" ) 
+  brainnek_include.append( "/Users/fuentes/MyProjects/Slicer4-SuperBuild-Debug/VTKv5-build/" ) 
 else:
   brainnek_include.append( "/opt/apps/khronos/1.1")
   brainnek_include.append( "/opt/apps/EPD/epd-7.3-1-rh5-x86_64/lib/python2.7/site-packages/numpy/core/include")
@@ -44,7 +51,10 @@ brainnek_cxxflags.append( "-Ddatafloat=float"    )
 brainnek_cxxflags.append( "-DGL_ENABLED=0"       )
 brainnek_cxxflags.append( "-DSCREENSHOT=1"       )
 brainnek_cxxflags.append( "-DVERBOSE=0"          )
-brainnek_cxxflags.append( "-DOS_LINUX=1"         )
+if ( MacOSXBuild ):
+  brainnek_cxxflags.append( "-DOS_OSX=1"         )
+else:
+  brainnek_cxxflags.append( "-DOS_LINUX=1"         )
 brainnek_cxxflags.append( "-DOCCA_USE_OPENCL=1"  )
 brainnek_cxxflags.append( "-DOCCA_USE_CUDA=0"    )
 brainnek_cxxflags.append( "-DOCCA_USE_ALL=0"     )

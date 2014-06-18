@@ -113,8 +113,11 @@ LITT plan module for Slicer 4
 	curl -O http://cython.org/release/Cython-0.16.tar.gz
 	tar -xvf Cython-0.16.tar.gz
 	cd Cython-0.16
- 	../python-install/bin/customPython setup.py install
+ 	../python-install/bin/python setup.py install
 
  - configure and build PathExplorer 
 	cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_OSX_SYSROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -DSlicer_DIR:PATH=/Users/fuentes/MyProjects/Slicer4-SuperBuild-Debug/Slicer-build/ ../PathExplorer
  
+ - run brain code
+	export PYTHONPATH=/Users/fuentes/MyProjects/Slicer4-SuperBuild-Debug/VTKv5-build/Wrapping/Python/:/Users/fuentes/MyProjects/Slicer4-SuperBuild-Debug/VTKv5-build/bin/:/Users/fuentes/github/DakotaApplications/PlanningValidation/build.tmp/
+	/Users/fuentes/MyProjects/Slicer4-SuperBuild-Debug/Cython-0.16/../python-install/bin/python brainsearch.py --ini=planningExample/Patient2/littData.ini

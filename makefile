@@ -11,7 +11,8 @@ MCC=$(MATLABROOT)/bin/mcc
 .PHONY: $(obj_path)/brainNekLibrary.so tags
 
 $(obj_path)/brainNekLibrary.so:
-	python setup.py build_ext -g  -v --build-lib=$(obj_path) --build-temp=$(obj_path)
+	/Users/fuentes/MyProjects/Slicer4-SuperBuild-Debug/Cython-0.16/../python-install/bin/python setup.py build_ext -g  -v --build-lib=$(obj_path) --build-temp=$(obj_path)
+	#python setup.py build_ext -g  -v --build-lib=$(obj_path) --build-temp=$(obj_path)
 	chmod 755 $(obj_path)
 	chmod 755 $(obj_path)/brainNekLibrary.so
 
