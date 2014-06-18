@@ -337,7 +337,7 @@ def GetMinJobID(FileNameTemplate):
       #print '%s/%s'  % (DirectoryLocation, dakotaoutfile), obj_fn_data 
       # FIXME: find the best one, ignore errors
       if( obj_fn_data.size > 1 ):
-       if(obj_fn_data[0] < MinObjVal ): 
+       if(obj_fn_data[1] < MinObjVal ): 
          MinObjVal  = obj_fn_data[0]
          MinDiceVal = obj_fn_data[1]
          MinID     = int(dakotaoutfile.split(".").pop()) 
@@ -1440,7 +1440,7 @@ if (options.param_file != None):
 elif (options.accum_history ):
   resultfileList = [
   './workdir/Study0035/0530/',
-  './workdir/Study0023/0433/',
+  #'./workdir/Study0023/0433/',
   './workdir/Study0023/0428/',
   ##'./workdir/Study0023/0425/',
   './workdir/Study0030/0495/',
