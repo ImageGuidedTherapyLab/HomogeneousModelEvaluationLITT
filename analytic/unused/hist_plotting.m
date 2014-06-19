@@ -250,44 +250,50 @@ Study_paths8 = temp_paths;
 % stats_mu_iter = stats_mu7;
 % iteration_tracker = stats_mu_iter.n;
 
-mu_eff_iter = mu_eff8;
-paths_iter = Study_paths8;
-alpha_iter = alpha8;
-best_iter_iter = best_iter8;
-hh_iter.ptest = hh8.ptest;
-stats_mu_iter = stats_mu8;
-iteration_tracker = stats_mu_iter.n;
+% mu_eff_iter = mu_eff8;
+% paths_iter = Study_paths8;
+% alpha_iter = alpha8;
+% best_iter_iter = best_iter8;
+% hh_iter.ptest = hh8.ptest;
+% stats_mu_iter = stats_mu8;
+% iteration_tracker = stats_mu_iter.n;
+% 
+% while hh_iter.ptest > 0.05 && stats_mu_iter.n > 3
+%     
+%     disp( iteration_tracker );
+%     disp( hh_iter.ptest );
+%     residual8 = abs( mu_eff_iter - stats_mu_iter.mean ); % Find the largest residual
+%     [~,toss_index] = max( residual8 );
+%     mu_eff_iter(toss_index) = [];
+%     alpha_iter (toss_index) = [];
+%     paths_iter (toss_index,:) = [];
+%     best_iter_iter (toss_index) = [];
+%     stats_mu_iter = Descriptive_statistics( mu_eff_iter);
+%     iteration_tracker = stats_mu_iter;
+%     
+%     [ hh_iter, dice_values_iter ] = LOOCV_t_test_DiceTemp ( paths_iter, mu_eff_iter, alpha_iter, best_iter_iter, opttype );
+%     
+% end
 
-while hh_iter.ptest > 0.05 && stats_mu_iter.n > 3
-    
-    disp( iteration_tracker );
-    disp( hh_iter.ptest );
-    residual8 = abs( mu_eff_iter - stats_mu_iter.mean ); % Find the largest residual
-    [~,toss_index] = max( residual8 );
-    mu_eff_iter(toss_index) = [];
-    alpha_iter (toss_index) = [];
-    paths_iter (toss_index,:) = [];
-    best_iter_iter (toss_index) = [];
-    stats_mu_iter = Descriptive_statistics( mu_eff_iter);
-    iteration_tracker = stats_mu_iter;
-    
-    [ hh_iter, dice_values_iter ] = LOOCV_t_test_DiceTemp ( paths_iter, mu_eff_iter, alpha_iter, best_iter_iter, opttype );
-    
-end
-
-if hh_iter.ptest < 0.05 && stats_mu_iter.n > 3
-    stats_mu_iter = Descriptive_statistics( mu_eff_iter);
-    stats_alpha_iter = Descriptive_statistics( alpha_iter );
-end
+% if hh_iter.ptest < 0.05 && stats_mu_iter.n > 3
+%     stats_mu_iter = Descriptive_statistics( mu_eff_iter);
+%     stats_alpha_iter = Descriptive_statistics( alpha_iter );
+% end
 
 thresholds = linspace ( 0.0, 1, 10001);
 passes_LOOCV8 = zeros (10001,1);
-passes_iter = passes_LOOCV8;
+%passes_LOOCV7 = passes_LOOCV8;
+%passes_iter = passes_LOOCV8;
 for ii = 1:10001
-    passes_iter   (ii) = sum ( dice_values_iter > thresholds(ii));
+    %passes_iter   (ii) = sum ( dice_values_iter > thresholds(ii));
+    %passes_LOOCV7 (ii) = sum ( dice_LOOCV7 > thresholds(ii));
     passes_LOOCV8 (ii) = sum ( dice_LOOCV8 > thresholds(ii));
 end
 
+%passes_iter_AUC = sum (passes_iter) ./ (10001 * stats_mu_iter.n) ;  % The AUC is actually the same as the mean
+%passes_LOOCV7_AUC = sum (passes_LOOCV7) ./ (10001 * stats_mu7.n);
+passes_LOOCV8_AUC = sum (passes_LOOCV8) ./ (10001 * stats_mu8.n);
 figure(1); plot (thresholds, passes_LOOCV8);
-figure(2); plot (thresholds, passes_iter);
+%figure(2); plot (thresholds, passes_LOOCV7);
 figure(3); hist (mu_eff8);
+%figure(4); hist (mu_eff7);
