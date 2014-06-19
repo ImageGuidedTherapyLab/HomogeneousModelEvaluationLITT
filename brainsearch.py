@@ -324,9 +324,9 @@ laserTip  1.0      4180           0.5985        500         14000       0.88
 """
 # Convenience Routine
 def GetMinJobID(FileNameTemplate):
-    MinID      = 1  
+    OptID      = 1  
     MinObjVal  = 1.e99
-    MinDiceVal = 1.e99
+    MaxDiceVal = 0.0
     # get a list of all output files in the directory 
     DirectoryLocation = FileNameTemplate.split('/')
     FileTypeID = DirectoryLocation.pop() 
@@ -337,11 +337,12 @@ def GetMinJobID(FileNameTemplate):
       #print '%s/%s'  % (DirectoryLocation, dakotaoutfile), obj_fn_data 
       # FIXME: find the best one, ignore errors
       if( obj_fn_data.size > 1 ):
-       if(obj_fn_data[1] < MinObjVal ): 
+       if(obj_fn_data[0] < MinObjVal ): 
          MinObjVal  = obj_fn_data[0]
-         MinDiceVal = obj_fn_data[1]
-         MinID     = int(dakotaoutfile.split(".").pop()) 
-    return (MinID,MinObjVal,MinDiceVal )
+       if(obj_fn_data[1] > MaxDiceVal ): 
+         MaxDiceVal = obj_fn_data[1]
+         OptID     = int(dakotaoutfile.split(".").pop()) 
+    return (OptID,MinObjVal,MaxDiceVal )
 
 # Convenience Routine
 def DiceTxtFileParse(DiceInputFilename):
@@ -1492,40 +1493,43 @@ elif (options.accum_history ):
   texHandle  = open('datasummary.tex' , 'w') 
   fileHandle = open('datasummary.txt' , 'w') 
   # write header
-  fileHandle.write("idstudy,iddata,idmin,mu_eff,alpha,robin,dice,obj\n")
+  fileHandle.write("idstudy,iddata,idopt,mu_eff,alpha,robin,dice,obj\n")
   # loop over files and extract optimal value
   opttype = options.accum_history 
   for filenamebase in resultfileList:
-    # get latex command
-    config = ConfigParser.SafeConfigParser({})
-    inisetupfile = '%s/opt/setup.ini' % (filenamebase)
-    config.read(inisetupfile)
+    try: 
+      # get latex command
+      config = ConfigParser.SafeConfigParser({})
+      inisetupfile = '%s/opt/setup.ini' % (filenamebase)
+      config.read(inisetupfile)
   
-    # get min value
-    (idmin,minobjval,dicevalue ) = GetMinJobID( '%s/opt/optpp_pds.%s' % (filenamebase,opttype))
-    print (idmin,minobjval,dicevalue ) 
-    
-    studyid= int(filenamebase.split('/')[2].replace('Study',''))
-    dataid = int(filenamebase.split('/')[3])
-    # count the file lines
-    dakotafilename = '%s/opt/optpp_pds.%s.in.%d' % (filenamebase,opttype,idmin)
-    opt_fem_params = ParseInput(dakotafilename,False)
-    simvariable = opt_fem_params['cv']     
-    # get arrhenius dice value
-    heattimeinterval               = eval(config.get('mrti','heating')  )
-    SEMDataDirectory               = outputDirectory % int(filenamebase.split('/')[-2]) 
-    #dataarray = numpy.loadtxt(filename,skiprows=1,usecols=(0,1,2,3,4,6)
-    fileHandle.write("%05d,%05d,%05d,%s,%s,%s,%12.5e,%12.5e\n" %( studyid, dataid, idmin     ,
-                                                                    simvariable['mu_eff_healthy'],
-                                                                    simvariable['alpha_healthy'],
-                                                                    simvariable['robin_coeff'],
-                                                                    dicevalue,
-                                                                    minobjval))
-    # format latex ouput
-    outputformat                   = config.get('latex','opttype')
-    texFormat = outputformat % (opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],minobjval,dicevalue)
-    #print texFormat 
-    texHandle.write("%s\n" %(texFormat))
+      # get min value
+      (idopt,minobjval,dicevalue ) = GetMinJobID( '%s/opt/optpp_pds.%s' % (filenamebase,opttype))
+      print (idopt,minobjval,dicevalue ) 
+      
+      studyid= int(filenamebase.split('/')[2].replace('Study',''))
+      dataid = int(filenamebase.split('/')[3])
+      # count the file lines
+      dakotafilename = '%s/opt/optpp_pds.%s.in.%d' % (filenamebase,opttype,idopt)
+      opt_fem_params = ParseInput(dakotafilename,False)
+      simvariable = opt_fem_params['cv']     
+      # get arrhenius dice value
+      heattimeinterval               = eval(config.get('mrti','heating')  )
+      SEMDataDirectory               = outputDirectory % int(filenamebase.split('/')[-2]) 
+      #dataarray = numpy.loadtxt(filename,skiprows=1,usecols=(0,1,2,3,4,6)
+      fileHandle.write("%05d,%05d,%05d,%s,%s,%s,%12.5e,%12.5e\n" %( studyid, dataid, idopt     ,
+                                                                      simvariable['mu_eff_healthy'],
+                                                                      simvariable['alpha_healthy'],
+                                                                      simvariable['robin_coeff'],
+                                                                      dicevalue,
+                                                                      minobjval))
+      # format latex ouput
+      outputformat                   = config.get('latex','opttype')
+      texFormat = outputformat % (opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],minobjval,dicevalue)
+      #print texFormat 
+      texHandle.write("%s\n" %(texFormat))
+    except IOError as inst: 
+      print inst
 
   texHandle.close() 
   fileHandle.close()
@@ -1535,11 +1539,11 @@ elif (options.run_min != None):
 
   templatefilename = options.run_min
   # get min value
-  (idmin,minobjval,dicevalue) = GetMinJobID( templatefilename )
-  print (idmin,minobjval,dicevalue) 
+  (idopt,minobjval,dicevalue) = GetMinJobID( templatefilename )
+  print (idopt,minobjval,dicevalue) 
 
   # build execution command
-  runcmd = "vglrun python ./brainsearch.py --param_file  %s.in.%d %s.out.%d --vis_out" % (templatefilename,idmin,templatefilename,idmin)
+  runcmd = "vglrun python ./brainsearch.py --param_file  %s.in.%d %s.out.%d --vis_out" % (templatefilename,idopt,templatefilename,idopt)
   print runcmd
   #FIXME not running ???
   os.system( runcmd )

@@ -54,6 +54,7 @@ for ii = 1:n_patients
     param_file = strcat( path_base,'optpp_pds.LOOCV.in.1');
     result_file = strcat( path_base, 'optpp_pds.LOOCV.out.1');
     python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ' ./', result_file, ''')');   % unix(''python test_saveFile.py'')
+    disp(python_command);
     evalc(python_command);
     
     output = dlmread( strcat( './',result_file));

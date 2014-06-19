@@ -46,7 +46,7 @@ close all
 % The output: The output is a binary acceptance/rejection of the null and alternative hypotheses.
 
 % This script finds the best mu_eff for the different studies.
-opttype = 'bestfit1' ;
+opttype = 'bestfit' ;
 
 
 % Identify the studies to be examined.

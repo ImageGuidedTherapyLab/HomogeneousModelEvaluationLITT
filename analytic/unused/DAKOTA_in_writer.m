@@ -28,6 +28,7 @@ function DAKOTA_in_writer ( path, mu_opt, alpha_opt, best_iter, opttype  );
 path_base = strcat( 'workdir/',path{1,1},'/',path{1,2},'/opt/');
 copy_command = strcat('cp ./', path_base, 'optpp_pds.', opttype, '.in.', num2str(best_iter), ' ./', path_base, 'optpp_pds.LOOCV.in.1');
 bash_copy_command = strcat( 'unix(''', copy_command, ''')');
+disp(bash_copy_command);
 evalc( bash_copy_command);
 
 % Find and replace using Bash's Sed commands
