@@ -65,7 +65,7 @@ elseif Matlab_flag == 0
     % Find and replace using Bash's Sed commands
     orig_mu = '.*mu_eff_healthy';
     new_mu = strcat ( num2str(mu_opt),' mu_eff_healthy');
-    mu_sed_command = strcat( '''sed "2s/', orig_mu, '/', new_mu, '/" ./',path_base,'optpp_pds.LOOCV.in.1 > ./', path_base,'optpp_pds.LOOCV.in.2' );
+    mu_sed_command = strcat( '''sed "3s/', orig_mu, '/', new_mu, '/" ./',path_base,'optpp_pds.LOOCV.in.1 > ./', path_base,'optpp_pds.LOOCV.in.2' );
     bash_mu_command = strcat( 'unix(', mu_sed_command, ''')');
     evalc( bash_mu_command);
     
@@ -73,7 +73,7 @@ elseif Matlab_flag == 0
     
     orig_alpha = '.*alpha_healthy';
     new_alpha = strcat ( num2str(alpha_opt),' alpha_healthy');
-    alpha_sed_command = strcat( '''sed "3s/', orig_alpha, '/', new_alpha, '/" ./', path_base,'optpp_pds.LOOCV.in.2 > ./',path_base,'optpp_pds.LOOCV.in.3' );
+    alpha_sed_command = strcat( '''sed "6s/', orig_alpha, '/', new_alpha, '/" ./', path_base,'optpp_pds.LOOCV.in.2 > ./',path_base,'optpp_pds.LOOCV.in.3' );
     bash_alpha_command = strcat( 'unix(', alpha_sed_command, ''')');
     evalc( bash_alpha_command);
     

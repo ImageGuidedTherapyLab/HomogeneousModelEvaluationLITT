@@ -21,12 +21,12 @@
 % mu_eff_opt is a vector of the inverse problem optimized mu_eff values in
 %   1/m units
 
-function [ hh, dice_values ] = LOOCV_t_test_DiceTemp ( Study_paths, mu_eff_opt, alpha_opt, best_iter, opttype );
+function [ hh, dice_values ] = LOOCV_t_test_DiceTemp ( Study_paths, mu_eff_opt, alpha_opt, best_iter, opttype, Matlab_flag );
 
 % Make the LOOCV iteration system
 n_patients = length( mu_eff_opt); % This is the number of patients
 % n_patients = 1;
-path_iter = cell(1,2);
+%path_iter = cell(1,2);
 L2norm = zeros( n_patients,1);
 dice_values = zeros( n_patients,1); % Initialize the number of DSC (dice) values
 for ii = 1:n_patients
@@ -45,7 +45,7 @@ for ii = 1:n_patients
     alpha_iter (ii) = [];
     alpha_iter = mean ( alpha_iter );
     
-    DAKOTA_in_writer ( Study_paths(ii,:), mu_eff_iter, alpha_iter, best_iter(ii), opttype  );
+    DAKOTA_in_writer ( Study_paths(ii,:), mu_eff_iter, alpha_iter, best_iter(ii), opttype, Matlab_flag  );
     % This section prepares the varied parameters into a .mat file for the
     % thermal code to run
     %     param_file  = strcat( 'workdir/', Study_paths { ii,1 }, '/', Study_paths { ii,2 }, '/opt/optpp_pds.', opt_type, '.in.1');
@@ -59,7 +59,17 @@ for ii = 1:n_patients
     
     output = dlmread( strcat( './',result_file));
     L2norm (ii) = output(1);
-    dice_values (ii) = 1-output(2);
+    if Matlab_flag == 0
+        dice_values (ii) = output(2);
+        
+    elseif Matlab_flag ==1
+        dice_values (ii) = 1 - output(2);
+        
+    else
+        disp('Invalid Matlab_flag. Only 0 or 1 allowed')
+        break
+    end
+
     
     
 
