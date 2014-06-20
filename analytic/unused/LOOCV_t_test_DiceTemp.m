@@ -31,7 +31,7 @@ L2norm = zeros( n_patients,1);
 dice_values = zeros( n_patients,1); % Initialize the number of DSC (dice) values
 for ii = 1:n_patients
     
-    disp( ii );
+    disp( fprintf('%d of %d\n',ii,n_patients) );
     
     % Set up LOOCV for mu_eff
     mu_eff_iter = mu_eff_opt; % Make a copy of both the mu_eff values and the paths
@@ -53,7 +53,7 @@ for ii = 1:n_patients
     path_base = strcat( 'workdir/',Study_paths{ii,1},'/',Study_paths{ii,2},'/opt/');
     param_file = strcat( path_base,'optpp_pds.LOOCV.in.1');
     result_file = strcat( path_base, 'optpp_pds.LOOCV.out.1');
-    python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ' ./', result_file, ''')');   % unix(''python test_saveFile.py'')
+    python_command = strcat( '[errorcode, codestdout] = unix(''python ./brainsearch.py --param_file ./', param_file, ' ./', result_file, ''')');   % unix(''python test_saveFile.py'')
     disp(python_command);
     evalc(python_command);
     

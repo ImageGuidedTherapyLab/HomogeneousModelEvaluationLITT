@@ -45,9 +45,6 @@ close all
 % 
 % The output: The output is a binary acceptance/rejection of the null and alternative hypotheses.
 
-% This script finds the best mu_eff for the different studies.
-opttype = 'bestfit' ;
-
 
 % Identify the studies to be examined.
 % Study_paths {1,1} = 'Study0035';
@@ -193,7 +190,13 @@ end
 % clear ii
 
 %mu_eff_opt22 = mu_eff_opt*(6000-100)+100; %This line converts the normalized value into absolute. It's very import to get the converion correct
-dice_raw = 1 - datasummary(:,7);
+
+% This script finds the best mu_eff for the different studies.
+opttype = 'bestfit' ;
+dice_raw = datasummary(:,7);
+%opttype = 'bestfit1' ;
+%dice_raw = 1 - datasummary(:,7);
+
 toss_index7 = find(dice_raw<0.7);
 toss_index8 = find(dice_raw<0.8);
 
