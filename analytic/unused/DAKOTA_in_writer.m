@@ -35,8 +35,8 @@ evalc( bash_copy_command);
 orig_mu = '.*mu_eff_healthy';
 new_mu = strcat ( num2str(mu_opt),' mu_eff_healthy');
 mu_sed_command = strcat( '''sed "2s/', orig_mu, '/', new_mu, '/" ./',path_base,'optpp_pds.LOOCV.in.1 > ./', path_base,'optpp_pds.LOOCV.in.2' );
-bash_mu_command = strcat( 'unix(', mu_sed_command, ''')');
-evalc( bash_mu_command);
+disp(mu_sed_command );
+[returnvalue, stdoutbash ] = unix(mu_sed_command )
 
 % sed "3s/.*mu_eff_healthy/289.8162 mu_eff_healthy/" ./optpp_pds.LOOCV.in.1 >optpp_pds.LOOCV.in.2
 
@@ -44,12 +44,13 @@ orig_alpha = '.*alpha_healthy';
 new_alpha = strcat ( num2str(alpha_opt),' alpha_healthy');
 alpha_sed_command = strcat( '''sed "3s/', orig_alpha, '/', new_alpha, '/" ./', path_base,'optpp_pds.LOOCV.in.2 > ./',path_base,'optpp_pds.LOOCV.in.3' );
 bash_alpha_command = strcat( 'unix(', alpha_sed_command, ''')');
-evalc( bash_alpha_command);
+disp(alpha_sed_command);
+[returnvalue, stdoutbash ] = unix(alpha_sed_command)
 
 % Because I'm inept at sed, I'll do this:
 mv_command = strcat('mv ./', path_base, 'optpp_pds.LOOCV.in.3 ./', path_base,'optpp_pds.LOOCV.in.1');
-bash_mv_command = strcat( 'unix(''', mv_command, ''')');
-evalc( bash_mv_command);
+disp(mv_command );
+[returnvalue, stdoutbash ] = unix(mv_command )
 
 
 %     python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ''')'); % unix(''python test_saveFile.py'')
