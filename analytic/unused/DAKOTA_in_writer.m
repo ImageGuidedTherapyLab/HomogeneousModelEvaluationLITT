@@ -1,6 +1,6 @@
 % This function writes a DAKOTA *.in.* file
 
-function DAKOTA_in_writer ( path, mu_opt, alpha_opt, best_iter, opttype  );
+function DAKOTA_in_writer ( path, mu_opt, alpha_opt, best_iter, opttype, Matlab_flag  );
 
 % base_cell = cell (31,1);
 % base_cell {1,1} = '20 variables';
@@ -24,32 +24,66 @@ function DAKOTA_in_writer ( path, mu_opt, alpha_opt, best_iter, opttype  );
 % base_cell{30,1} = '5 DVV_5:alpha_healthy';
 % base_cell{31,1} = '0 analysis_components';
 
-% Copy the DAKOTA *.in.* file to the main directory
-path_base = strcat( 'workdir/',path{1,1},'/',path{1,2},'/opt/');
-copy_command = strcat('cp ./', path_base, 'optpp_pds.', opttype, '.in.', num2str(best_iter), ' ./', path_base, 'optpp_pds.LOOCV.in.1');
-bash_copy_command = strcat( 'unix(''', copy_command, ''')');
-disp(bash_copy_command);
-evalc( bash_copy_command);
+if Matlab_flag == 1;
+    
+    % Copy the DAKOTA *.in.* file to the main directory
+    path_base = strcat( 'workdir/',path{1,1},'/',path{1,2},'/opt/');
+    copy_command = strcat('cp ./', path_base, 'optpp_pds.', opttype, '.in.', num2str(best_iter), ' ./', path_base, 'optpp_pds.LOOCV.in.1');
+    bash_copy_command = strcat( 'unix(''', copy_command, ''')');
+    disp(bash_copy_command);
+    evalc( bash_copy_command);
+    
+    % Find and replace using Bash's Sed commands
+    orig_mu = '.*mu_eff_healthy';
+    new_mu = strcat ( num2str(mu_opt),' mu_eff_healthy');
+    mu_sed_command = strcat( '''sed "2s/', orig_mu, '/', new_mu, '/" ./',path_base,'optpp_pds.LOOCV.in.1 > ./', path_base,'optpp_pds.LOOCV.in.2' );
+    bash_mu_command = strcat( 'unix(', mu_sed_command, ''')');
+    evalc( bash_mu_command);
+    
+    % sed "3s/.*mu_eff_healthy/289.8162 mu_eff_healthy/" ./optpp_pds.LOOCV.in.1 >optpp_pds.LOOCV.in.2
+    
+    orig_alpha = '.*alpha_healthy';
+    new_alpha = strcat ( num2str(alpha_opt),' alpha_healthy');
+    alpha_sed_command = strcat( '''sed "3s/', orig_alpha, '/', new_alpha, '/" ./', path_base,'optpp_pds.LOOCV.in.2 > ./',path_base,'optpp_pds.LOOCV.in.3' );
+    bash_alpha_command = strcat( 'unix(', alpha_sed_command, ''')');
+    evalc( bash_alpha_command);
+    
+    % Because I'm inept at sed, I'll do this:
+    mv_command = strcat('mv ./', path_base, 'optpp_pds.LOOCV.in.3 ./', path_base,'optpp_pds.LOOCV.in.1');
+    bash_mv_command = strcat( 'unix(''', mv_command, ''')');
+    evalc( bash_mv_command);
+    
+elseif Matlab_flag == 0
+    
+    % Copy the DAKOTA *.in.* file to the main directory
+    path_base = strcat( 'workdir/',path{1,1},'/',path{1,2},'/opt/');
+    copy_command = strcat('cp ./', path_base, 'optpp_pds.', opttype, '.in.', num2str(best_iter), ' ./', path_base, 'optpp_pds.LOOCV.in.1');
+    bash_copy_command = strcat( 'unix(''', copy_command, ''')');
+    disp(bash_copy_command);
+    evalc( bash_copy_command);
+    
+    % Find and replace using Bash's Sed commands
+    orig_mu = '.*mu_eff_healthy';
+    new_mu = strcat ( num2str(mu_opt),' mu_eff_healthy');
+    mu_sed_command = strcat( '''sed "2s/', orig_mu, '/', new_mu, '/" ./',path_base,'optpp_pds.LOOCV.in.1 > ./', path_base,'optpp_pds.LOOCV.in.2' );
+    bash_mu_command = strcat( 'unix(', mu_sed_command, ''')');
+    evalc( bash_mu_command);
+    
+    % sed "3s/.*mu_eff_healthy/289.8162 mu_eff_healthy/" ./optpp_pds.LOOCV.in.1 >optpp_pds.LOOCV.in.2
+    
+    orig_alpha = '.*alpha_healthy';
+    new_alpha = strcat ( num2str(alpha_opt),' alpha_healthy');
+    alpha_sed_command = strcat( '''sed "3s/', orig_alpha, '/', new_alpha, '/" ./', path_base,'optpp_pds.LOOCV.in.2 > ./',path_base,'optpp_pds.LOOCV.in.3' );
+    bash_alpha_command = strcat( 'unix(', alpha_sed_command, ''')');
+    evalc( bash_alpha_command);
+    
+    % Because I'm inept at sed, I'll do this:
+    mv_command = strcat('mv ./', path_base, 'optpp_pds.LOOCV.in.3 ./', path_base,'optpp_pds.LOOCV.in.1');
+    bash_mv_command = strcat( 'unix(''', mv_command, ''')');
+    evalc( bash_mv_command);
 
-% Find and replace using Bash's Sed commands
-orig_mu = '.*mu_eff_healthy';
-new_mu = strcat ( num2str(mu_opt),' mu_eff_healthy');
-mu_sed_command = strcat( '''sed "2s/', orig_mu, '/', new_mu, '/" ./',path_base,'optpp_pds.LOOCV.in.1 > ./', path_base,'optpp_pds.LOOCV.in.2' );
-bash_mu_command = strcat( 'unix(', mu_sed_command, ''')');
-evalc( bash_mu_command);
+end
 
-% sed "3s/.*mu_eff_healthy/289.8162 mu_eff_healthy/" ./optpp_pds.LOOCV.in.1 >optpp_pds.LOOCV.in.2
-
-orig_alpha = '.*alpha_healthy';
-new_alpha = strcat ( num2str(alpha_opt),' alpha_healthy');
-alpha_sed_command = strcat( '''sed "3s/', orig_alpha, '/', new_alpha, '/" ./', path_base,'optpp_pds.LOOCV.in.2 > ./',path_base,'optpp_pds.LOOCV.in.3' );
-bash_alpha_command = strcat( 'unix(', alpha_sed_command, ''')');
-evalc( bash_alpha_command);
-
-% Because I'm inept at sed, I'll do this:
-mv_command = strcat('mv ./', path_base, 'optpp_pds.LOOCV.in.3 ./', path_base,'optpp_pds.LOOCV.in.1');
-bash_mv_command = strcat( 'unix(''', mv_command, ''')');
-evalc( bash_mv_command);
 
 
 %     python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ''')'); % unix(''python test_saveFile.py'')

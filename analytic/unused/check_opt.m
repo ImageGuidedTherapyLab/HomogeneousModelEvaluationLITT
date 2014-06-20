@@ -1,12 +1,26 @@
-function y = check_opt( path_base, opttype )
+function y = check_opt( paths, opttype, best_iter )
 
-close all
+num_studies = size(paths);
 
-load( strcat ( path_base, '/optpp_pds.', opttype, '.in.1.mat') );
+
+
+for ii = 1:num_studies
+    clear inputdatavars
+    path_base = strcat ('./workdir/', paths{ii,1},'/',paths{ii,2},'/opt/optpp_pds.',opttype,'.in.', num2str(best_iter),'.mat');
+    
+    load ( path_base );
+
+    
+
+
+
+%load( strcat ( path_base, '/optpp_pds.', opttype, '.in.1.mat') );
 
 % index = load ( 'index.txt' );
 
-[L2norm,dice, tmap_model, MRTI_crop] =  fast_temperature_obj_fxn_sanity ( inputdatavars, 1 );
+inputdatavars.cv.mu_eff_healthy = num2str( mu_eff );
+
+[L2norm(ii,:) , dice(ii,:), tmap_model(:,:,ii), MRTI_crop(:,:,ii)] =  fast_temperature_obj_fxn_sanity ( inputdatavars, 1 );
 
 % index = index + 1;
 % csvwrite ('index.txt' , index);

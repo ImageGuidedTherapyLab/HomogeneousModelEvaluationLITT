@@ -47,6 +47,7 @@ close all
 
 % This script finds the best mu_eff for the different studies.
 opttype = 'bestfit' ;
+Matlab_flag = 0; % 0 means use FEM kernel; 1 means use MATLAB for kernel
 
 
 % Identify the studies to be examined.
@@ -293,7 +294,7 @@ end
 %passes_iter_AUC = sum (passes_iter) ./ (10001 * stats_mu_iter.n) ;  % The AUC is actually the same as the mean
 %passes_LOOCV7_AUC = sum (passes_LOOCV7) ./ (10001 * stats_mu7.n);
 passes_LOOCV8_AUC = sum (passes_LOOCV8) ./ (10001 * stats_mu8.n);
-figure(1); plot (thresholds, passes_LOOCV8);
+figure(1); plot (thresholds, passes_LOOCV8,'LineWidth',5);
 %figure(2); plot (thresholds, passes_LOOCV7);
 figure(3); hist (mu_eff8);
 %figure(4); hist (mu_eff7);
