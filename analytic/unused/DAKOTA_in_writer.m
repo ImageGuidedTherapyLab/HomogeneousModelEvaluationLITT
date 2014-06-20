@@ -1,6 +1,6 @@
 % This function writes a DAKOTA *.in.* file
 
-function DAKOTA_in_writer ( path, mu_opt, alpha_opt, best_iter, opttype  );
+function DAKOTA_in_writer ( path, mu_opt, alpha_opt, best_iter, opttype, Matlab_flag  );
 
 % base_cell = cell (31,1);
 % base_cell {1,1} = '20 variables';
@@ -27,14 +27,13 @@ function DAKOTA_in_writer ( path, mu_opt, alpha_opt, best_iter, opttype  );
 % Copy the DAKOTA *.in.* file to the main directory
 path_base = strcat( 'workdir/',path{1,1},'/',path{1,2},'/opt/');
 copy_command = strcat('cp ./', path_base, 'optpp_pds.', opttype, '.in.', num2str(best_iter), ' ./', path_base, 'optpp_pds.LOOCV.in.1');
-bash_copy_command = strcat( 'unix(''', copy_command, ''')');
-disp(bash_copy_command);
-evalc( bash_copy_command);
+disp(copy_command);
+[returnvalue, stdoutbash ] = unix(copy_command )
 
 % Find and replace using Bash's Sed commands
 orig_mu = '.*mu_eff_healthy';
 new_mu = strcat ( num2str(mu_opt),' mu_eff_healthy');
-mu_sed_command = strcat( '''sed "2s/', orig_mu, '/', new_mu, '/" ./',path_base,'optpp_pds.LOOCV.in.1 > ./', path_base,'optpp_pds.LOOCV.in.2' );
+mu_sed_command = strcat( 'sed -i "0,/',orig_mu,'/s/',orig_mu,'/',  new_mu, '/" ./',path_base,'optpp_pds.LOOCV.in.1');
 disp(mu_sed_command );
 [returnvalue, stdoutbash ] = unix(mu_sed_command )
 
@@ -42,16 +41,10 @@ disp(mu_sed_command );
 
 orig_alpha = '.*alpha_healthy';
 new_alpha = strcat ( num2str(alpha_opt),' alpha_healthy');
-alpha_sed_command = strcat( '''sed "3s/', orig_alpha, '/', new_alpha, '/" ./', path_base,'optpp_pds.LOOCV.in.2 > ./',path_base,'optpp_pds.LOOCV.in.3' );
-bash_alpha_command = strcat( 'unix(', alpha_sed_command, ''')');
+alpha_sed_command = strcat( 'sed -i "0,/', orig_alpha, '/s/', orig_alpha, '/', new_alpha, '/" ./', path_base,'optpp_pds.LOOCV.in.1'  );
 disp(alpha_sed_command);
 [returnvalue, stdoutbash ] = unix(alpha_sed_command)
-
-% Because I'm inept at sed, I'll do this:
-mv_command = strcat('mv ./', path_base, 'optpp_pds.LOOCV.in.3 ./', path_base,'optpp_pds.LOOCV.in.1');
-disp(mv_command );
-[returnvalue, stdoutbash ] = unix(mv_command )
-
+    
 
 %     python_command = strcat( 'unix(''python ./brainsearch.py --param_file ./', param_file, ''')'); % unix(''python test_saveFile.py'')
 %     disp(python_command );

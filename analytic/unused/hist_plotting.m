@@ -45,6 +45,9 @@ close all
 % 
 % The output: The output is a binary acceptance/rejection of the null and alternative hypotheses.
 
+% This script finds the best mu_eff for the different studies.
+Matlab_flag = 0; % 0 means use FEM kernel; 1 means use MATLAB for kernel
+
 
 % Identify the studies to be examined.
 % Study_paths {1,1} = 'Study0035';
@@ -191,12 +194,18 @@ end
 
 %mu_eff_opt22 = mu_eff_opt*(6000-100)+100; %This line converts the normalized value into absolute. It's very import to get the converion correct
 
-% This script finds the best mu_eff for the different studies.
-opttype = 'bestfit' ;
-dice_raw = datasummary(:,7);
-%opttype = 'bestfit1' ;
-%dice_raw = 1 - datasummary(:,7);
+if Matlab_flag == 0
+    opttype = 'bestfit' ;
+    dice_raw = datasummary(:,7);
 
+elseif Matlab_flag ==1
+    opttype = 'bestfit1' ;
+    dice_raw = 1 - datasummary(:,7);
+    
+else
+    disp('Invalid Matlab_flag. Only 0 or 1 allowed')
+    break
+end
 toss_index7 = find(dice_raw<0.7);
 toss_index8 = find(dice_raw<0.8);
 
@@ -241,7 +250,7 @@ Study_paths8 = temp_paths;
 
 %[ hh_raw, dice_values_LOOCV ] = LOOCV_t_test_DiceTemp ( Study_paths, datasummary(:,4) ,datasummary(:,5) , datasummary(:,3), opttype );
 %[ hh7, dice_LOOCV7 ] = LOOCV_t_test_DiceTemp ( Study_paths7, mu_eff7, alpha7, best_iter7, opttype );
-[ hh8, dice_LOOCV8 ] = LOOCV_t_test_DiceTemp ( Study_paths8, mu_eff8, alpha8, best_iter8, opttype );
+[ hh8, dice_LOOCV8 ] = LOOCV_t_test_DiceTemp ( Study_paths8, mu_eff8, alpha8, best_iter8, opttype, Matlab_flag );
 
 %hh8.ptest = .5;
 
@@ -296,7 +305,7 @@ end
 %passes_iter_AUC = sum (passes_iter) ./ (10001 * stats_mu_iter.n) ;  % The AUC is actually the same as the mean
 %passes_LOOCV7_AUC = sum (passes_LOOCV7) ./ (10001 * stats_mu7.n);
 passes_LOOCV8_AUC = sum (passes_LOOCV8) ./ (10001 * stats_mu8.n);
-figure(1); plot (thresholds, passes_LOOCV8);
+figure(1); plot (thresholds, passes_LOOCV8,'LineWidth',5);
 %figure(2); plot (thresholds, passes_LOOCV7);
 figure(3); hist (mu_eff8);
 %figure(4); hist (mu_eff7);
