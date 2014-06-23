@@ -1,4 +1,4 @@
-% This script is meant to see how many datasets have solutions that are
+h% This script is meant to see how many datasets have solutions that are
 % good. The following questions need to be answered:
 % 1. Does a good solution exist? This will be done by doing max(dice) >0.7
 % 2. How far (in mu_eff value) is the max Dice from the min obj fxn?
@@ -47,7 +47,7 @@ close all
 
 % This script finds the best mu_eff for the different studies.
 opttype = 'bestfit' ;
-Matlab_flag = 0; % 0 means use FEM kernel; 1 means use MATLAB for kernel
+Matlab_flag = 1; % 0 means use FEM kernel; 1 means use MATLAB for kernel
 
 
 % Identify the studies to be examined.
@@ -250,7 +250,7 @@ Study_paths8 = temp_paths;
 %[ hh_raw, dice_values_LOOCV ] = LOOCV_t_test_DiceTemp ( Study_paths, datasummary(:,4) ,datasummary(:,5) , datasummary(:,3), opttype );
 %[ hh7, dice_LOOCV7 ] = LOOCV_t_test_DiceTemp ( Study_paths7, mu_eff7, alpha7, best_iter7, opttype );
 [ hh8, dice_LOOCV8 ] = LOOCV_t_test_DiceTemp ( Study_paths8, mu_eff8, alpha8, best_iter8, opttype, Matlab_flag );
-
+dice_LOOCV8_stats = Descriptive_statistics(dice_LOOCV8);
 %hh8.ptest = .5;
 
 % mu_eff_iter = mu_eff7;

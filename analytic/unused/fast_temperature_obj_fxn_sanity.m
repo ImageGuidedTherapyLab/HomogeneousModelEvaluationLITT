@@ -118,7 +118,7 @@ scaling.z = 1;
 source.n=sources;
 source.length=0.01;  %~0.033 is when n=5 is visible
 if source.n > 1;
-    source.base = linspace((-source.length/2),(source.length/2),source.n)
+    source.base = linspace((-source.length/2),(source.length/2),source.n);
    % source.laser = [geometry.x_disp, geometry.y_disp, geometry.z_disp];
 else
     source.base = 0;
