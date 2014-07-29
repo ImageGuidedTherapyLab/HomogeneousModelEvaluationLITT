@@ -1490,8 +1490,8 @@ elif (options.accum_history ):
   ## './workdir/Study0030/0491/',
   ## ]
   
-  texHandle  = open('datasummary.tex' , 'w') 
-  fileHandle = open('datasummary.txt' , 'w') 
+  texHandle  = open('datasummaryDice1sourcePattern.tex' , 'w') 
+  fileHandle = open('datasummaryDice1sourcePattern.txt' , 'w') 
   # write header
   fileHandle.write("idstudy,iddata,idopt,mu_eff,alpha,robin,dice,obj\n")
   # loop over files and extract optimal value

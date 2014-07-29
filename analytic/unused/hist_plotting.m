@@ -1,4 +1,4 @@
-h% This script is meant to see how many datasets have solutions that are
+% This script is meant to see how many datasets have solutions that are
 % good. The following questions need to be answered:
 % 1. Does a good solution exist? This will be done by doing max(dice) >0.7
 % 2. How far (in mu_eff value) is the max Dice from the min obj fxn?
@@ -247,7 +247,7 @@ temp_paths = Study_paths;
 temp_paths(toss_index8,:) = [];
 Study_paths8 = temp_paths;
 
-%[ hh_raw, dice_values_LOOCV ] = LOOCV_t_test_DiceTemp ( Study_paths, datasummary(:,4) ,datasummary(:,5) , datasummary(:,3), opttype );
+%[ hh_raw, dice_values_LOOCV ] = LOOCV_t_test_DiceTemp ( Study_paths, datasummary(:,4) ,datasummary(:,5) , datasummary(:,3), opttype, Matlab_flag );
 %[ hh7, dice_LOOCV7 ] = LOOCV_t_test_DiceTemp ( Study_paths7, mu_eff7, alpha7, best_iter7, opttype );
 [ hh8, dice_LOOCV8 ] = LOOCV_t_test_DiceTemp ( Study_paths8, mu_eff8, alpha8, best_iter8, opttype, Matlab_flag );
 dice_LOOCV8_stats = Descriptive_statistics(dice_LOOCV8);

@@ -8,13 +8,13 @@ function y = f(~)
 
 % save('./superTemp.mat','x');
 % disp(x)
-
+tic
 inputdatavars = load('./TmpDataInput.mat');
 
 % index = load ( 'index.txt' );
 
-[L2norm,dice, ~,~] =  fast_temperature_obj_fxn_sanity ( inputdatavars, 1 );
-
+%[L2norm,dice, ~,~] =  fast_temperature_obj_fxn_sanity ( inputdatavars, 1 );
+[L2norm,dice, ~,~] =  temperature_obj_fxn ( inputdatavars, 1 );
 % index = index + 1;
 % csvwrite ('index.txt' , index);
 metric(1) = L2norm;
@@ -23,16 +23,19 @@ metric(2) = 1 - dice;
 %metric = 1 -dice;
 
 file_base = strcat( './workdir/',inputdatavars.patientID,'/',inputdatavars.UID,'/opt/optpp_pds.',inputdatavars.opttype);
-% fout = fopen( strcat( file_base,'.out.',num2str(inputdatavars.fileID) ), 'w' );
-% fprintf(fout, '%s\n', num2str(metric(1)) );
-% fprintf(fout, '%s\n'  , num2str(metric(2)) );
-% fclose(fout);
+fout = fopen( strcat( file_base,'.out.',num2str(inputdatavars.fileID) ), 'w' );
+fprintf(fout, '%s\n', num2str(metric(1)) );
+fprintf(fout, '%s\n'  , num2str(metric(2)) );
+fclose(fout);
 
 save ( strcat( file_base,'.in.',num2str(inputdatavars.fileID), '.mat'), 'inputdatavars');
 
+
+
 y =  metric;
 
-
+toc
+end
 % patientID = strcat ( inputdatavars.patientID, '/', inputdatavars.patientID, '/');
 % patient_index = load ( 'patient_index.txt' );
 % vtk_times = load ( 'VTK_patient_times.txt' );

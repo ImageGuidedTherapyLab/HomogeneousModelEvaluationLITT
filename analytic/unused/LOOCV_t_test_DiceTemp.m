@@ -113,7 +113,7 @@ for ii = 1:n_patients
 
 end
 
-[hh.H, hh.ptest] = ttest( dice_values, 0.7, 0.05, 'right');
+[hh.H, hh.ptest, hh.ci, hh.stats] = ttest( dice_values, 0.7, 0.05, 'right');
 
 % mean_dice = mean ( dice_values ); % Average Dice values
 % std_dice = std ( dice_values ); % Stardard deviation of Dice values.
