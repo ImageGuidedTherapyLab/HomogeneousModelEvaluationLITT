@@ -46,7 +46,7 @@ close all
 % The output: The output is a binary acceptance/rejection of the null and alternative hypotheses.
 
 % This script finds the best mu_eff for the different studies.
-opttype = 'bestfit' ;
+opttype = 'bestfit2' ;
 Matlab_flag = 1; % 0 means use FEM kernel; 1 means use MATLAB for kernel
 
 
@@ -122,7 +122,7 @@ Matlab_flag = 1; % 0 means use FEM kernel; 1 means use MATLAB for kernel
 
 % read  best_fit optimization data and store mu_eff and alpha
 %datasummary = dlmread('ex_datasummary.txt',',',1,0);
-datasummary = dlmread('datasummary.txt',',',1,0);
+datasummary = dlmread('datasummaryL2_10sourcePattern.txt',',',1,0);
 datasummary(any(isnan(datasummary), 2), :) = [];
 num_studies = size(datasummary,1);
 
@@ -207,11 +207,16 @@ else
 end
 toss_index7 = find(dice_raw<0.7);
 toss_index8 = find(dice_raw<0.8);
+toss_indexLow = find(datasummary(:,4)>300);
+toss_indexHigh = find(datasummary(:,4)<300);
 
 mu_eff7 = datasummary(:,4);
 mu_eff7 (toss_index7) = [];
 mu_eff8 = datasummary(:,4);
 mu_eff8 (toss_index8) = [];
+mu_effLow = datasummary(:,4);
+mu_effLow(toss_indexLow) = [];
+
 
 alpha7 = datasummary(:,5);
 alpha7 (toss_index7) = [];
@@ -235,9 +240,9 @@ stats_alpha7 = Descriptive_statistics(alpha7);
 stats_mu8 = Descriptive_statistics(mu_eff8);
 stats_alpha8 = Descriptive_statistics(alpha8);
 
-% figure; hist(mu_eff_opt22);
-% figure; hist(mu_eff7);
-% figure; hist(mu_eff8);
+figure; hist(datasummary(:,4));
+figure; hist(mu_eff7);
+figure; hist(mu_eff8);
 
 % Remove Study_paths indices
 temp_paths = Study_paths;
@@ -248,9 +253,11 @@ temp_paths(toss_index8,:) = [];
 Study_paths8 = temp_paths;
 
 %[ hh_raw, dice_values_LOOCV ] = LOOCV_t_test_DiceTemp ( Study_paths, datasummary(:,4) ,datasummary(:,5) , datasummary(:,3), opttype, Matlab_flag );
-%[ hh7, dice_LOOCV7 ] = LOOCV_t_test_DiceTemp ( Study_paths7, mu_eff7, alpha7, best_iter7, opttype );
-[ hh8, dice_LOOCV8 ] = LOOCV_t_test_DiceTemp ( Study_paths8, mu_eff8, alpha8, best_iter8, opttype, Matlab_flag );
-dice_LOOCV8_stats = Descriptive_statistics(dice_LOOCV8);
+[ hh7, dice_LOOCV7 ] = LOOCV_t_test_DiceTemp ( Study_paths7, mu_eff7, alpha7, best_iter7, opttype, Matlab_flag );
+%[ hh8, dice_LOOCV8 ] = LOOCV_t_test_DiceTemp ( Study_paths8, mu_eff8, alpha8, best_iter8, opttype, Matlab_flag );
+%dice_LOOCV8_stats = Descriptive_statistics(dice_LOOCV8);
+dice_LOOCV7_stats = Descriptive_statistics(dice_LOOCV7);
+
 %hh8.ptest = .5;
 
 % mu_eff_iter = mu_eff7;
@@ -292,19 +299,19 @@ dice_LOOCV8_stats = Descriptive_statistics(dice_LOOCV8);
 % end
 
 thresholds = linspace ( 0.0, 1, 10001);
-passes_LOOCV8 = zeros (10001,1);
-%passes_LOOCV7 = passes_LOOCV8;
+%passes_LOOCV8 = zeros (10001,1);
+passes_LOOCV7 = zeros (10001,1);
 %passes_iter = passes_LOOCV8;
 for ii = 1:10001
     %passes_iter   (ii) = sum ( dice_values_iter > thresholds(ii));
-    %passes_LOOCV7 (ii) = sum ( dice_LOOCV7 > thresholds(ii));
-    passes_LOOCV8 (ii) = sum ( dice_LOOCV8 > thresholds(ii));
+    passes_LOOCV7 (ii) = sum ( dice_LOOCV7 > thresholds(ii));
+    %passes_LOOCV8 (ii) = sum ( dice_LOOCV8 > thresholds(ii));
 end
 
 %passes_iter_AUC = sum (passes_iter) ./ (10001 * stats_mu_iter.n) ;  % The AUC is actually the same as the mean
-%passes_LOOCV7_AUC = sum (passes_LOOCV7) ./ (10001 * stats_mu7.n);
-passes_LOOCV8_AUC = sum (passes_LOOCV8) ./ (10001 * stats_mu8.n);
-figure(1); plot (thresholds, passes_LOOCV8,'LineWidth',5);
-%figure(2); plot (thresholds, passes_LOOCV7);
-figure(3); hist (mu_eff8);
+passes_LOOCV7_AUC = sum (passes_LOOCV7) ./ (10001 * stats_mu7.n);
+%passes_LOOCV8_AUC = sum (passes_LOOCV8) ./ (10001 * stats_mu8.n);
+%figure(1); plot (thresholds, passes_LOOCV8,'LineWidth',5);
+figure; plot (thresholds, passes_LOOCV7);
+%figure(3); hist (mu_eff8);
 %figure(4); hist (mu_eff7);

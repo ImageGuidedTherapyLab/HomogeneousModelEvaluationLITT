@@ -4,7 +4,7 @@
 hist_plotting;
 
 % Gathers all of the data into one nice group of variables
-[L2norm, dice, tmap_model, MRTI_crop,mat_struct] = check_opt_GoodBadUgly( Study_paths, 'bestfit1', datasummary(:,3));
+[L2norm, dice, tmap_model, MRTI_crop,mat_struct,quality] = check_opt_GoodBadUgly( Study_paths, 'bestfit1', datasummary(:,3));
 
 % For Aim 2, I want to show Good, Bad, and Ugly examples of the
 % optimization. This is before the DSC > 0.8 threshold.

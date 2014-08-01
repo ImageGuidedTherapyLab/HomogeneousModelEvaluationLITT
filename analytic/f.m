@@ -8,13 +8,13 @@ function y = f(~)
 
 % save('./superTemp.mat','x');
 % disp(x)
-tic
+
 inputdatavars = load('./TmpDataInput.mat');
 
 % index = load ( 'index.txt' );
 
 %[L2norm,dice, ~,~] =  fast_temperature_obj_fxn_sanity ( inputdatavars, 1 );
-[L2norm,dice, ~,~] =  temperature_obj_fxn ( inputdatavars, 1 );
+[L2norm,dice, ~,~] =  temperature_obj_fxn ( inputdatavars, 10 );
 % index = index + 1;
 % csvwrite ('index.txt' , index);
 metric(1) = L2norm;
@@ -34,7 +34,7 @@ save ( strcat( file_base,'.in.',num2str(inputdatavars.fileID), '.mat'), 'inputda
 
 y =  metric;
 
-toc
+
 end
 % patientID = strcat ( inputdatavars.patientID, '/', inputdatavars.patientID, '/');
 % patient_index = load ( 'patient_index.txt' );

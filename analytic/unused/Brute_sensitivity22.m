@@ -5,7 +5,7 @@ tic;
 % mu_eff_data = cell2mat(cell_data(2:end,:));
 
 % Identify the studies to be examined.
-opttype = 'bestfit1' ;
+opttype = 'bestfit4' ;
 
 Study_paths = cell (1,2);
 Study_paths {1,1} = 'Study0035';

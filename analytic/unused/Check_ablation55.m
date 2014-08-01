@@ -24,16 +24,14 @@
 % This silly script is a sensitivity study. I put some of the data in
 % /FUS4/data2/sjfahrenholtz/Matlab/Tests
 
-function [ total, dice, thermal_model, MRTI_crop ] = Check_ablation55 ( Study_paths, opttype );
+function [ total, dice ] = Check_ablation55 ( Study_paths, opttype );
 
 cd /FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
 % Make the LOOCV iteration system
 n_patients = size( Study_paths,1); % This is the number of patients
 % n_patients = 1;
-% mu_eff(1) = 0.008;
-% mu_eff(2:10001) = linspace(1,10000,10000);
-mu_eff = 5000;
-
+mu_eff(1) = 0.008;
+mu_eff(2:10001) = linspace(1,10000,10000);
 threshold_temps = 51:65;
 num_threshold_temps = length(threshold_temps);
 dice = zeros( length(mu_eff),num_threshold_temps); % Initialize the number of DSC (dice) values
@@ -79,7 +77,7 @@ for ii = 1:n_patients
         inputdatavars.cv.mu_eff_healthy = num2str( mu_eff (jj) );
         
         %[metric, thermal_model, MRTI_crop] = fast_temperature_obj_fxn33 ( params_iter );
-        [metric, ~, thermal_model,MRTI_crop] = fast_temperature_obj_fxn_sanity ( inputdatavars, 1 );
+        [metric, ~, thermal_model,MRTI_crop] = fast_temperature_obj ( inputdatavars, 10 );
         % Column 2 of 'total' is based on conservation of energy (only cares
         % about summation of temperatures in the FOV)
         base_level=ones(size(thermal_model,1),size(thermal_model,2))*37;
