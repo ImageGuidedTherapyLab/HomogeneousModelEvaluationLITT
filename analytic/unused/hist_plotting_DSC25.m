@@ -49,11 +49,7 @@ close all
 opttype = 'bestfit' ;
 Matlab_flag = 0; % 0 means use FEM kernel; 1 means use MATLAB for kernel
 
-
-
-
 % read  best_fit optimization data and store mu_eff and alpha
-%datasummary = dlmread('ex_datasummary.txt',',',1,0);
 datasummary = dlmread('datasummary.txt',',',1,0);
 datasummary(any(isnan(datasummary), 2), 7) = 1;
 num_studies = size(datasummary,1);
@@ -85,8 +81,6 @@ end
 toss_index7 = find(dice_raw<0.7);
 toss_index25= find(dice_raw<0.25);
 % toss_index8 = find(dice_raw<0.8);
-% toss_indexLow = find(datasummary(:,4)>300);
-% toss_indexHigh = find(datasummary(:,4)<300);
 
 num_studies = size(datasummary,1);
 linenum=7;
@@ -108,16 +102,6 @@ mu_eff25 = datasummary(:,4);
 mu_eff25 (toss_index25) = [];
 % mu_eff8 = datasummary(:,4);
 % mu_eff8 (toss_index8) = [];
-% mu_effLow = datasummary(:,4);
-% mu_effLow(toss_indexLow) = [];
-
-% toss_indexLow7 = find(mu_eff7>300);
-% toss_indexHigh7 = find(mu_eff7<300);
-% mu_effLow7 = mu_eff7;
-% mu_effLow7(toss_indexLow7) = [];
-% mu_effHigh7 = mu_eff7;
-% mu_effHigh7(toss_indexHigh7)=[];
-
 
 alpha7 = datasummary(:,5);
 alpha7 (toss_index7) = [];
@@ -125,10 +109,6 @@ alpha25 = datasummary(:,5);
 alpha25 (toss_index25) = [];
 % alpha8 = datasummary(:,5);
 % alpha8 (toss_index8) = [];
-% alphaLow7 = alpha7;
-% alphaLow7(toss_indexLow7)=[];
-% alphaHigh7=alpha7;
-% alphaHigh7(toss_indexHigh7)=[];
 
 best_iter7 = datasummary(:,3);
 best_iter7 (toss_index7) = [];
@@ -136,10 +116,6 @@ best_iter25 = datasummary(:,3);
 best_iter25 (toss_index25) = [];
 % best_iter8 = datasummary(:,3);
 % best_iter8 (toss_index8) = [];
-% best_iterLow7 = best_iter7;
-% best_iterLow7(toss_indexLow7)=[];
-% best_iterHigh7=best_iter7;
-% best_iterHigh7(toss_indexHigh7)=[];
 
 dice7 = dice_raw;
 dice7(toss_index7) = [];
@@ -147,10 +123,6 @@ dice25 = dice_raw;
 dice25(toss_index25) = [];
 % dice8 = dice_raw;
 % dice8(toss_index8) = [];
-% diceLow7 = dice7;
-% diceLow7(toss_indexLow7)=[];
-% diceHigh7=dice7;
-% diceHigh7(toss_indexHigh7)=[];
 
 quality7 = quality;
 quality7(toss_index7) = [];
@@ -161,8 +133,7 @@ stats_mu_raw = Descriptive_statistics( datasummary(:,4) );
 stats_alpha_raw = Descriptive_statistics( datasummary(:, 5) );
 stats_mu7 = Descriptive_statistics(mu_eff7);
 stats_mu25 = Descriptive_statistics(mu_eff25);
-% stats_muLow7 = Descriptive_statistics(mu_effLow7);
-% stats_muHigh7 = Descriptive_statistics(mu_effHigh7);
+
 stats_alpha7 = Descriptive_statistics(alpha7);
 stats_alpha25 = Descriptive_statistics(alpha25);
 % stats_mu8 = Descriptive_statistics(mu_eff8);
@@ -170,15 +141,10 @@ stats_alpha25 = Descriptive_statistics(alpha25);
 stats_dice_raw = Descriptive_statistics(dice_raw);
 stats_dice7 = Descriptive_statistics(dice7);
 stats_dice25 = Descriptive_statistics(dice25);
-% stats_diceLow7 = Descriptive_statistics(diceLow7);
-% stats_diceHigh7 = Descriptive_statistics(diceHigh7);
-
 
 figure; hist(datasummary(:,4));
 figure; hist(mu_eff7);
 figure; hist(mu_eff25);
-% figure; hist(mu_effLow7);
-% figure; hist(mu_effHigh7);
 
 % Remove Study_paths indices
 temp_paths = Study_paths;
@@ -187,15 +153,6 @@ Study_paths7 = temp_paths;
 temp_paths = Study_paths;
 temp_paths(toss_index25,:) = [];
 Study_paths25 = temp_paths;
-% temp_paths = Study_paths7;
-% temp_paths(toss_indexLow8,:)=[];
-% Study_pathsLow8=temp_paths;
-% temp_paths = Study_paths7;
-% temp_paths(toss_indexLow7,:)=[];
-% Study_pathsLow7=temp_paths;
-% temp_paths = Study_paths7;
-% temp_paths(toss_indexHigh7,:)=[];
-% Study_pathsHigh7=temp_paths;
 % temp_paths = Study_paths;
 % temp_paths(toss_index8,:) = [];
 % Study_paths8 = temp_paths;
@@ -203,29 +160,22 @@ Study_paths25 = temp_paths;
 %[ hh_raw, dice_values_LOOCV ] = LOOCV_t_test_DiceTemp ( Study_paths, datasummary(:,4) ,datasummary(:,5) , datasummary(:,3), opttype, Matlab_flag );
 %[ hh7, dice_LOOCV7 ] = LOOCV_t_test_DiceTemp ( Study_paths7, mu_eff7, alpha7, best_iter7, opttype, Matlab_flag );
 [ hh25, dice_LOOCV25 ] = LOOCV_t_test_DiceTemp ( Study_paths25, mu_eff25, alpha25, best_iter25, opttype, Matlab_flag );
-% [ hhLow7, dice_LOOCV_Low7 ] = LOOCV_t_test_DiceTemp ( Study_pathsLow7, mu_effLow7, alphaLow7, best_iterLow7, opttype, Matlab_flag );
-% [ hhHigh7, dice_LOOCV_High7 ] = LOOCV_t_test_DiceTemp ( Study_pathsHigh7, mu_effHigh7, alphaHigh7, best_iterHigh7, opttype, Matlab_flag );
 %[ hh8, dice_LOOCV8 ] = LOOCV_t_test_DiceTemp ( Study_paths8, mu_eff8, alpha8, best_iter8, opttype, Matlab_flag );
 %dice_LOOCV8_stats = Descriptive_statistics(dice_LOOCV8);
 %dice_LOOCV7_stats = Descriptive_statistics(dice_LOOCV7);
-% dice_LOOCV_Low7stats = Descriptive_statistics(dice_LOOCV_Low7);
-% dice_LOOCV_High7stats = Descriptive_statistics(dice_LOOCV_High7);
-
-
+dice_LOOCV25_stats = Descriptive_statistics(dice_LOOCV25);
 thresholds = linspace ( 0.0, 1, 10001);
 %passes_LOOCV8 = zeros (10001,1);
 %passes_LOOCV7 = zeros (10001,1);
 passes_LOOCV25 = zeros (10001,1);
-% passes_LOOCV_Low7 = zeros(10001,1);
-% passes_LOOCV_High7 = zeros(10001,1);
+
 passes_all = zeros(10001,1);
 %passes_iter = passes_LOOCV8;
 for ii = 1:10001
     %passes_iter   (ii) = sum ( dice_values_iter > thresholds(ii));
     %passes_LOOCV7 (ii) = sum ( dice_LOOCV7 > thresholds(ii));
     passes_LOOCV25 (ii) = sum ( dice_LOOCV25 > thresholds(ii));
-%     passes_LOOCV_Low7 (ii) = sum ( dice_LOOCV_Low7 > thresholds(ii));
-%     passes_LOOCV_High7 (ii) = sum ( dice_LOOCV_High7 > thresholds(ii));
+
     passes_all (ii) = sum ( (1-datasummary(:,7)) > thresholds(ii));
     %passes_LOOCV8 (ii) = sum ( dice_LOOCV8 > thresholds(ii));
 end
@@ -238,10 +188,9 @@ end
 %figure(1); plot (thresholds, passes_LOOCV8,'LineWidth',5);
 %figure; plot (thresholds, passes_LOOCV7);
 figure; plot (thresholds, passes_LOOCV25);
-% figure; plot (thresholds, passes_LOOCV_Low7);
-% figure; plot (thresholds, passes_LOOCV_High7);
+
 figure; plot (thresholds, passes_all);
 %figure(3); hist (mu_eff8);
 %figure(4); hist (mu_eff7);
 
-stats_dice25
+dice_LOOCV25_stats
