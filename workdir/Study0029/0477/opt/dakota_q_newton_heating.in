@@ -34,7 +34,7 @@ interface,
 
 #        discrete_state_range = 1
 #          initial_state    0
-#          descriptors      'powerhistory:[['Use'], ['Default'], 5.0, [0, 0], [0, 38]]'
+#          descriptors      'powerhistory:[['Use'], ['Default'], 5.0, [38, 59, 79, 85], [6, 38, 59, 79]]'
 
 responses,
         objective_functions = 2

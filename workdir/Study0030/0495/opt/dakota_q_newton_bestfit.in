@@ -34,7 +34,7 @@ interface,
 
 #        discrete_state_range = 1
 #          initial_state    0
-#          descriptors      'powerhistory:[[36, 42, 49, 142, 160], [0.0, 3.0, 0.0, 11.85, 0.0], 5.0, [0, 0], [0, 142]]'
+#          descriptors      'powerhistory:[[36, 42, 49, 142, 160], [0.0, 3.0, 0.0, 11.85, 0.0], 5.0, [144, 161], [50, 144]]'
 
 responses,
         objective_functions = 2
@@ -57,5 +57,5 @@ variables,
           #upper_bounds  =  -8.50000e+01   1.09725e+03   1.00000e+00   9.00000e+00   4.00000e+01   5.00000e+00   5.00000e+00   4.00000e+01   5.00000e+04   3.82200e+03   1.00000e+04   4.03200e+03 
           descriptors  =  'y_rotate'  'rho_healthy'  'anfact_healthy'  'w_0_healthy'  'body_temp'  'x_rotate'  'z_rotate'  'probe_init'  'mu_s_healthy'  'c_p_healthy'  'robin_coeff'  'c_blood_healthy' 
         discrete_state_set_integer = 3
-          set_values  = 30 495 1 
+          set_values  = 30 495 0 
           descriptors  = 'study' 'series' 'quality'
