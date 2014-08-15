@@ -46,12 +46,8 @@ close all
 % The output: The output is a binary acceptance/rejection of the null and alternative hypotheses.
 
 % This script finds the best mu_eff for the different studies.
-<<<<<<< HEAD
 opttype = 'bestfit2' ;
 Matlab_flag = 1; % 0 means use FEM kernel; 1 means use MATLAB for kernel
-=======
-Matlab_flag = 0; % 0 means use FEM kernel; 1 means use MATLAB for kernel
->>>>>>> e13d467987e08e37b4a18b34b010ae185ade8896
 
 
 % Identify the studies to be examined.
