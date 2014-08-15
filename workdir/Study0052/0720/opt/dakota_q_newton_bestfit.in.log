@@ -1,0 +1,107 @@
+Running MPI executable in serial mode.
+DAKOTA version 5.2 released 11/30/2011.
+Subversion revision 873 built Jan  8 2013 23:05:25.
+Constructing Single Method Strategy...
+Writing new restart file dakota.rst
+methodName = optpp_q_newton
+gradientType = numerical
+Numerical gradients using forward differences
+to be calculated by the dakota finite difference routine.
+hessianType = none
+
+Minimizer: Scaling enabled (any scaling derived from 'auto' reported as value)
+
+Continuous design variable scales:
+scale type        multiplier            offset label
+value                  0.002             0.101 x_displace
+value                 5299.2               0.8 mu_eff_healthy
+value                  0.002             0.129 y_displace
+value                  0.002            -0.001 z_displace
+value            1.72069e-07       1.19227e-07 alpha_healthy
+
+Instantiating OptBCQNewton optimizer with NLF1 evaluator.
+
+>>>>> Running Single Method Strategy.
+
+>>>>> Running optpp_q_newton iterator.
+
+>>>>> optpp_q_newton: pre-run phase.
+
+>>>>> optpp_q_newton: core run phase.
+
+SNLLOptimizer::nlf1_evaluator called with mode = 3
+SNLLOptimizer::nlf1_evaluator vars = 
+                      5.0000000000e-01
+                      3.3816425121e-02
+                      5.0000000000e-01
+                      5.0000000000e-01
+                      1.1227472700e-01
+
+------------------------------------------
+Begin Dakota derivative estimation routine
+------------------------------------------
+
+>>>>> Initial map for analytic portion of response:
+
+----------------------------------
+Pre-processing Function Evaluation
+----------------------------------
+Variables before scaling transformation:
+                      5.0000000000e-01 x_displace
+                      3.3816425121e-02 mu_eff_healthy
+                      5.0000000000e-01 y_displace
+                      5.0000000000e-01 z_displace
+                      1.1227472700e-01 alpha_healthy
+
+
+------------------------------
+Begin Function Evaluation    1
+------------------------------
+Parameters for function evaluation 1:
+                      1.0200000000e-01 x_displace
+                      1.8000000000e+02 mu_eff_healthy
+                      1.3000000000e-01 y_displace
+                      0.0000000000e+00 z_displace
+                      1.3854600000e-07 alpha_healthy
+                     -9.0000000000e+01 y_rotate
+                      1.0450000000e+03 rho_healthy
+                      9.0000000000e-01 anfact_healthy
+                      6.0000000000e+00 w_0_healthy
+                      3.7000000000e+01 body_temp
+                      0.0000000000e+00 x_rotate
+                      2.0000000000e+01 z_rotate
+                      2.1000000000e+01 probe_init
+                      8.0000000000e+03 mu_s_healthy
+                      3.6400000000e+03 c_p_healthy
+                      0.0000000000e+00 robin_coeff
+                      3.8400000000e+03 c_blood_healthy
+                                    52 study
+                                   720 series
+                                     0 quality
+
+blocking fork: python ./brainsearch.py --param_file  ./workdir/Study0052/0720/opt/optpp_pds.bestfit.in.1 ./workdir/Study0052/0720/opt/optpp_pds.bestfit.out.1
+using vtk version 5.6.0
+opening StudyDatabase//Study0052/0720/vtk/referenceBased//temperature.0001.vtk
+Traceback (most recent call last):
+  File "./brainsearch.py", line 1401, in <module>
+    fem_params = ParseInput(options.param_file,options.vis_out)
+  File "./brainsearch.py", line 1311, in ParseInput
+    fem_params['lambdacode']       = eval(config.get('power','lambdacode'))
+  File "/opt/apps/EPD/epd-7.3-1-rh5-x86_64/lib/python2.7/ConfigParser.py", line 607, in get
+    raise NoSectionError(section)
+ConfigParser.NoSectionError: No section: 'power'
+
+Error: cannot open results file ./workdir/Study0052/0720/opt/optpp_pds.bestfit.out.1
+using vtk version 5.6.0
+opening StudyDatabase//Study0052/0720/vtk/referenceBased//temperature.0001.vtk
+Traceback (most recent call last):
+  File "./brainsearch.py", line 1401, in <module>
+    fem_params = ParseInput(options.param_file,options.vis_out)
+  File "./brainsearch.py", line 1311, in ParseInput
+    fem_params['lambdacode']       = eval(config.get('power','lambdacode'))
+  File "/opt/apps/EPD/epd-7.3-1-rh5-x86_64/lib/python2.7/ConfigParser.py", line 607, in get
+    raise NoSectionError(section)
+ConfigParser.NoSectionError: No section: 'power'
+using vtk version 5.6.0
+(1, 1e+99, 1e+99)
+vglrun python ./brainsearch.py --param_file  ./workdir/Study0052/0720/opt/optpp_pds.bestfit.in.1 ./workdir/Study0052/0720/opt/optpp_pds.bestfit.out.1 --vis_out

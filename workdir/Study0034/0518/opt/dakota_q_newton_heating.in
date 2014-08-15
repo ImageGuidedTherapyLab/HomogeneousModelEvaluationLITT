@@ -34,7 +34,7 @@ interface,
 
 #        discrete_state_range = 1
 #          initial_state    0
-#          descriptors      'powerhistory:[['Use'], ['Default'], 1.0, [0, 0], [0, 0]]'
+#          descriptors      'powerhistory:[['Use'], ['Default'], 1.0, [24, 30, 72, 82], [18, 24, 30, 72]]'
 
 responses,
         objective_functions = 2
@@ -51,10 +51,10 @@ variables,
           upper_bounds  =   5.30000e+03 
           descriptors  =  'mu_eff_healthy' 
         continuous_state = 16
-          initial_state  =   0.00000e+00   0.00000e+00   1.04500e+03   9.00000e-01   0.00000e+00   6.00000e+00   0.00000e+00   3.70000e+01   0.00000e+00   1.38546e-07   0.00000e+00   2.10000e+01   8.00000e+03   3.64000e+03   0.00000e+00   3.84000e+03 
-          #lower_bounds  =  -5.00000e+00  -1.00000e-03   9.92750e+02   7.00000e-01  -1.00000e-03   3.00000e+00  -1.00000e-03   3.40000e+01  -5.00000e+00   1.19227e-07  -5.00000e+00   2.00000e+01   8.00000e+02   3.45800e+03   0.00000e+00   3.64800e+03 
-          #upper_bounds  =   5.00000e+00   1.00000e-03   1.09725e+03   1.00000e+00   1.00000e-03   9.00000e+00   1.00000e-03   4.00000e+01   5.00000e+00   2.91296e-07   5.00000e+00   4.00000e+01   5.00000e+04   3.82200e+03   1.00000e+04   4.03200e+03 
+          initial_state  =  -9.00000e+01   1.01800e-01   1.04500e+03   9.00000e-01   1.41000e-01   6.00000e+00   0.00000e+00   3.70000e+01   0.00000e+00   1.38546e-07   8.20000e+01   2.10000e+01   8.00000e+03   3.64000e+03   0.00000e+00   3.84000e+03 
+          #lower_bounds  =  -9.50000e+01   1.00800e-01   9.92750e+02   7.00000e-01   1.40000e-01   3.00000e+00  -1.00000e-03   3.40000e+01  -5.00000e+00   1.19227e-07   7.70000e+01   2.00000e+01   8.00000e+02   3.45800e+03   0.00000e+00   3.64800e+03 
+          #upper_bounds  =  -8.50000e+01   1.02800e-01   1.09725e+03   1.00000e+00   1.42000e-01   9.00000e+00   1.00000e-03   4.00000e+01   5.00000e+00   2.91296e-07   8.70000e+01   4.00000e+01   5.00000e+04   3.82200e+03   1.00000e+04   4.03200e+03 
           descriptors  =  'y_rotate'  'y_displace'  'rho_healthy'  'anfact_healthy'  'x_displace'  'w_0_healthy'  'z_displace'  'body_temp'  'x_rotate'  'alpha_healthy'  'z_rotate'  'probe_init'  'mu_s_healthy'  'c_p_healthy'  'robin_coeff'  'c_blood_healthy' 
         discrete_state_set_integer = 3
-          set_values  = 34 518 -2 
+          set_values  = 34 518 1 
           descriptors  = 'study' 'series' 'quality'
