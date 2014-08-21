@@ -77,7 +77,7 @@ for ii = 1:n_patients
         inputdatavars.cv.mu_eff_healthy = num2str( mu_eff (jj) );
         
         %[metric, thermal_model, MRTI_crop] = fast_temperature_obj_fxn33 ( params_iter );
-        [metric, ~, thermal_model,MRTI_crop] = fast_temperature_obj ( inputdatavars, 10 );
+        [metric, ~, thermal_model,MRTI_crop] = temperature_obj_fxn ( inputdatavars, 10 );
         % Column 2 of 'total' is based on conservation of energy (only cares
         % about summation of temperatures in the FOV)
         base_level=ones(size(thermal_model,1),size(thermal_model,2))*37;

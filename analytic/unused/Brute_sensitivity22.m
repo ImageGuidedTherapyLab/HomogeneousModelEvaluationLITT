@@ -1,4 +1,5 @@
 % This script finds the best mu_eff for the different studies.
+clear
 tic;
 % cell_data = csvimport('datasummary.txt');
 % headers = cell_data(1,1:3);
@@ -8,8 +9,8 @@ tic;
 opttype = 'bestfit4' ;
 
 Study_paths = cell (1,2);
-Study_paths {1,1} = 'Study0035';
-Study_paths {1,2} = '0530';
+% Study_paths {1,1} = 'Study0035';
+% Study_paths {1,2} = '0530';
 % Study_paths {2,1} = 'Study0030';
 % Study_paths {2,2} = '0495';
 % Study_paths {3,1} = 'Study0030';
@@ -40,8 +41,8 @@ Study_paths {1,2} = '0530';
 % Study_paths {15,2} = '0447';
 % Study_paths {16,1} = 'Study0026';
 % Study_paths {16,2} = '0457';
-% Study_paths {17,1} = 'Study0026';
-% Study_paths {17,2} = '0455';
+Study_paths {1,1} = 'Study0026';
+Study_paths {1,2} = '0455';
 % Study_paths {18,1} = 'Study0026';
 % Study_paths {18,2} = '0453';
 % Study_paths {19,1} = 'Study0026';
@@ -81,25 +82,26 @@ for ii = 1:num_studies
     input_path{1,1} = Study_paths{ii,1};
     input_path{1,2} = Study_paths{ii,2};
     %[ total_path{ii,2}, total_path{ii,3} ] = Check_ablation44 ( input_path , opttype);
-    [ total_path{ii,2}, total_path{ii,3} , model_temp_dice_shoulder, MRTI_crop_dice_shoulder] = Check_ablation55 ( input_path , opttype);
+    [ total_path{ii,2}, total_path{ii,3} ] = Check_ablation55 ( input_path , opttype);
+    %[ total_path{ii,2}, total_path{ii,3} , model_temp_dice_shoulder, MRTI_crop_dice_shoulder] = Check_ablation55 ( input_path , opttype);
 end
 %[ H0, H1, dice_values ] = Check_ablation ( Study_paths, mu_eff_opt );
 toc
 
-model_deg_threshold = model_temp_dice_shoulder >= 57;
-MRTI_deg_threshold = MRTI_crop_dice_shoulder >= 57;
-n_model = sum(sum( model_deg_threshold ));
-n_MRTI = sum(sum( MRTI_deg_threshold ));
-
-MRTI_label = MRTI_deg_threshold .* 2;
-
-intersection = model_deg_threshold + MRTI_deg_threshold;
-intersection = intersection > 1;
-intersection_label = model_deg_threshold + MRTI_label;
-n_intersection = sum(sum( intersection ));
-dice = 2*n_intersection / (n_model + n_MRTI);
-figure(4); imagesc(model_deg_threshold);
-figure(5); imagesc(MRTI_deg_threshold);
-figure(6); imagesc(intersection_label, [ 0 3]);
-figure(7); imagesc(model_temp_dice_shoulder,[30 90]);
-figure(8); imagesc(MRTI_crop_dice_shoulder, [30 90]);
+% model_deg_threshold = model_temp_dice_shoulder >= 57;
+% MRTI_deg_threshold = MRTI_crop_dice_shoulder >= 57;
+% n_model = sum(sum( model_deg_threshold ));
+% n_MRTI = sum(sum( MRTI_deg_threshold ));
+% 
+% MRTI_label = MRTI_deg_threshold .* 2;
+% 
+% intersection = model_deg_threshold + MRTI_deg_threshold;
+% intersection = intersection > 1;
+% intersection_label = model_deg_threshold + MRTI_label;
+% n_intersection = sum(sum( intersection ));
+% dice = 2*n_intersection / (n_model + n_MRTI);
+% figure(4); imagesc(model_deg_threshold);
+% figure(5); imagesc(MRTI_deg_threshold);
+% figure(6); imagesc(intersection_label, [ 0 3]);
+% figure(7); imagesc(model_temp_dice_shoulder,[30 90]);
+% figure(8); imagesc(MRTI_crop_dice_shoulder, [30 90]);
