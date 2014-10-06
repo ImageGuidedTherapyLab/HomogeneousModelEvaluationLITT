@@ -40,7 +40,7 @@ points.z=linspace(0,dom.z/2,(dom.z_subslice-floor(dom.z_subslice/2)));
 
 t_sample=zeros(dom.pointx,dom.pointy,dom.pointz,source.n);
 r=zeros(source.n,1);
-
+%r = zeros(dom.pointx,dom.pointy,dom.pointz,source.n);
 %Spatial locations of the sources; My convention is that the long axis of
 %the laser is parallel to the y-axis.
 %laser=linspace((-source.length/2),(source.length/2),source.n);
@@ -57,7 +57,7 @@ for i=1:dom.pointx   %Spatial loop for i, ii, iii
         for iii=1:(dom.z_subslice-floor(dom.z_subslice/2)) % This takes advantage of symmetry
             
             for j=1:source.n    %Loop for the separate isotropic sources
-                
+                %r(i,ii,iii,j)=sqrt( (source.laser(j,1)-points.x(i))^2 + (source.laser(j,2)-points.y(ii))^2+(source.laser(j,3)-points.z(iii))^2);
                 r(j)=sqrt( (source.laser(j,1)-points.x(i))^2 + (source.laser(j,2)-points.y(ii))^2+(source.laser(j,3)-points.z(iii))^2);  %Distance for each isotropic source
                 if (r(j) <= r1) && (source.n ==1)
                     t_sample(i,ii,iii,j) = u0;

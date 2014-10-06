@@ -1494,8 +1494,8 @@ elif (options.accum_history ):
   ## './workdir/Study0030/0491/',
   ## ]
   
-  texHandle  = open('datasummaryL2_1sourceNewton.tex' , 'w') 
-  fileHandle = open('datasummaryL2_1sourceNewton.txt' , 'w')
+  texHandle  = open('datasummaryL2_10sourceNewton46.tex' , 'w') 
+  fileHandle = open('datasummaryL2_10sourceNewton46.txt' , 'w')
   # write header
   fileHandle.write("idstudy,iddata,idopt,mu_eff,alpha,robin,dice,obj\n")
   # loop over files and extract optimal value

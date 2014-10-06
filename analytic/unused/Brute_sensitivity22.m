@@ -82,7 +82,9 @@ for ii = 1:num_studies
     input_path{1,1} = Study_paths{ii,1};
     input_path{1,2} = Study_paths{ii,2};
     %[ total_path{ii,2}, total_path{ii,3} ] = Check_ablation44 ( input_path , opttype);
-    [ total_path{ii,2}, total_path{ii,3} ] = Check_ablation55 ( input_path , opttype);
+    %[ total_path{ii,2}, total_path{ii,3} ] = Check_ablation55 ( input_path , opttype);
+    %[ total_path{ii,2}, total_path{ii,3} ] = Check_ablation66 ( input_path , opttype);
+    [ total_path{ii,2}, total_path{ii,3} ] = Check_ablation77 ( input_path , opttype);
     %[ total_path{ii,2}, total_path{ii,3} , model_temp_dice_shoulder, MRTI_crop_dice_shoulder] = Check_ablation55 ( input_path , opttype);
 end
 %[ H0, H1, dice_values ] = Check_ablation ( Study_paths, mu_eff_opt );

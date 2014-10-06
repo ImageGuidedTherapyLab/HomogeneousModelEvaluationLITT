@@ -50,7 +50,7 @@ for ii = 1:n_patients
     % This section prepares the varied parameters into a .mat file for the
     % thermal code to run. It needs to be there so that the paths are OK.
     % Sample:  'python ./brainsearch.py --param_file '
-    load( strcat ( path_base, '/optpp_pds.', opttype, '.in.1.mat') );
+    load( strcat ( path_base, '/optpp_pds.', opttype, '.in.2.mat') );
 
     
     %params_iter = load(   'TmpDataInput.mat' ); % Read in one dakota.in file to find the constant parameters

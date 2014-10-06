@@ -1,6 +1,7 @@
 clear
 close all
 
+cd /FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
 Study_paths {1,1} = 'Study0035';
 Study_paths {1,2} = '0530';
 Study_paths {2,1} = 'Study0023';
@@ -77,8 +78,8 @@ Study_paths {35,1} = 'Study0006';
 Study_paths {35,2} = '0183';
 num_studies = size(Study_paths,1);
 
-dakota_filename_in = 'dakota_bestfit5';
-dakota_filename_out= 'dakota_bestfit5';
+dakota_filename_in = 'dakota_bestfit46';
+dakota_filename_out= 'dakota_bestfit46';
 %file_base = strcat( './workdir/',Study_paths{1,1},'/',Study_paths{1,2},'/opt/');
 %copyfile( strcat( file_base,dakota_filename_in,'.in' ), strcat( file_base, dakota_filename_out, '.txt') );   % unix(''python test_sa
 % shell_command = strcat( 'unix(''cp workdir/',Study_paths{1,1},'/',Study_paths{1,2},'/opt/',dakota_filename_in,'.in workdir/',Study_paths{1,1},'/',Study_paths{1,2},'/opt/',dakota_filename_out,'.txt'')');   % unix(''python test_saveFile.py'')
@@ -129,4 +130,5 @@ for ii = 2:num_studies
     fclose(fout);
     
 end
+clear
 %delete(strcat('workdir/',Study_paths{1,1},'/',Study_paths{1,2},'/opt/', dakota_filename_out, '.txt'));
