@@ -47,8 +47,8 @@ responses,
 variables,
         continuous_design = 5
           initial_point  =   1.27500e-01   1.80000e+02   1.19000e-01   0.00000e+00   1.38546e-07 
-          lower_bounds  =   1.26500e-01   8.00000e-01   1.18000e-01  -1.00000e-03   1.19227e-07 
-          upper_bounds  =   1.28500e-01   5.30000e+03   1.20000e-01   1.00000e-03   2.91296e-07 
+          lower_bounds  =   1.26500e-01   1.00000e+02   1.18000e-01  -1.00000e-03   1.19227e-07 
+          upper_bounds  =   1.28500e-01   4.00000e+02   1.20000e-01   1.00000e-03   2.91296e-07 
           descriptors  =  'x_displace'  'mu_eff_healthy'  'y_displace'  'z_displace'  'alpha_healthy' 
           scale_types  =  'auto'  'auto'  'auto'  'auto'  'auto' 
         continuous_state = 12
