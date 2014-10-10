@@ -6,7 +6,7 @@ tic;
 % mu_eff_data = cell2mat(cell_data(2:end,:));
 
 % Identify the studies to be examined.
-opttype = 'bestfit4' ;
+opttype = 'bestfit48' ;
 
 Study_paths = cell (1,2);
 % Study_paths {1,1} = 'Study0035';
@@ -41,8 +41,8 @@ Study_paths = cell (1,2);
 % Study_paths {15,2} = '0447';
 % Study_paths {16,1} = 'Study0026';
 % Study_paths {16,2} = '0457';
-Study_paths {1,1} = 'Study0026';
-Study_paths {1,2} = '0455';
+Study_paths {1,1} = 'Study0030';
+Study_paths {1,2} = '0491';
 % Study_paths {18,1} = 'Study0026';
 % Study_paths {18,2} = '0453';
 % Study_paths {19,1} = 'Study0026';
