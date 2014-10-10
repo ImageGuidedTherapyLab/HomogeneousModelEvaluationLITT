@@ -40,7 +40,7 @@ responses,
         objective_functions = 2
         multi_objective_weights  = 1. 0.
         numerical_gradients
-        fd_gradient_step_size 1.
+        # fd_gradient_step_size 1.
         # no_gradients
         no_hessians
 
@@ -53,7 +53,7 @@ variables,
           scale_types  =  'auto'  'auto' 
         continuous_state = 15
           initial_state  =  -9.00000e+01   1.04500e+03   9.00000e-01   1.01500e-01   1.33000e-01   0.00000e+00   0.00000e+00   3.70000e+01   0.00000e+00  -4.50000e+01   2.10000e+01   1.80000e+02   3.64000e+03   8.00000e+03   3.84000e+03 
-          #lower_bounds  =  -9.50000e+01   9.92750e+02   7.00000e-01   1.00500e-01   1.32000e-01  -1.00000e-03   0.00000e+00   3.40000e+01  -5.00000e+00  -5.00000e+01   2.00000e+01   1.00000e+02   3.45800e+03   8.00000e+02   3.64800e+03 
+          #lower_bounds  =  -9.50000e+01   9.92750e+02   7.00000e-01   1.00500e-01   1.32000e-01  -1.00000e-03   0.00000e+00   3.40000e+01  -5.00000e+00  -5.00000e+01   2.00000e+01   8.00000e-01   3.45800e+03   8.00000e+02   3.64800e+03 
           #upper_bounds  =  -8.50000e+01   1.09725e+03   1.00000e+00   1.02500e-01   1.34000e-01   1.00000e-03   1.00000e+04   4.00000e+01   5.00000e+00  -4.00000e+01   4.00000e+01   4.00000e+02   3.82200e+03   5.00000e+04   4.03200e+03 
           descriptors  =  'y_rotate'  'rho_healthy'  'anfact_healthy'  'x_displace'  'y_displace'  'z_displace'  'robin_coeff'  'body_temp'  'x_rotate'  'z_rotate'  'probe_init'  'mu_eff_healthy'  'c_p_healthy'  'mu_s_healthy'  'c_blood_healthy' 
         discrete_state_set_integer = 3
