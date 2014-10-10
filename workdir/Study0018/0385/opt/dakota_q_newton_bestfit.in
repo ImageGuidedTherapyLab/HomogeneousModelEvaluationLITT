@@ -40,22 +40,22 @@ responses,
         objective_functions = 2
         multi_objective_weights  = 1. 0.
         numerical_gradients
-        fd_gradient_step_size 1.
+        # fd_gradient_step_size 1.
         # no_gradients
         no_hessians
 
 variables,
-        continuous_design = 5
-          initial_point  =   6.66000e-02   1.80000e+02   1.21000e-01   0.00000e+00   1.38546e-07 
-          lower_bounds  =   6.56000e-02   8.00000e-01   1.20000e-01  -1.00000e-03   1.19227e-07 
-          upper_bounds  =   6.76000e-02   5.30000e+03   1.22000e-01   1.00000e-03   2.91296e-07 
-          descriptors  =  'x_displace'  'mu_eff_healthy'  'y_displace'  'z_displace'  'alpha_healthy' 
-          scale_types  =  'auto'  'auto'  'auto'  'auto'  'auto' 
-        continuous_state = 12
-          initial_state  =  -9.00000e+01   1.04500e+03   9.00000e-01   6.00000e+00   3.70000e+01   0.00000e+00  -7.70000e+00   2.10000e+01   8.00000e+03   3.64000e+03   0.00000e+00   3.84000e+03 
-          #lower_bounds  =  -9.50000e+01   9.92750e+02   7.00000e-01   3.00000e+00   3.40000e+01  -5.00000e+00  -1.27000e+01   2.00000e+01   8.00000e+02   3.45800e+03   0.00000e+00   3.64800e+03 
-          #upper_bounds  =  -8.50000e+01   1.09725e+03   1.00000e+00   9.00000e+00   4.00000e+01   5.00000e+00  -2.70000e+00   4.00000e+01   5.00000e+04   3.82200e+03   1.00000e+04   4.03200e+03 
-          descriptors  =  'y_rotate'  'rho_healthy'  'anfact_healthy'  'w_0_healthy'  'body_temp'  'x_rotate'  'z_rotate'  'probe_init'  'mu_s_healthy'  'c_p_healthy'  'robin_coeff'  'c_blood_healthy' 
+        continuous_design = 4
+          initial_point  =   6.66000e-02   1.80000e+02   1.21000e-01   0.00000e+00 
+          lower_bounds  =   6.56000e-02   8.00000e-01   1.20000e-01  -1.00000e-03 
+          upper_bounds  =   6.76000e-02   4.00000e+02   1.22000e-01   1.00000e-03 
+          descriptors  =  'x_displace'  'mu_eff_healthy'  'y_displace'  'z_displace' 
+          scale_types  =  'auto'  'auto'  'auto'  'auto' 
+        continuous_state = 13
+          initial_state  =  -9.00000e+01   1.04500e+03   9.00000e-01   6.00000e+00   3.70000e+01   0.00000e+00   1.38546e-07  -7.70000e+00   2.10000e+01   8.00000e+03   3.64000e+03   0.00000e+00   3.84000e+03 
+          #lower_bounds  =  -9.50000e+01   9.92750e+02   7.00000e-01   3.00000e+00   3.40000e+01  -5.00000e+00   1.19227e-07  -1.27000e+01   2.00000e+01   8.00000e+02   3.45800e+03   0.00000e+00   3.64800e+03 
+          #upper_bounds  =  -8.50000e+01   1.09725e+03   1.00000e+00   9.00000e+00   4.00000e+01   5.00000e+00   2.91296e-07  -2.70000e+00   4.00000e+01   5.00000e+04   3.82200e+03   1.00000e+04   4.03200e+03 
+          descriptors  =  'y_rotate'  'rho_healthy'  'anfact_healthy'  'w_0_healthy'  'body_temp'  'x_rotate'  'alpha_healthy'  'z_rotate'  'probe_init'  'mu_s_healthy'  'c_p_healthy'  'robin_coeff'  'c_blood_healthy' 
         discrete_state_set_integer = 3
           set_values  = 18 385 1 
           descriptors  = 'study' 'series' 'quality'

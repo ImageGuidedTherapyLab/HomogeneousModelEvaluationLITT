@@ -8,12 +8,32 @@
 library(car)
 # jac2009 = readNIfTI("Brain_Stemlogjacobian2009.nii.gz", reorient=FALSE)
 
+stopQuietly <- function(...)
+  {
+  blankMsg <- sprintf( "\r%s\r", paste( rep(" ", getOption( "width" ) - 1L ), collapse = " ") );
+  stop( simpleError( blankMsg ) );
+  } # stopQuietly()
+
+#args <- commandArgs( trailingOnly = TRUE )
+# manually pass in command line arguments for debugging
+args <- c( "datasummaryL2_10sourceNewton46.txt","bestfit", ".3")
+args <- c( "datasummary.txt","bestfit", ".7")
+print(typeof(args))
+print(args)
+
+if( length( args ) < 3 )
+  {
+  cat( "Usage: Rscript datasummary.R datasummary.txt plotid dcethreshold", sep = "" )
+  stopQuietly()
+  }
+
 # global vars
-PlotID='bestfit'
-NumBreaks = 10
 
 # read data
-rawdata = read.table('datasummary.txt',header = TRUE, sep = ',')
+rawdata = read.table(args[1],header = TRUE, sep = ',')
+PlotID=args[2]
+dcetreshold= as.numeric( args[3] )
+NumBreaks = 10
 
 # for large objective functions and data on the boundary of optimization
 # space most likely and error in the optimization
@@ -29,7 +49,7 @@ upper_bound_robin  = 1.00000e+04
 rawdata$alpha  = rawdata$alpha  * alphaconversion
 rawdata$mu_eff = rawdata$mu_eff * mueffconversion 
 iterstats        =  subset(rawdata , obj<=5.e5   
-                                   & dice   >  .5
+                                   & dice   >  .3
                                    & alpha  > (1.34e-7*alphaconversion) 
                                    & mu_eff < (5.e3*mueffconversion)
                           )

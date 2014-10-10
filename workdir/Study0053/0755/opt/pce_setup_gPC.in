@@ -44,5 +44,5 @@ method,
 variables,
         uniform_uncertain = 4
           lower_bounds  =   8.00000e-01   3.00000e+00   0.00000e+00   1.19227e-07 
-          upper_bounds  =   5.30000e+03   9.00000e+00   1.00000e+04   2.91296e-07 
+          upper_bounds  =   4.00000e+02   9.00000e+00   1.00000e+04   2.91296e-07 
           descriptors  =  'mu_eff_healthy'  'w_0_healthy'  'robin_coeff'  'alpha_healthy' 
