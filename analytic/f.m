@@ -19,6 +19,7 @@ inputdatavars = load('./TmpDataInput.mat');
 % csvwrite ('index.txt' , index);
 metric(1) = L2norm;
 metric(2) = 1 - dice;
+metric(isnan(metric)) = 0;
 
 %metric = 1 -dice;
 
