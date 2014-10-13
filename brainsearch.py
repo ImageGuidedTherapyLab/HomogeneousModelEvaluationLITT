@@ -333,8 +333,11 @@ def GetMinJobID(FileNameTemplate):
     FileTypeID = DirectoryLocation.pop() 
     DirectoryLocation = '/'.join(DirectoryLocation)
     DirectoryOutList = filter(lambda x: len( x.split("%s.out" % FileTypeID) ) == 2 , os.listdir(DirectoryLocation ))
+    print FileNameTemplate
     for dakotaoutfile in DirectoryOutList:
-      obj_fn_data = numpy.loadtxt('%s/%s'  % (DirectoryLocation ,dakotaoutfile ) )
+      datafile = '%s/%s'  % (DirectoryLocation ,dakotaoutfile ) 
+      #print datafile 
+      obj_fn_data = numpy.loadtxt(datafile )
       #print '%s/%s'  % (DirectoryLocation, dakotaoutfile), obj_fn_data 
       # FIXME: find the best one, ignore errors
       if( obj_fn_data.size > 1 ):
@@ -1093,8 +1096,8 @@ def ComputeObjective(**kwargs):
        dicecmd = "%s -verbose %s/roisemdose.%s.%04d.vtk -thresh 1 inf 1 0 -type uchar -as SEM %s/roimrtidose.%s.%04d.vtk -thresh 1 inf 1 0 -type uchar -push SEM -overlap 1 > %s  2>&1" % (c3dexe,SEMDataDirectory,kwargs['opttype'],MRTItimeID,SEMDataDirectory,kwargs['opttype'],MRTItimeID,dicefilename)
        print dicecmd, dicefilename 
        os.system(dicecmd)
-       if (  MRTItimeID == fem_params['maxheatid'] ):
-         dicevalue = DiceTxtFileParse(dicefilename)
+       #if (  MRTItimeID == fem_params['maxheatid'] ):
+       dicevalue = DiceTxtFileParse(dicefilename)
        ##if (MRTItimeID > 20):
        ##  raise 
 
@@ -1519,12 +1522,13 @@ elif (options.accum_history ):
   './workdir/Study0022/0417/',
   './workdir/Study0021/0409/',
   './workdir/Study0021/0414/',
-  './workdir/Study0021/0415/',
+  #'./workdir/Study0021/0415/',
   ]
-  ## resultfileList = [
+  resultfileList = [
+  './workdir/Study0026/0450/',
   ## './workdir/Study0035/0530/',
   ## './workdir/Study0030/0491/',
-  ## ]
+  ]
   
   texHandle  = open('datasummaryL2_10sourceNewton49.tex' , 'w') 
   fileHandle = open('datasummaryL2_10sourceNewton49.txt' , 'w')
@@ -1539,9 +1543,12 @@ elif (options.accum_history ):
       inisetupfile = '%s/opt/setup.ini' % (filenamebase)
       config.read(inisetupfile)
   
+      grepcmd = "grep '^heating' %s" %  inisetupfile 
+      print grepcmd 
+      os.system(grepcmd )
       # get min value
       (idopt,minobjval,dicevalue,mindice ) = GetMinJobID( '%s/opt/optpp_pds.%s' % (filenamebase,opttype))
-      print (idopt,minobjval,dicevalue ) 
+      print (idopt,minobjval,dicevalue, mindice ) 
       
       studyid= int(filenamebase.split('/')[2].replace('Study',''))
       dataid = int(filenamebase.split('/')[3])
@@ -1709,3 +1716,5 @@ elif (options.config_ini != None):
 else:
   parser.print_help()
   print options
+
+print DiceTxtFileParse('/tmp/outputs/dakota/0450/dice.heating.0061.txt')

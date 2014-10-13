@@ -18,6 +18,7 @@ stopQuietly <- function(...)
 # manually pass in command line arguments for debugging
 args <- c( "datasummaryL2_10sourceNewton46.txt","bestfit", ".3")
 args <- c( "datasummary.txt","bestfit", ".7")
+args <- c( "datasummaryL2_10sourceNewton49.txt","heating", ".3")
 print(typeof(args))
 print(args)
 
@@ -49,7 +50,6 @@ upper_bound_robin  = 1.00000e+04
 rawdata$alpha  = rawdata$alpha  * alphaconversion
 rawdata$mu_eff = rawdata$mu_eff * mueffconversion 
 iterstats        =  subset(rawdata , obj<=5.e5   
-                                   & dice   >  .3
                                    & alpha  > (1.34e-7*alphaconversion) 
                                    & mu_eff < (5.e3*mueffconversion)
                           )
@@ -111,8 +111,8 @@ panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
     par(usr = c(0, 1, 0, 1))
     r <- abs(cor(x, y))
     txt <- format(c(r, 0.123456789), digits = digits)[1]
-    if(cor(x, y) <  0.0) txt <- paste("cor=-", txt)
-    if(cor(x, y) >= 0.0) txt <- paste("cor=" , txt)
+    #if(cor(x, y) <  0.0) txt <- paste("cor=-", txt)
+    #if(cor(x, y) >= 0.0) txt <- paste("cor=" , txt)
     if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
     #text(0.5, 0.5, txt, cex = cex.cor * r)
     text(0.5, 0.5, txt, cex = 1.2* r)
@@ -124,7 +124,7 @@ panel.linear <- function(x, y)
 {
         points(x,y)
         #points(x,y,col=colcode,pch=symcode)
-	abline(lm(y~x), col='red')
+	#abline(lm(y~x), col='red')
         abline(h=CrossOver,v=CrossOver,col='blue',lty=2)
 }
 
