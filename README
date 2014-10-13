@@ -6,6 +6,7 @@ all registration parameters are WRT workdir/meshTemplateFull1.e
 make -f exe.makefile -j 6 &
 
 # decide at run time which run to accumulate stats
+python brainsearch.py --accum_history heating
 python brainsearch.py --accum_history bestfit
 python brainsearch.py --accum_history bestfit1
 

@@ -1,3 +1,4 @@
+global.ini
 optpp_pds/case.*.setup
 optpp_pds/setuprc.*
 optpp_pds/run.*.log
