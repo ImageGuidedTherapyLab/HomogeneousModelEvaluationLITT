@@ -1524,11 +1524,11 @@ elif (options.accum_history ):
   './workdir/Study0021/0414/',
   #'./workdir/Study0021/0415/',
   ]
-  resultfileList = [
-  './workdir/Study0026/0450/',
-  ## './workdir/Study0035/0530/',
-  ## './workdir/Study0030/0491/',
-  ]
+  ## resultfileList = [
+  ## './workdir/Study0026/0450/',
+  ## ## './workdir/Study0035/0530/',
+  ## ## './workdir/Study0030/0491/',
+  ## ]
   
   texHandle  = open('datasummaryL2_10sourceNewton49.tex' , 'w') 
   fileHandle = open('datasummaryL2_10sourceNewton49.txt' , 'w')
