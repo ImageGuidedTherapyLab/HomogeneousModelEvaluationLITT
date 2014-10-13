@@ -338,9 +338,9 @@ def GetMinJobID(FileNameTemplate):
       #print '%s/%s'  % (DirectoryLocation, dakotaoutfile), obj_fn_data 
       # FIXME: find the best one, ignore errors
       if( obj_fn_data.size > 1 ):
-        if(obj_fn_data[0] < MinObjVal ): 
-          MinObjVal  = obj_fn_data[0]
-          MinInvDiceVal = obj_fn_data[1]
+        if(obj_fn_data[0] < MinObjVal ): # SJF - this finds the best L2_norm 
+          MinObjVal  = obj_fn_data[0]   # SJF - This records the best L2_norm
+          MinInvDiceVal = obj_fn_data[1] # SJF - This records the Dice associated with the best L2_norm
           OptID     = int(dakotaoutfile.split(".").pop()) 
         #if(obj_fn_data[1] < MaxInvDiceVal ): 
           #MinInvDiceVal = obj_fn_data[1]
