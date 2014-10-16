@@ -341,9 +341,9 @@ def GetMinJobID(FileNameTemplate):
       #print '%s/%s'  % (DirectoryLocation, dakotaoutfile), obj_fn_data 
       # FIXME: find the best one, ignore errors
       if( obj_fn_data.size > 1 ):
-        if(obj_fn_data[0] < MinObjVal ): 
-          MinObjVal  = obj_fn_data[0]
-          MinInvDiceVal = obj_fn_data[1]
+        if(obj_fn_data[0] < MinObjVal ): # SJF - this finds the best L2_norm 
+          MinObjVal  = obj_fn_data[0]   # SJF - This records the best L2_norm
+          MinInvDiceVal = obj_fn_data[1] # SJF - This records the Dice associated with the best L2_norm
           OptID     = int(dakotaoutfile.split(".").pop()) 
         #if(obj_fn_data[1] < MaxInvDiceVal ): 
           #MinInvDiceVal = obj_fn_data[1]
@@ -1447,9 +1447,9 @@ if (options.param_file != None):
 # find the best point for each run
 elif (options.accum_history ):
   resultfileList = [
-  './workdir/Study0035/0530/',
+  #'./workdir/Study0035/0530/',
   #'./workdir/Study0023/0433/',
-  './workdir/Study0023/0428/',
+  #'./workdir/Study0023/0428/',
   ##'./workdir/Study0023/0425/',
   './workdir/Study0030/0495/',
   './workdir/Study0030/0497/',
@@ -1492,6 +1492,7 @@ elif (options.accum_history ):
   ##'./workdir/Study0006/0183/',
   ]
   resultfileList = [
+  #'./workdir/Study0023/0428/',
   './workdir/Study0030/0495/',
   './workdir/Study0030/0497/',
   './workdir/Study0030/0488/',
