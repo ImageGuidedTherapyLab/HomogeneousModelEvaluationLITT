@@ -1118,8 +1118,10 @@ def ComputeObjective(**kwargs):
     diff =  numpy.abs(mrti_array-fem_array)
     diffsq =  diff**2
     ObjectiveFunction = ObjectiveFunction + diff.sum()
+    
+    dicepenalty = 1./(dicevalue +1.e-9)
 
-  return (ObjectiveFunction ,dicevalue)
+  return (ObjectiveFunction,dicevalue  ,dicepenalty )
 # end def ComputeObjective:
 ##################################################################
 def brainNekWrapper(**kwargs):
