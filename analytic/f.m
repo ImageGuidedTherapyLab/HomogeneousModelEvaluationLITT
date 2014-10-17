@@ -18,15 +18,19 @@ inputdatavars = load('./TmpDataInput.mat');
 % index = index + 1;
 % csvwrite ('index.txt' , index);
 metric(1) = L2norm;
-metric(2) = 1 - dice;
-metric(isnan(metric)) = 0;
-
+%metric(2) = 1 - dice;
+%metric(isnan(metric)) = 0;
+metric(2) = 1/(dice + 1E-7);
+metric(3) = dice;
+metric(4) = 1-dice;
 %metric = 1 -dice;
 
 file_base = strcat( './workdir/',inputdatavars.patientID,'/',inputdatavars.UID,'/opt/optpp_pds.',inputdatavars.opttype);
 fout = fopen( strcat( file_base,'.out.',num2str(inputdatavars.fileID) ), 'w' );
 fprintf(fout, '%s\n', num2str(metric(1)) );
-fprintf(fout, '%s\n'  , num2str(metric(2)) );
+fprintf(fout, '%s\n', num2str(metric(2)) );
+fprintf(fout, '%s\n', num2str(metric(3)) );
+fprintf(fout, '%s\n', num2str(metric(4)) );
 fclose(fout);
 
 save ( strcat( file_base,'.in.',num2str(inputdatavars.fileID), '.mat'), 'inputdatavars');
