@@ -1118,8 +1118,10 @@ def ComputeObjective(**kwargs):
     diff =  numpy.abs(mrti_array-fem_array)
     diffsq =  diff**2
     ObjectiveFunction = ObjectiveFunction + diff.sum()
+    
+    dicepenalty = 1./(dicevalue +1.e-9)
 
-  return (ObjectiveFunction ,dicevalue)
+  return (ObjectiveFunction,dicevalue  ,dicepenalty )
 # end def ComputeObjective:
 ##################################################################
 def brainNekWrapper(**kwargs):
@@ -1323,18 +1325,18 @@ def ParseInput(paramfilename,VisualizeOutput):
   fulltimeinterval               = eval(config.get('mrti','fulltime') )
   cooltimeinterval               = eval(config.get('mrti','cooling')  )
   heattimeinterval               = eval(config.get('mrti','heating')  )
-  # select time interval selection from optimization type
-  if(fem_params['opttype'] == 'heating'):
-    timeinterval = heattimeinterval
-  elif(fem_params['opttype'] == 'cooling'):
-    timeinterval = cooltimeinterval
-  else:
-    timeinterval = fulltimeinterval
+  # use full heating interval for all
+  timeinterval = fulltimeinterval
+  ## # select time interval selection from optimization type
+  ## if(fem_params['opttype'] == 'heating'):
+  ##   timeinterval = heattimeinterval
+  ## elif(fem_params['opttype'] == 'cooling'):
+  ##   timeinterval = cooltimeinterval
   fem_params['timeinterval'] = timeinterval
   fem_params['mrtideltat']   = config.getfloat('mrti','deltat') 
   fem_params['initialtime']  = timeinterval[0] * config.getfloat('mrti','deltat') 
   fem_params['finaltime']    = timeinterval[1] * config.getfloat('mrti','deltat') 
-  fem_params['maxheatid']    = heattimeinterval[1]
+  fem_params['maxheatid']    = heattimeinterval[-1]
   fem_params['voi']          = eval(config.get('mrti','voi'))
 
   print 'opttype',fem_params['opttype'],timeinterval ,'mrti data from' , fem_params['mrti'] , 'setupfile', inisetupfile  
@@ -1522,7 +1524,7 @@ elif (options.accum_history ):
   './workdir/Study0022/0417/',
   './workdir/Study0021/0409/',
   './workdir/Study0021/0414/',
-  #'./workdir/Study0021/0415/',
+  './workdir/Study0021/0415/',
   ]
   ## resultfileList = [
   ## './workdir/Study0026/0450/',
