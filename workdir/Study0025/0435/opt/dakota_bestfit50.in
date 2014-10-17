@@ -41,9 +41,9 @@ interface,
 #          descriptors      'powerhistory:[[4, 17, 59], [0.0, 8.0, 0.0], 5.0, [19, 59], [0, 18]]'
 
 responses,
-        objective_functions = 3
+        objective_functions = 4
 #        multi_objective_weights  = 1. 0.
-        multi_objective_weights  = 0.5 0.5 0
+        multi_objective_weights  = 1 1 0 0
         numerical_gradients
 #        fd_gradient_step_size 1.0e-02
         # no_gradients
