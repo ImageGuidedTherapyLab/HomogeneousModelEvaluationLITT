@@ -37,8 +37,8 @@ interface,
 #          descriptors      'powerhistory:[[36, 42, 49, 142, 160], [0.0, 3.0, 0.0, 11.85, 0.0], 5.0, [144, 161], [50, 144]]'
 
 responses,
-        objective_functions = 2
-        multi_objective_weights  = 1. 0.
+        objective_functions = 4
+        multi_objective_weights  = 1. 1. 0. 0.
         numerical_gradients
         # fd_gradient_step_size 1.
         # no_gradients

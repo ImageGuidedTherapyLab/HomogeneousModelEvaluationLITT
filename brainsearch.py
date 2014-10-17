@@ -1119,9 +1119,10 @@ def ComputeObjective(**kwargs):
     diffsq =  diff**2
     ObjectiveFunction = ObjectiveFunction + diff.sum()
     
-    dicepenalty = 1./(dicevalue +1.e-9)
+    epsilonPenalty = 1.e-7
+    dicepenalty = 1./(dicevalue +epsilonPenalty )
 
-  return (ObjectiveFunction,dicevalue  ,dicepenalty )
+  return (ObjectiveFunction,dicepenalty,  dicevalue  , 1.-dicevalue)
 # end def ComputeObjective:
 ##################################################################
 def brainNekWrapper(**kwargs):
