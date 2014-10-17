@@ -18,9 +18,9 @@ inputdatavars = load('./TmpDataInput.mat');
 % index = index + 1;
 % csvwrite ('index.txt' , index);
 metric(1) = L2norm;
-metric(2) = 1 - dice;
-metric(isnan(metric)) = 0;
-
+%metric(2) = 1 - dice;
+%metric(isnan(metric)) = 0;
+metric(2) = 1/(dice + exp(-12));
 %metric = 1 -dice;
 
 file_base = strcat( './workdir/',inputdatavars.patientID,'/',inputdatavars.UID,'/opt/optpp_pds.',inputdatavars.opttype);
