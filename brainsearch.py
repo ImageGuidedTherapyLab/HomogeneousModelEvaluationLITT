@@ -326,8 +326,10 @@ laserTip  1.0      4180           0.5985        500         14000       0.88
 def GetMinJobID(FileNameTemplate):
     OptID      = 1  
     MinObjVal  = 1.e99
-    MaxInvDiceVal = 1.1
-    MinInvDiceVal = 1.1
+    MinL2Value     = 1.e99
+    MinDicePenalty = 1.e99
+    DiceAtL2Min = 0.0
+    OneMinuseDice = 1.0
     # get a list of all output files in the directory 
     DirectoryLocation = FileNameTemplate.split('/')
     FileTypeID = DirectoryLocation.pop() 
@@ -336,20 +338,21 @@ def GetMinJobID(FileNameTemplate):
     print FileNameTemplate
     for dakotaoutfile in DirectoryOutList:
       datafile = '%s/%s'  % (DirectoryLocation ,dakotaoutfile ) 
-      #print datafile 
+      print datafile 
       obj_fn_data = numpy.loadtxt(datafile )
       #print '%s/%s'  % (DirectoryLocation, dakotaoutfile), obj_fn_data 
       # FIXME: find the best one, ignore errors
-      if( obj_fn_data.size > 1 ):
-        if(obj_fn_data[0] < MinObjVal ): # SJF - this finds the best L2_norm 
-          MinObjVal  = obj_fn_data[0]   # SJF - This records the best L2_norm
-          MinInvDiceVal = obj_fn_data[1] # SJF - This records the Dice associated with the best L2_norm
+      if( obj_fn_data.size == 4 ):
+        L2Value       = obj_fn_data[0] # SJF - This records the best L2_norm
+        DicePenalty   = obj_fn_data[1]   
+        if(L2Value  + DicePenalty   < MinObjVal ): # SJF - this finds the best L2_norm 
+          MinObjVal = L2Value  + DicePenalty  
           OptID     = int(dakotaoutfile.split(".").pop()) 
-        #if(obj_fn_data[1] < MaxInvDiceVal ): 
-          #MinInvDiceVal = obj_fn_data[1]
-          #MinObjVal  = obj_fn_data[0]
-          #OptID     = int(dakotaoutfile.split(".").pop()) 
-    return (OptID,MinObjVal,MaxInvDiceVal,MinInvDiceVal )
+          MinL2Value     = L2Value  
+          MinDicePenalty = DicePenalty  
+          DiceAtL2Min    = obj_fn_data[2]   
+          OneMinuseDice  = obj_fn_data[3]   
+    return (OptID,MinL2Value,MinDicePenalty ,DiceAtL2Min  ,OneMinuseDice )
 
 # Convenience Routine
 def DiceTxtFileParse(DiceInputFilename):
@@ -1528,15 +1531,14 @@ elif (options.accum_history ):
   './workdir/Study0021/0415/',
   ]
   ## resultfileList = [
-  ## './workdir/Study0026/0450/',
-  ## ## './workdir/Study0035/0530/',
   ## ## './workdir/Study0030/0491/',
+  ## './workdir/Study0028/0466/',
   ## ]
   
   texHandle  = open('datasummaryL2_10sourceNewton49.tex' , 'w') 
   fileHandle = open('datasummaryL2_10sourceNewton49.txt' , 'w')
   # write header
-  fileHandle.write("idstudy,iddata,idopt,mu_eff,alpha,robin,dice,obj\n")
+  fileHandle.write("idstudy,iddata,idopt,mu_eff,alpha,robin,dice,obj,dicepenalty,oneminusdice\n")
   # loop over files and extract optimal value
   opttype = options.accum_history 
   for filenamebase in resultfileList:
@@ -1550,8 +1552,8 @@ elif (options.accum_history ):
       print grepcmd 
       os.system(grepcmd )
       # get min value
-      (idopt,minobjval,dicevalue,mindice ) = GetMinJobID( '%s/opt/optpp_pds.%s' % (filenamebase,opttype))
-      print (idopt,minobjval,dicevalue, mindice ) 
+      (idopt,minobjval,penaltydice,dicevalue,onemindice ) = GetMinJobID( '%s/opt/optpp_pds.%s' % (filenamebase,opttype))
+      print (idopt,minobjval,penaltydice,dicevalue,onemindice ) 
       
       studyid= int(filenamebase.split('/')[2].replace('Study',''))
       dataid = int(filenamebase.split('/')[3])
@@ -1563,12 +1565,15 @@ elif (options.accum_history ):
       heattimeinterval               = eval(config.get('mrti','heating')  )
       SEMDataDirectory               = outputDirectory % int(filenamebase.split('/')[-2]) 
       #dataarray = numpy.loadtxt(filename,skiprows=1,usecols=(0,1,2,3,4,6)
-      fileHandle.write("%05d,%05d,%05d,%s,%s,%s,%12.5e,%12.5e\n" %( studyid, dataid, idopt     ,
+      fileHandle.write("%05d,%05d,%05d,%s,%s,%s,%12.5e,%12.5e,%12.5e,%12.5e\n" %( studyid, dataid, idopt     ,
                                                                       simvariable['mu_eff_healthy'],
                                                                       simvariable['alpha_healthy'],
                                                                       simvariable['robin_coeff'],
-                                                                      mindice,
-                                                                      minobjval))
+                                                                      dicevalue,
+                                                                      minobjval,
+                                                                      penaltydice,
+                                                                      onemindice
+                                                                     ))
       # format latex ouput
       outputformat                   = config.get('latex','opttype')
       texFormat = outputformat % (opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],opttype,heattimeinterval[1],minobjval,dicevalue)
@@ -1585,8 +1590,8 @@ elif (options.run_min != None):
 
   templatefilename = options.run_min
   # get min value
-  (idopt,minobjval,dicevalue,mindice) = GetMinJobID( templatefilename )
-  print (idopt,minobjval,dicevalue,mindice) 
+  (idopt,minobjval,penaltydice,dicevalue,onemindice ) = GetMinJobID( templatefilename )
+  print (idopt,minobjval,dicevalue,onemindice ) 
 
   # build execution command
   runcmd = "vglrun python ./brainsearch.py --param_file  %s.in.%d %s.out.%d --vis_out" % (templatefilename,idopt,templatefilename,idopt)
