@@ -326,7 +326,8 @@ laserTip  1.0      4180           0.5985        500         14000       0.88
 def GetMinJobID(FileNameTemplate):
     OptID      = 1  
     MinObjVal  = 1.e99
-    DicePenalty = 0.0
+    MinL2Value     = 1.e99
+    MinDicePenalty = 1.e99
     DiceAtL2Min = 0.0
     OneMinuseDice = 1.0
     # get a list of all output files in the directory 
@@ -342,13 +343,16 @@ def GetMinJobID(FileNameTemplate):
       #print '%s/%s'  % (DirectoryLocation, dakotaoutfile), obj_fn_data 
       # FIXME: find the best one, ignore errors
       if( obj_fn_data.size == 4 ):
-        if(obj_fn_data[0] < MinObjVal ): # SJF - this finds the best L2_norm 
-          MinObjVal     = obj_fn_data[0] # SJF - This records the best L2_norm
-          DicePenalty   = obj_fn_data[1]   
-          DiceAtL2Min   = obj_fn_data[2]   
-          OneMinuseDice = obj_fn_data[3]   
+        L2Value       = obj_fn_data[0] # SJF - This records the best L2_norm
+        DicePenalty   = obj_fn_data[1]   
+        if(L2Value  + DicePenalty   < MinObjVal ): # SJF - this finds the best L2_norm 
+          MinObjVal = L2Value  + DicePenalty  
           OptID     = int(dakotaoutfile.split(".").pop()) 
-    return (OptID,MinObjVal,DicePenalty ,DiceAtL2Min  ,OneMinuseDice )
+          MinL2Value     = L2Value  
+          MinDicePenalty = DicePenalty  
+          DiceAtL2Min    = obj_fn_data[2]   
+          OneMinuseDice  = obj_fn_data[3]   
+    return (OptID,MinL2Value,MinDicePenalty ,DiceAtL2Min  ,OneMinuseDice )
 
 # Convenience Routine
 def DiceTxtFileParse(DiceInputFilename):
@@ -1527,9 +1531,8 @@ elif (options.accum_history ):
   './workdir/Study0021/0415/',
   ]
   ## resultfileList = [
-  ## './workdir/Study0026/0450/',
-  ## ## './workdir/Study0035/0530/',
   ## ## './workdir/Study0030/0491/',
+  ## './workdir/Study0028/0466/',
   ## ]
   
   texHandle  = open('datasummaryL2_10sourceNewton49.tex' , 'w') 
