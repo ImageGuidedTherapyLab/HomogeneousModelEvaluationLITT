@@ -1533,10 +1533,11 @@ elif (options.accum_history ):
   ## ## './workdir/Study0030/0491/',
   ## ]
   
-  texHandle  = open('datasummaryL2_10sourceNewton49.tex' , 'w') 
-  fileHandle = open('datasummaryL2_10sourceNewton49.txt' , 'w')
+  texHandle  = open('datasummaryL2_10sourceNewton50.tex' , 'w') 
+  fileHandle = open('datasummaryL2_10sourceNewton50.txt' , 'w')
   # write header
   fileHandle.write("idstudy,iddata,idopt,mu_eff,alpha,robin,dice,obj\n")
+  #fileHandle.write("idstudy,iddata,idopt,mu_eff,alpha,robin,obj,epsilon_dice,dice,1-dice\n")
   # loop over files and extract optimal value
   opttype = options.accum_history 
   for filenamebase in resultfileList:

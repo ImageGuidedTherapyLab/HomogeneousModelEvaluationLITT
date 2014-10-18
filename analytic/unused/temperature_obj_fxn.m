@@ -160,7 +160,7 @@ tmap_model_scaled_to_MRTI = imresize (tmap_unique , 1/scaling.x); % Set the mode
 
 % Change directory and load the temperature from VTK
 cd (patient_MRTI_path);
-MRTI = readVTK_SJF('temperature', pwr_hist(ii));   % This 'vtkNumber' should b
+MRTI = readVTK_one_time('temperature', inputdatavars.maxheatid);   % This 'vtkNumber' should b
 
 % Go to the workdir
 cd (patient_opt_path);
@@ -184,11 +184,11 @@ MRTI ( :,(VOI.x(2)+1):end, : ) = 0;
 % [~ ,max_temperature_timepoint] = max ( timepoint_summation ); % Find the max summed value for temperature
 % MRTI_hottest = MRTI(:,:,max_temperature_timepoint); % Set the variable
 
-MRTI_hottest = MRTI(:,:,inputdatavars.maxheatid);
+%MRTI_hottest = MRTI(:,:,inputdatavars.maxheatid);
 
 % Crop the MRTI_image
 % This is the VOI.x and VOI.y swapped for ParaView
-MRTI_crop = MRTI_hottest( (VOI.y(1) ):(VOI.y(2) ) , (VOI.x(1) ):(VOI.x(2) ) ); % Set the cropped region
+MRTI_crop = MRTI( (VOI.y(1) ):(VOI.y(2) ) , (VOI.x(1) ):(VOI.x(2) ) ); % Set the cropped region
 %MRTI_crop22 = MRTI_hottest_DF2( (VOI.y(1) ):(VOI.y(2) ) , (VOI.x(1) ):(VOI.x(2) ) );
 % MRTI_crop = MRTI_hottest( (VOI.y(1)-1):(VOI.y(2)+1) , (VOI.x(1)-1):(VOI.x(2)+1) ); % Set the cropped region with odd border
 
