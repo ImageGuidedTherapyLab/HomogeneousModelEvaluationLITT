@@ -78,7 +78,7 @@ if Matlab_flag ~=1 && Matlab_flag ~=0
     disp('Invalid Matlab_flag. Only 0 or 1 allowed')
     break
 end
-toss_index7 = find(dice_raw<0.7);
+toss_index5 = find(dice_raw<0.5);
 %toss_index25= find(dice_raw<0.25);
 toss_index3 = find(dice_raw<0.3);
 % toss_index8 = find(dice_raw<0.8);
@@ -99,8 +99,8 @@ end
 quality=char(quality);
 clear ii
 
-mu_eff7 = datasummary(:,4);
-mu_eff7 (toss_index7) = [];
+mu_eff5 = datasummary(:,4);
+mu_eff5 (toss_index5) = [];
 % mu_eff25 = datasummary(:,4);
 % mu_eff25 (toss_index25) = [];
 mu_eff3 = datasummary(:,4);
@@ -118,8 +118,8 @@ mu_eff3 (toss_index3)=[];
 % mu_effHigh7(toss_indexHigh7)=[];
 
 
-alpha7 = datasummary(:,5);
-alpha7 (toss_index7) = [];
+alpha5 = datasummary(:,5);
+alpha5 (toss_index5) = [];
 % alpha25 = datasummary(:,5);
 % alpha25 (toss_index25) = [];
 alpha3 = datasummary(:,5);
@@ -131,21 +131,21 @@ alpha3 (toss_index3)=[];
 % alphaHigh7=alpha7;
 % alphaHigh7(toss_indexHigh7)=[];
 
-best_iter7 = datasummary(:,3);
-best_iter7 (toss_index7) = [];
+best_iter5 = datasummary(:,3);
+best_iter5 (toss_index5) = [];
 % best_iter25 = datasummary(:,3);
 % best_iter25 (toss_index25) = [];
 best_iter3=datasummary(:,3);
 best_iter3(toss_index3)=[];
 % best_iter8 = datasummary(:,3);
 % best_iter8 (toss_index8) = [];
-% best_iterLow7 = best_iter7;
-% best_iterLow7(toss_indexLow7)=[];
-% best_iterHigh7=best_iter7;
-% best_iterHigh7(toss_indexHigh7)=[];
+% best_iterLow5 = best_iter5;
+% best_iterLow5(toss_indexLow5)=[];
+% best_iterHigh5=best_iter5;
+% best_iterHigh5(toss_indexHigh5)=[];
 
-dice7 = dice_raw;
-dice7(toss_index7) = [];
+dice5 = dice_raw;
+dice5(toss_index5) = [];
 % dice25 = dice_raw;
 % dice25(toss_index25) = [];
 dice3= dice_raw;
@@ -157,8 +157,8 @@ dice3(toss_index3)=[];
 % diceHigh7=dice7;
 % diceHigh7(toss_indexHigh7)=[];
 
-quality7 = quality;
-quality7(toss_index7) = [];
+quality5 = quality;
+quality5(toss_index5) = [];
 % quality25 = quality;
 % quality25(toss_index25) = [];
 quality3=quality;
@@ -166,18 +166,18 @@ quality3(toss_index3)=[];
 
 stats_mu_raw = Descriptive_statistics( datasummary(:,4) );
 stats_alpha_raw = Descriptive_statistics( datasummary(:, 5) );
-stats_mu7 = Descriptive_statistics(mu_eff7);
+stats_mu5 = Descriptive_statistics(mu_eff5);
 % stats_mu25 = Descriptive_statistics(mu_eff25);
 stats_mu3 =  Descriptive_statistics(mu_eff3);
-% stats_muLow7 = Descriptive_statistics(mu_effLow7);
-% stats_muHigh7 = Descriptive_statistics(mu_effHigh7);
-stats_alpha7 = Descriptive_statistics(alpha7);
+% stats_muLow5 = Descriptive_statistics(mu_effLow5);
+% stats_muHigh5 = Descriptive_statistics(mu_effHigh5);
+stats_alpha5 = Descriptive_statistics(alpha5);
 % stats_alpha25 = Descriptive_statistics(alpha25);
 stats_alpha3 = Descriptive_statistics(alpha3);
 % stats_mu8 = Descriptive_statistics(mu_eff8);
 % stats_alpha8 = Descriptive_statistics(alpha8);
 stats_dice_raw = Descriptive_statistics(dice_raw);
-stats_dice7 = Descriptive_statistics(dice7);
+stats_dice5 = Descriptive_statistics(dice5);
 % stats_dice25 = Descriptive_statistics(dice25);
 stats_dice3 = Descriptive_statistics(dice3);
 % stats_diceLow7 = Descriptive_statistics(diceLow7);
@@ -185,16 +185,16 @@ stats_dice3 = Descriptive_statistics(dice3);
 
 
 figure; hist(datasummary(:,4));
-figure; hist(mu_eff7);
+figure; hist(mu_eff5);
 % figure; hist(mu_eff25);
 figure; hist(mu_eff3);
-% figure; hist(mu_effLow7);
-% figure; hist(mu_effHigh7);
+% figure; hist(mu_effLow5);
+% figure; hist(mu_effHigh5);
 
 % Remove Study_paths indices
 temp_paths = Study_paths;
-temp_paths(toss_index7,:) = [];
-Study_paths7 = temp_paths;
+temp_paths(toss_index5,:) = [];
+Study_paths5 = temp_paths;
 % temp_paths = Study_paths;
 % temp_paths(toss_index25,:) = [];
 % Study_paths25 = temp_paths;
@@ -215,14 +215,14 @@ Study_paths3 = temp_paths;
 % Study_paths8 = temp_paths;
 
 %[ hh_raw, dice_values_LOOCV ] = LOOCV_t_test_DiceTemp ( Study_paths, datasummary(:,4) ,datasummary(:,5) , datasummary(:,3), opttype, Matlab_flag );
-[ hh7, dice_LOOCV7 ] = LOOCV_t_test_DiceTemp ( Study_paths7, mu_eff7, alpha7, best_iter7, opttype, Matlab_flag );
+[ hh5, dice_LOOCV5 ] = LOOCV_t_test_DiceTemp ( Study_paths5, mu_eff5, alpha5, best_iter5, opttype, Matlab_flag );
 % [ hh25, dice_LOOCV25 ] = LOOCV_t_test_DiceTemp ( Study_paths25, mu_eff25, alpha25, best_iter25, opttype, Matlab_flag );
 [ hh3, dice_LOOCV3 ] = LOOCV_t_test_DiceTemp ( Study_paths3, mu_eff3, alpha3, best_iter3, opttype, Matlab_flag );
 % [ hhLow7, dice_LOOCV_Low7 ] = LOOCV_t_test_DiceTemp ( Study_pathsLow7, mu_effLow7, alphaLow7, best_iterLow7, opttype, Matlab_flag );
 % [ hhHigh7, dice_LOOCV_High7 ] = LOOCV_t_test_DiceTemp ( Study_pathsHigh7, mu_effHigh7, alphaHigh7, best_iterHigh7, opttype, Matlab_flag );
 %[ hh8, dice_LOOCV8 ] = LOOCV_t_test_DiceTemp ( Study_paths8, mu_eff8, alpha8, best_iter8, opttype, Matlab_flag );
 %dice_LOOCV8_stats = Descriptive_statistics(dice_LOOCV8);
-dice_LOOCV7_stats = Descriptive_statistics(dice_LOOCV7);
+dice_LOOCV5_stats = Descriptive_statistics(dice_LOOCV5);
 % dice_LOOCV25_stats = Descriptive_statistics(dice_LOOCV25);
 dice_LOOCV3_stats = Descriptive_statistics(dice_LOOCV3);
 % dice_LOOCV_Low7stats = Descriptive_statistics(dice_LOOCV_Low7);
@@ -231,7 +231,7 @@ dice_LOOCV3_stats = Descriptive_statistics(dice_LOOCV3);
 
 thresholds = linspace ( 0.0, 1, 10001);
 %passes_LOOCV8 = zeros (10001,1);
-passes_LOOCV7 = zeros (10001,1);
+passes_LOOCV5 = zeros (10001,1);
 % passes_LOOCV25 = zeros (10001,1);
 passes_LOOCV3 = zeros(10001,1);
 % passes_LOOCV_Low7 = zeros(10001,1);
@@ -240,32 +240,32 @@ passes_all = zeros(10001,1);
 %passes_iter = passes_LOOCV8;
 for ii = 1:10001
     %passes_iter   (ii) = sum ( dice_values_iter > thresholds(ii));
-    passes_LOOCV7 (ii) = sum ( dice_LOOCV7 > thresholds(ii));
+    passes_LOOCV5 (ii) = sum ( dice_LOOCV5 > thresholds(ii));
 %     passes_LOOCV25 (ii) = sum ( dice_LOOCV25 > thresholds(ii));
     passes_LOOCV3 (ii) = sum ( dice_LOOCV3 > thresholds(ii));
-%     passes_LOOCV_Low7 (ii) = sum ( dice_LOOCV_Low7 > thresholds(ii));
-%     passes_LOOCV_High7 (ii) = sum ( dice_LOOCV_High7 > thresholds(ii));
+%     passes_LOOCV_Low5 (ii) = sum ( dice_LOOCV_Low5 > thresholds(ii));
+%     passes_LOOCV_High5 (ii) = sum ( dice_LOOCV_High5 > thresholds(ii));
     passes_all (ii) = sum ( datasummary(:,7) > thresholds(ii));
     %passes_LOOCV8 (ii) = sum ( dice_LOOCV8 > thresholds(ii));
 end
 
 %passes_iter_AUC = sum (passes_iter) ./ (10001 * stats_mu_iter.n) ;  % The AUC is actually the same as the mean
-passes_LOOCV7_AUC = sum (passes_LOOCV7) ./ (10001 * stats_mu7.n);
-% passes_LOOCV7_AUC_Low = sum (passes_LOOCV_Low7) ./ (10001 * stats_muLow7.n);
-% passes_LOOCV7_AUC_High = sum (passes_LOOCV_High7) ./ (10001 * stats_muHigh7.n);
+passes_LOOCV5_AUC = sum (passes_LOOCV5) ./ (10001 * stats_mu5.n);
+% passes_LOOCV5_AUC_Low = sum (passes_LOOCV_Low5) ./ (10001 * stats_muLow5.n);
+% passes_LOOCV5_AUC_High = sum (passes_LOOCV_High5) ./ (10001 * stats_muHigh5.n);
 %passes_LOOCV8_AUC = sum (passes_LOOCV8) ./ (10001 * stats_mu8.n);
 %figure(1); plot (thresholds, passes_LOOCV8,'LineWidth',5);
-figure; plot (thresholds, passes_LOOCV7);
+figure; plot (thresholds, passes_LOOCV5);
 % figure; plot (thresholds, passes_LOOCV25,'LineWidth',5);
 figure; plot (thresholds, passes_LOOCV3,'LineWidth',5);
-% figure; plot (thresholds, passes_LOOCV_Low7);
-% figure; plot (thresholds, passes_LOOCV_High7);
+% figure; plot (thresholds, passes_LOOCV_Low5);
+% figure; plot (thresholds, passes_LOOCV_High5);
 figure; plot (thresholds, passes_all);
 %figure(3); hist (mu_eff8);
-%figure(4); hist (mu_eff7);
+%figure(4); hist (mu_eff5);
 
 temp_paths = Study_paths3;
-toss_index_LOOCV3 = find(dice_LOOCV3<0.7);
+toss_index_LOOCV3 = find(dice_LOOCV3<0.5);
 temp_paths(toss_index_LOOCV3,:) = [];
 paths3_pass = temp_paths;
 temp_dice = dice_LOOCV3;
@@ -273,7 +273,7 @@ temp_dice(toss_index_LOOCV3,:) = [];
 dice3_pass = temp_dice;
 
 temp_paths = Study_paths3;
-toss_index_LOOCV3 = find(dice_LOOCV3<0.7);
+toss_index_LOOCV3 = find(dice_LOOCV3<0.5);
 temp_paths(toss_index_LOOCV3,:) = [];
 paths3_pass = temp_paths;
 temp_dice = dice_LOOCV3;

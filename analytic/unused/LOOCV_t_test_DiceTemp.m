@@ -63,7 +63,7 @@ for ii = 1:n_patients
         dice_values (ii) = output(2);
         
     elseif Matlab_flag ==1
-        dice_values (ii) = 1 - output(2);
+        dice_values (ii) = output(3);
         
     else
         disp('Invalid Matlab_flag. Only 0 or 1 allowed')
