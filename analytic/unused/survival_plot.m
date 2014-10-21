@@ -37,7 +37,7 @@ clear ii jj kk
 passes_opt = zeros(10001,1);
 for kk = 1:10001
     
-    passes_opt (kk) = sum( dice_opt > thresholds(kk) );
+    passes_opt (kk) = sum( dice_opt.values > thresholds(kk) );
     
 end
 clear kk
