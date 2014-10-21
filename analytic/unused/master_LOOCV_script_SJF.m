@@ -1,4 +1,6 @@
 % My script for master_LOOCV
+close all
+clear
 
 opttype = 'bestfit50';
 datafilename = 'datasummaryL2_10sourceNewton50.txt';
