@@ -22,7 +22,7 @@ clean:
 BrainNek_SOURCE = /workarea/fuentes/braincode/tym1/
 
 tags:
-	ctags -R --langmap=c++:+.tpp --langmap=c++:+.occa --langmap=c++:+.cl $(BrainNek_SOURCE) ./wrapbrainNek.* PyLITTPlan
+	ctags -R --langmap=c++:+.tpp --langmap=c++:+.occa --langmap=c++:+.cl $(BrainNek_SOURCE) ./wrapbrainNek.* PyLITTPlan analytic
 
 hello:  hello.m 
 	$(MCC) -m $^ -o $@
