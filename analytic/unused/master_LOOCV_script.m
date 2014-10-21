@@ -8,12 +8,40 @@ datafilename = 'datasummaryL2_10sourceNewton50.txt';  % Name the datasummary fil
 % and above
 DSC_thresholds = [0.7];   % At least one DSC threshold is required
 mu_thresholds = [175];   % Zero or more mu_threholds is possible. 
-Matlab_flag = 1;         % Matlab_flag must be 0 or 1. 0 runs FEM, 1 runs MATLAB Greens Function kernel
+%Matlab_flag = 1;         % Matlab_flag must be 0 or 1. 0 runs FEM, 1 runs MATLAB Greens Function kernel
 
-if Matlab_flag ~=1 && Matlab_flag ~=0
-    disp('Invalid Matlab_flag. Only 0 or 1 allowed')
-    break
+fin  = fopen(strcat('./global.ini'));
+
+while ~feof(fin)
+    f_line = fgetl(fin);
+    f_line_length = length(f_line);
+    if length(f_line) >= 14
+        
+        TF = strcmp( 'MatlabDriver =', f_line(1:14));
+        
+        if TF == 1
+            match_or_not(1) = sum(f_line(end-3:end)=='True');
+            match_or_not(2) = sum(f_line(end-4:end)=='False');
+            if match_or_not(1)==4
+                Matlab_flag = 1;
+            elseif match_or_not(2)==5
+                Matlab_flag = 0;
+            else
+                disp('Invalid Matlab_flag. Only 0 or 1 allowed')
+            end
+            
+            break
+        end
+    end
+    
 end
+
+
+
+% if Matlab_flag ~=1 && Matlab_flag ~=0
+%     disp('Invalid Matlab_flag. Only 0 or 1 allowed')
+%     break
+% end
 
 [opt, LOOCV] = master_LOOCV ( opttype, datafilename, DSC_thresholds, mu_thresholds, Matlab_flag);
 
