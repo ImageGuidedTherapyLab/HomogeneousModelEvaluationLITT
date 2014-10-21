@@ -1,8 +1,6 @@
 % 
 function [] = survival_plot (dice_values, dice_opt);
 
-
-
 sizes.mu = size(dice_values,1);
 sizes.dice = size(dice_values,2);
 is_empty_matrix = zeros(sizes.mu, sizes.dice);
@@ -44,7 +42,7 @@ clear kk
 
 figure(1); plot (thresholds, passes_opt, 'LineWidth',5);
 kk = 2;
-% ll = 1;
+
 for ii = 1:sizes.mu
     
     if sum(is_empty_matrix(ii,:)) < sizes.dice
@@ -64,11 +62,7 @@ for ii = 1:sizes.mu
         kk=kk+1;
 
     end
-%     ll=ll+1;
+
 end
 
 end
-% figure(1); plot (thresholds, passes_LOOCV8,'LineWidth',5);
-% figure; plot (thresholds, passes_LOOCV7);
-% figure; plot (thresholds, passes_LOOCV25,'LineWidth',5);
-% figure; plot (thresholds, passes_LOOCV3,'LineWidth',5);
