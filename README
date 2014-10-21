@@ -136,32 +136,17 @@ Steps:
 
 ########2. Threshold by DSC to identify the best data sets, remove mu_eff outliers, do LOOCV t-test
 
-1. The primary file is ./analytic/unused/hist_plotting.m . In the MATLAB command line:
-###### hist_plotting
+1. The primary script is ./analytic/unused/master_LOOCV_script.m .
 
-2. Lines 1-103 define 3 things:
-opt_type string (line 46): The name of the DAKOTA .in and .out files (default opt_type is sanity_1D
-Study_paths cell of strings (lines 50-99): A long list of all the data sets paths.
-Load the optimized Dice values and mu_eff values (line 102; default file is alt_datasummary.txt)
+2. Modify the script to your specifications. I.e., mu_eff thresholds, DSC thresholds,
+datasummary filename, opttype, and Matlab_flag.
 
-3. Lines 105-132 does: 
-organize the optimized data into variable mu_eff_opt
-Converts the normalized DAKOTA mu_eff values into real mu_eff values (line 131)
-Puts the optimized DSC values into dice_pre
+3. There are comments for guidance.
 
-4. Lines 133-152 does:
-Thresholds the optimized DSC
-Keeps mu_eff that pass the DSC thresholds
-Computes statistical moments on the mu_eff values
-
-#######3. Use thresholded data sets in LOOCV t-test (hist_plotting.m lines 161 - 192)
-1. Lines 161 - 166 cut out the Study_paths that do not pass DSC threshold
-
-2. Lines 169 and 170 do the LOOCV t-test LOOCV_t_test_DiceTemp.m for data sets thresholded at DSC > 0.7 and DSC > 0.8;
-
-3. Lines 171 - 192 iteratively throws out mu_eff values that are furthest from the mean and reruns the LOOCV t-test until the t-test passes. The loop will also stop if there isnt any data left
+4. In the MATLAB command line:
+###### master_LOOCV_script
 	
-#######4. Guts of LOOCV t-test file LOOCV_t_test_DiceTemp.m ; This section outlines how the LOOCV and t-test
+#######3. Guts of LOOCV t-test file LOOCV_t_test_DiceTemp.m ; This section outlines how the LOOCV and t-test
 1. Receive:
 Paths: Study_paths
 mu_eff values corresponding to Study_paths : variable name: mu_eff_DpassT
