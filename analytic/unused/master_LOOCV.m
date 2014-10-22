@@ -82,7 +82,7 @@ fig_labels.DSC    = zeros(size(total_toss,2),1);
 alpha = total_toss;
 best_iter = total_toss;
 kk=1;
-for ii = 2:length_mu_groups
+for ii = 1:length_mu_groups
     for jj = 1:length_dice_thresholds
         
         if isempty(mu_thresholds) ==1   % Identify if there is only one mu_eff group
@@ -126,6 +126,7 @@ for ii = 2:length_mu_groups
                     LOOCV.dice.hh{ii,jj}=LOOCV.dice.hh{ii,jj-1};
                     LOOCV.run{ii,jj} = LOOCV.run{ii,jj-1};
                     LOOCV.dice.stats{ii,jj} = LOOCV.dice.stats{ii,jj-1};
+                    LOOCV.dice.values{ii,jj} = LOOCV.dice.values{ii,jj-1};
                     
                 else
                     opt.mu_eff.values{ii,jj} = datasummary(:,4);

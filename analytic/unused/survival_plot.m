@@ -43,7 +43,7 @@ end
 clear kk
 
 figure(1); plot (thresholds, passes_opt, 'LineWidth',5);
-h_opt_title = title('DSC performance for optimization');
+title('DSC performance for optimization');
 kk = 2;
 
 for ii = 1:sizes.mu
@@ -60,6 +60,15 @@ for ii = 1:sizes.mu
                 plot(thresholds, passes{ii,jj},'LineWidth',5);
                 origtitle = get(h_title,'String');
                 set(h_title, 'String', strcat(origtitle, [', DSC >'], num2str(fig_labels.DSC(jj))));
+                
+                if jj == 1
+                    h_legend = legend( num2str(fig_labels.DSC(ii)), 'Location','southwest');
+                    origlegend = get(h_legend,'String');
+                else
+                    
+                    %set(h_legend, 'String', strcat(origlegend, [' , 
+                end
+                
                 hold all
                 
             end
