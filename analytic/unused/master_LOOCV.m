@@ -1,5 +1,4 @@
-function [opt, LOOCV, fig_labels] = master_LOOCV ( opttype, data_filename, dice_thresholds, mu_thresholds, Matlab_flag);
-
+function [opt, LOOCV, fig_labels] = master_LOOCV ( opttype, data_filename, dice_thresholds, mu_thresholds);
 datasummary = dlmread(data_filename,',',1,0);
 datasummary(any(isnan(datasummary), 2), 7) = 1;
 num_studies = size(datasummary,1);
@@ -175,7 +174,7 @@ for ii = 1:length_mu_groups
                 disp(opt.labels{ii,jj});
                 disp(strcat( num2str(kk), [' of '], num2str(length_mu_groups .* length_dice_thresholds), [' groups']));
                 kk = kk+1;
-                [ LOOCV.dice.hh{ii,jj}, LOOCV.dice.values{ii,jj}] = LOOCV_t_test_DiceTemp( LOOCV.paths{ii,jj}, opt.mu_eff.values{ii,jj}, alpha{ii,jj}, best_iter{ii,jj}, opttype, Matlab_flag);
+                [ LOOCV.dice.hh{ii,jj}, LOOCV.dice.values{ii,jj}] = LOOCV_t_test_DiceTemp( LOOCV.paths{ii,jj}, opt.mu_eff.values{ii,jj}, alpha{ii,jj}, best_iter{ii,jj}, opttype);
                 LOOCV.run1(ii,jj) = 2;
                 LOOCV.run2(ii,jj) = 1;
                 LOOCV.dice.stats{ii,jj} = Descriptive_statistics_LOOCV( LOOCV.dice.values{ii,jj});
