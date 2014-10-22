@@ -27,14 +27,14 @@ function DAKOTA_in_writer ( path, mu_opt, alpha_opt, best_iter, opttype, Matlab_
 % Copy the DAKOTA *.in.* file to the main directory
 path_base = strcat( 'workdir/',path{1,1},'/',path{1,2},'/opt/');
 copy_command = strcat('cp ./', path_base, 'optpp_pds.', opttype, '.in.', num2str(best_iter), ' ./', path_base, 'optpp_pds.LOOCV.in.1');
-%disp(copy_command);
+disp(copy_command);
 [returnvalue, stdoutbash ] = unix(copy_command );
 
 % Find and replace using Bash's Sed commands
 orig_mu = '.*mu_eff_healthy';
 new_mu = strcat ( num2str(mu_opt),' mu_eff_healthy');
 mu_sed_command = strcat( 'sed -i "0,/',orig_mu,'/s/',orig_mu,'/',  new_mu, '/" ./',path_base,'optpp_pds.LOOCV.in.1');
-%disp(mu_sed_command );
+disp(mu_sed_command );
 [returnvalue, stdoutbash ] = unix(mu_sed_command );
 
 % sed "3s/.*mu_eff_healthy/289.8162 mu_eff_healthy/" ./optpp_pds.LOOCV.in.1 >optpp_pds.LOOCV.in.2
@@ -42,7 +42,7 @@ mu_sed_command = strcat( 'sed -i "0,/',orig_mu,'/s/',orig_mu,'/',  new_mu, '/" .
 orig_alpha = '.*alpha_healthy';
 new_alpha = strcat ( num2str(alpha_opt),' alpha_healthy');
 alpha_sed_command = strcat( 'sed -i "0,/', orig_alpha, '/s/', orig_alpha, '/', new_alpha, '/" ./', path_base,'optpp_pds.LOOCV.in.1'  );
-%disp(alpha_sed_command);
+disp(alpha_sed_command);
 [returnvalue, stdoutbash ] = unix(alpha_sed_command);
     
 

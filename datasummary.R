@@ -49,9 +49,9 @@ upper_bound_robin  = 1.00000e+04
 
 rawdata$alpha  = rawdata$alpha  * alphaconversion
 rawdata$mu_eff = rawdata$mu_eff * mueffconversion 
-iterstats        =  subset(rawdata , obj<=5.e5   
-                                   & alpha  > (1.34e-7*alphaconversion) 
-                                   & mu_eff < (5.e3*mueffconversion)
+iterstats        =  subset(rawdata , dice> dcetreshold
+                                  #& alpha  > (1.34e-7*alphaconversion) 
+                                  #& mu_eff < (5.e3*mueffconversion)
                           )
                                    ##& alpha  < upper_bound_alpha
                                    ##& alpha  < (1.9e-7*alphaconversion)
@@ -133,7 +133,9 @@ panel.linear <- function(x, y)
 do.legend <- FALSE
 pdf(paste(paste('datasummary',PlotID,sep=""),'.pdf',sep=""))
  #pairs(~obj+dice+alpha+mu_eff,data=rawdata,
- pairs(~obj+dice+alpha+mu_eff,data=iterstats,
+ #pairs(~obj+dice+alpha+mu_eff,data=iterstats,
+ pairs(~obj+dice+mu_eff,data=rawdata,
+ #pairs(~obj+dice+mu_eff,data=iterstats,
         diag.panel  = panel.hist, 
         lower.panel = panel.linear,
         upper.panel = panel.cor,

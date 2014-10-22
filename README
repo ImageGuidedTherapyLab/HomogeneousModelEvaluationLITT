@@ -136,6 +136,8 @@ Steps:
 
 ########2. Threshold by DSC to identify the best data sets, remove mu_eff outliers, do LOOCV t-test
 
+0. path(path('DakotaApplications/PlanningValidation/analytic/unused'))
+
 1. The primary script is ./analytic/unused/master_LOOCV_script.m .
 
 2. Modify the script to your specifications. I.e., mu_eff thresholds, DSC thresholds,
