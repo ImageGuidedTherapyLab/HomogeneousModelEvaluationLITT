@@ -1,4 +1,4 @@
-% 
+%
 function [] = survival_plot22 (dice_values, dice_opt, fig_labels,run1,run2);
 
 close all
@@ -40,7 +40,9 @@ kk = 2;
 
 for ii = 1:sizes.mu
     
-    %if sum( run2(ii,:)) < sizes.dice
+
+    if sum(run2(ii,:)) >=1
+        
         figure(kk);
         
         h_title = title( strcat( fig_labels.mu_groups(ii), [' and DSC thresholds of ']));
@@ -53,27 +55,36 @@ for ii = 1:sizes.mu
                 set(h_title, 'String', strcat(origtitle, [', DSC >'], num2str(fig_labels.DSC(jj))));
                 
                 if run1(ii,jj) == 2
-                    plot(thresholds, passes{ii,jj},'LineWidth',5);
-                end
+                    
+                    if jj == 1
+                        plot(thresholds, passes{ii,jj},'LineWidth',5);
+                        legend_string = strcat( 'DSC >',num2str(fig_labels.DSC(jj)));
+                        legend( legend_string, 'Location','southwest');
+                        hold all
+                        legend('-DynamicLegend', 'Location','southwest');
+                        
+                    else
+                        legend_string = strcat( 'DSC >',num2str(fig_labels.DSC(jj)));
+                        plot(thresholds, passes{ii,jj},'DisplayName',legend_string,'LineWidth',5);
 
+                        %legend('-DynamicLegend', 'Location','southwest');
+                        %legend(legend_string, 'Location','southwest');
+                        %legend(legend_string,'-DynamicLegend', 'Location','southwest');
+                        %legend( legend_string, 'Location','southwest');
+                        
+                        %set(h_legend, 'String', strcat(origlegend, [' ,
+                    end
+                end
                 
-                if jj == 1
-                    legend_string = strcat( 'DSC >',num2str(fig_labels.DSC(jj)));
-                    h_legend = legend( legend_string, 'Location','southwest');
-
-                else
-                    origlegend = get(h_legend,'String');
-                    %set(h_legend, 'String', strcat(origlegend, [' ,  
-                end
                 
             end
         end
         
         hold off
         kk=kk+1;
-
-    %end
-
+        
+    end
+    
 end
 
 end
