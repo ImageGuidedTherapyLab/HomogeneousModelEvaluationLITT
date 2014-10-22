@@ -72,7 +72,8 @@ opt.labels        = total_toss;
 LOOCV.dice.values = total_toss;
 LOOCV.dice.stats  = total_toss;
 LOOCV.dice.hh     = total_toss;
-LOOCV.run         = total_toss;
+LOOCV.run1        = zeros(size(total_toss,1),size(total_toss,2));
+LOOCV.run2        = zeros(size(total_toss,1),size(total_toss,2));
 LOOCV.labels      = total_toss;
 LOOCV.paths       = total_toss;
 LOOCV.toss_index  = total_toss;
@@ -124,7 +125,8 @@ for ii = 1:length_mu_groups
                     opt.dice.stats{ii,jj} = opt.dice.stats{ii,jj-1};
                     kk=kk+1;
                     LOOCV.dice.hh{ii,jj}=LOOCV.dice.hh{ii,jj-1};
-                    LOOCV.run{ii,jj} = LOOCV.run{ii,jj-1};
+                    LOOCV.run1(ii,jj) = LOOCV.run1(ii,jj-1)+1;
+                    LOOCV.run2(ii,jj) = LOOCV.run2(ii,jj-1);
                     LOOCV.dice.stats{ii,jj} = LOOCV.dice.stats{ii,jj-1};
                     LOOCV.dice.values{ii,jj} = LOOCV.dice.values{ii,jj-1};
                     
@@ -148,7 +150,8 @@ for ii = 1:length_mu_groups
                     disp(strcat( num2str(kk), [' of '], num2str(length_mu_groups .* length_dice_thresholds), [' groups']));
                     kk = kk+1;
                     [ LOOCV.dice.hh{ii,jj}, LOOCV.dice.values{ii,jj}] = LOOCV_t_test_DiceTemp( LOOCV.paths{ii,jj}, opt.mu_eff.values{ii,jj}, alpha{ii,jj}, best_iter{ii,jj}, opttype, Matlab_flag);
-                    LOOCV.run{ii,jj} = 2;
+                    LOOCV.run1(ii,jj) = 2;
+                    LOOCV.run2(ii,jj) = 1;
                     LOOCV.dice.stats{ii,jj} = Descriptive_statistics_LOOCV( LOOCV.dice.values{ii,jj});
                     
                 end
@@ -173,7 +176,8 @@ for ii = 1:length_mu_groups
                 disp(strcat( num2str(kk), [' of '], num2str(length_mu_groups .* length_dice_thresholds), [' groups']));
                 kk = kk+1;
                 [ LOOCV.dice.hh{ii,jj}, LOOCV.dice.values{ii,jj}] = LOOCV_t_test_DiceTemp( LOOCV.paths{ii,jj}, opt.mu_eff.values{ii,jj}, alpha{ii,jj}, best_iter{ii,jj}, opttype, Matlab_flag);
-                LOOCV.run{ii,jj} = 2;
+                LOOCV.run1(ii,jj) = 2;
+                LOOCV.run2(ii,jj) = 1;
                 LOOCV.dice.stats{ii,jj} = Descriptive_statistics_LOOCV( LOOCV.dice.values{ii,jj});
             end
             
@@ -181,9 +185,11 @@ for ii = 1:length_mu_groups
             kk = kk+1;
             if length(total_toss{ii,jj}) == length(Study_paths) -1
                 
-                LOOCV.run{ii,jj} = 1;
+                LOOCV.run1(ii,jj) = 1;
+                LOOCV.run2(ii,jj) = 0;
             else
-                LOOCV.run{ii,jj} = 0;
+                LOOCV.run1(ii,jj) = 0;
+                LOOCV.run2(ii,jj) = 0;
             end
         end
         
