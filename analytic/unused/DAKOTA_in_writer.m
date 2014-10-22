@@ -1,6 +1,6 @@
 % This function writes a DAKOTA *.in.* file
 
-function DAKOTA_in_writer ( path, mu_opt, alpha_opt, best_iter, opttype, Matlab_flag  );
+function DAKOTA_in_writer ( path, mu_opt, alpha_opt, best_iter, opttype );
 
 % base_cell = cell (31,1);
 % base_cell {1,1} = '20 variables';
