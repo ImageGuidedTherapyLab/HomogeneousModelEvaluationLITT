@@ -3,18 +3,18 @@ datasummary = dlmread(data_filename,',',1,0);
 datasummary(any(isnan(datasummary), 2), 7) = 1;
 num_studies = size(datasummary,1);
 
-Study_paths = cell (num_studies,2);
+opt.paths = cell (num_studies,2);
 for ii = 1:num_studies
     
-    Study_paths{ii,1} = strcat( 'Study00',num2str(datasummary(ii,1)));
-    Study_paths{ii,2} = strcat( '0',num2str(datasummary(ii,2)));
+    opt.paths{ii,1} = strcat( 'Study00',num2str(datasummary(ii,1)));
+    opt.paths{ii,2} = strcat( '0',num2str(datasummary(ii,2)));
     
 end
 
 clear ii
-indexC = strfind(Study_paths,'Study0035');
+indexC = strfind(opt.paths,'Study0035');
 toss_index_phantom = find(not(cellfun('isempty',indexC)));
-Study_paths(toss_index_phantom,:)=[];
+opt.paths(toss_index_phantom,:)=[];
 datasummary(toss_index_phantom,:)=[];
 
 % variable initialization
@@ -74,7 +74,8 @@ LOOCV.dice.hh     = total_toss;
 LOOCV.run1        = zeros(size(total_toss,1),size(total_toss,2));
 LOOCV.run2        = zeros(size(total_toss,1),size(total_toss,2));
 LOOCV.labels      = total_toss;
-LOOCV.paths       = total_toss;
+LOOCV.paths.paths = total_toss;
+LOOCV.paths.table   = cell(length_mu_groups, length_dice_thresholds);
 LOOCV.toss_index  = total_toss;
 fig_labels.mu_groups = cell(size(total_toss,1),1);
 fig_labels.DSC    = zeros(size(total_toss,2),1);
@@ -108,12 +109,15 @@ for ii = 1:length_mu_groups
         
         LOOCV.labels{ii,jj} = opt.labels{ii,jj};
         
-        temp_paths = Study_paths;
+        temp_paths = opt.paths;
         temp_paths(total_toss{ii,jj},:) = [];
-        LOOCV.paths{ii,jj} = temp_paths;
+        LOOCV.paths.paths{ii,jj} = temp_paths;
         LOOCV.toss_index{ii,jj} = total_toss{ii,jj};
+
+            
+
         
-        if length(total_toss{ii,jj}) < length(Study_paths) -1
+        if length(total_toss{ii,jj}) < length(opt.paths) -1
             if jj >1
                 if length(total_toss{ii,jj}) == length(total_toss{ii,jj-1})
                     
@@ -128,6 +132,8 @@ for ii = 1:length_mu_groups
                     LOOCV.run2(ii,jj) = LOOCV.run2(ii,jj-1);
                     LOOCV.dice.stats{ii,jj} = LOOCV.dice.stats{ii,jj-1};
                     LOOCV.dice.values{ii,jj} = LOOCV.dice.values{ii,jj-1};
+                    LOOCV.paths.paths{ii,jj} = LOOCV.paths.paths{ii,jj-1};
+                    
                     
                 else
                     opt.mu_eff.values{ii,jj} = datasummary(:,4);
@@ -148,10 +154,11 @@ for ii = 1:length_mu_groups
                     disp(opt.labels{ii,jj});
                     disp(strcat( num2str(kk), [' of '], num2str(length_mu_groups .* length_dice_thresholds), [' groups']));
                     kk = kk+1;
-                    [ LOOCV.dice.hh{ii,jj}, LOOCV.dice.values{ii,jj}] = LOOCV_t_test_DiceTemp( LOOCV.paths{ii,jj}, opt.mu_eff.values{ii,jj}, alpha{ii,jj}, best_iter{ii,jj}, opttype, Matlab_flag);
+                    [ LOOCV.dice.hh{ii,jj}, LOOCV.dice.values{ii,jj}] = LOOCV_t_test_DiceTemp( LOOCV.paths.paths{ii,jj}, opt.mu_eff.values{ii,jj}, alpha{ii,jj}, best_iter{ii,jj}, opttype);
                     LOOCV.run1(ii,jj) = 2;
                     LOOCV.run2(ii,jj) = 1;
                     LOOCV.dice.stats{ii,jj} = Descriptive_statistics_LOOCV( LOOCV.dice.values{ii,jj});
+                    
                     
                 end
             else
@@ -174,15 +181,27 @@ for ii = 1:length_mu_groups
                 disp(opt.labels{ii,jj});
                 disp(strcat( num2str(kk), [' of '], num2str(length_mu_groups .* length_dice_thresholds), [' groups']));
                 kk = kk+1;
-                [ LOOCV.dice.hh{ii,jj}, LOOCV.dice.values{ii,jj}] = LOOCV_t_test_DiceTemp( LOOCV.paths{ii,jj}, opt.mu_eff.values{ii,jj}, alpha{ii,jj}, best_iter{ii,jj}, opttype);
+                [ LOOCV.dice.hh{ii,jj}, LOOCV.dice.values{ii,jj}] = LOOCV_t_test_DiceTemp( LOOCV.paths.paths{ii,jj}, opt.mu_eff.values{ii,jj}, alpha{ii,jj}, best_iter{ii,jj}, opttype);
                 LOOCV.run1(ii,jj) = 2;
                 LOOCV.run2(ii,jj) = 1;
                 LOOCV.dice.stats{ii,jj} = Descriptive_statistics_LOOCV( LOOCV.dice.values{ii,jj});
+                
+                
+            end
+            
+            LOOCV.paths.mix{ii,jj}{1,1} = 'Paths';
+            LOOCV.paths.mix{ii,jj}{1,2} = 'Dice';
+            LOOCV.paths.mix{ii,jj}{1,3} = 'Mu_eff';
+            for kk = 2:length(LOOCV.paths.paths{ii,jj})+1
+                
+                LOOCV.paths.mix{ii,jj}{kk,1} = strcat( LOOCV.paths.paths{ii,jj}{kk-1,1},'/',LOOCV.paths.paths{ii,jj}{kk-1,2});
+                LOOCV.paths.mix{ii,jj}{kk,2} = LOOCV.dice.values{ii,jj}(kk-1);
+                LOOCV.paths.mix{ii,jj}{kk,3} = opt.mu_eff.values{ii,jj}(kk-1);
             end
             
         else
             kk = kk+1;
-            if length(total_toss{ii,jj}) == length(Study_paths) -1
+            if length(total_toss{ii,jj}) == length(opt.paths) -1
                 
                 LOOCV.run1(ii,jj) = 1;
                 LOOCV.run2(ii,jj) = 0;
@@ -197,57 +216,3 @@ for ii = 1:length_mu_groups
 end
 
 end
-
-%
-%
-% thresholds = linspace ( 0.0, 1, 10001);
-% %passes_LOOCV8 = zeros (10001,1);
-% passes_LOOCV7 = zeros (10001,1);
-% % passes_LOOCV25 = zeros (10001,1);
-% passes_LOOCV3 = zeros(10001,1);
-% % passes_LOOCV_Low7 = zeros(10001,1);
-% % passes_LOOCV_High7 = zeros(10001,1);
-% passes_all = zeros(10001,1);
-% %passes_iter = passes_LOOCV8;
-% for ii = 1:10001
-%     %passes_iter   (ii) = sum ( dice_values_iter > thresholds(ii));
-%     passes_LOOCV7 (ii) = sum ( dice_LOOCV7 > thresholds(ii));
-% %     passes_LOOCV25 (ii) = sum ( dice_LOOCV25 > thresholds(ii));
-%     passes_LOOCV3 (ii) = sum ( dice_LOOCV3 > thresholds(ii));
-% %     passes_LOOCV_Low7 (ii) = sum ( dice_LOOCV_Low7 > thresholds(ii));
-% %     passes_LOOCV_High7 (ii) = sum ( dice_LOOCV_High7 > thresholds(ii));
-%     passes_all (ii) = sum ( datasummary(:,7) > thresholds(ii));
-%     %passes_LOOCV8 (ii) = sum ( dice_LOOCV8 > thresholds(ii));
-% end
-%
-% %passes_iter_AUC = sum (passes_iter) ./ (10001 * stats_mu_iter.n) ;  % The AUC is actually the same as the mean
-% passes_LOOCV7_AUC = sum (passes_LOOCV7) ./ (10001 * stats_mu7.n);
-% % passes_LOOCV7_AUC_Low = sum (passes_LOOCV_Low7) ./ (10001 * stats_muLow7.n);
-% % passes_LOOCV7_AUC_High = sum (passes_LOOCV_High7) ./ (10001 * stats_muHigh7.n);
-% %passes_LOOCV8_AUC = sum (passes_LOOCV8) ./ (10001 * stats_mu8.n);
-% %figure(1); plot (thresholds, passes_LOOCV8,'LineWidth',5);
-% figure; plot (thresholds, passes_LOOCV7);
-% % figure; plot (thresholds, passes_LOOCV25,'LineWidth',5);
-% figure; plot (thresholds, passes_LOOCV3,'LineWidth',5);
-% % figure; plot (thresholds, passes_LOOCV_Low7);
-% % figure; plot (thresholds, passes_LOOCV_High7);
-% figure; plot (thresholds, passes_all);
-% %figure(3); hist (mu_eff8);
-% %figure(4); hist (mu_eff7);
-%
-% temp_paths = Study_paths3;
-% toss_index_LOOCV3 = find(dice_LOOCV3<0.7);
-% temp_paths(toss_index_LOOCV3,:) = [];
-% paths3_pass = temp_paths;
-% temp_dice = dice_LOOCV3;
-% temp_dice(toss_index_LOOCV3,:) = [];
-% dice3_pass = temp_dice;
-%
-% temp_paths = Study_paths3;
-% toss_index_LOOCV3 = find(dice_LOOCV3<0.7);
-% temp_paths(toss_index_LOOCV3,:) = [];
-% paths3_pass = temp_paths;
-% temp_dice = dice_LOOCV3;
-% temp_dice(toss_index_LOOCV3,:) = [];
-% dice3_pass = temp_dice;
-
