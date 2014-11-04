@@ -1,7 +1,7 @@
 %
-function [] = survival_plot22 (dice_values, dice_opt, fig_labels,run1,run2);
+function [] = survival_plot (dice_values, dice_opt, fig_labels,run1,run2);
 
-close all
+%close all
 
 sizes.mu = size(dice_values,1);
 sizes.dice = size(dice_values,2);
@@ -19,6 +19,7 @@ for ii = 1:sizes.mu
             for kk = 1:10001
                 
                 passes{ii,jj}(kk) = sum( dice_values{ii,jj} > thresholds(kk));
+                
                 
             end
         end
