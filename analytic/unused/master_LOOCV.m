@@ -141,6 +141,7 @@ for ii = 1:length_mu_groups
                 if length(total_toss{ii,jj}) == length(total_toss{ii,jj-1})
                     
                     opt.mu_eff.values{ii,jj} = opt.mu_eff.values{ii,jj-1};
+                    opt.mu_eff.stats{ii,jj}  = opt.mu_eff.stats{ii,jj-1};
                     alpha{ii,jj} = alpha{ii,jj-1};
                     best_iter{ii,jj} = best_iter{ii,jj-1};
                     opt.dice.values{ii,jj}=opt.dice.values{ii,jj-1};
@@ -168,7 +169,7 @@ for ii = 1:length_mu_groups
                     opt.dice.values{ii,jj}(total_toss{ii,jj}) = [];
                     
                     opt.dice.stats{ii,jj} = Descriptive_statistics(opt.dice.values{ii,jj});
-                    opt.dice.stats{ii,jj} = Descriptive_statistics(opt.mu_eff.values{ii,jj});
+                    opt.mu_eff.stats{ii,jj} = Descriptive_statistics(opt.mu_eff.values{ii,jj});
                     
                     disp(opt.labels{ii,jj});
                     disp(strcat( num2str(kk), [' of '], num2str(length_mu_groups .* length_dice_thresholds), [' groups']));
@@ -195,7 +196,7 @@ for ii = 1:length_mu_groups
                 opt.dice.values{ii,jj}(total_toss{ii,jj}) = [];
                 
                 opt.dice.stats{ii,jj} = Descriptive_statistics(opt.dice.values{ii,jj});
-                opt.dice.stats{ii,jj} = Descriptive_statistics(opt.mu_eff.values{ii,jj});
+                opt.mu_eff.stats{ii,jj} = Descriptive_statistics(opt.mu_eff.values{ii,jj});
                 
                 disp(opt.labels{ii,jj});
                 disp(strcat( num2str(kk), [' of '], num2str(length_mu_groups .* length_dice_thresholds), [' groups']));
