@@ -16,6 +16,25 @@ indexC = strfind(opt.paths,'Study0035');
 toss_index_phantom = find(not(cellfun('isempty',indexC)));
 opt.paths(toss_index_phantom,:)=[];
 datasummary(toss_index_phantom,:)=[];
+num_studies = size(datasummary,1);
+
+indexC = strfind(opt.paths,'0457');
+toss_index_phantom = find(not(cellfun('isempty',indexC)));
+opt.paths(toss_index_phantom-num_studies,:)=[];
+datasummary(toss_index_phantom-num_studies,:)=[];
+num_studies = size(datasummary,1);
+
+indexC = strfind(opt.paths,'0476');
+toss_index_phantom = find(not(cellfun('isempty',indexC)));
+opt.paths(toss_index_phantom-num_studies,:)=[];
+datasummary(toss_index_phantom-num_studies,:)=[];
+num_studies = size(datasummary,1);
+
+indexC = strfind(opt.paths,'0436');
+toss_index_phantom = find(not(cellfun('isempty',indexC)));
+opt.paths(toss_index_phantom-num_studies,:)=[];
+datasummary(toss_index_phantom-num_studies,:)=[];
+num_studies = size(datasummary,1);
 
 % variable initialization
 if isempty(dice_thresholds) ==1

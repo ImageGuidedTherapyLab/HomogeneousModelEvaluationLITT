@@ -11,8 +11,8 @@ patientID = strcat ( inputdatavars.patientID, '/', inputdatavars.UID, '/');
 patient_opt_path = strcat ( path22, '/workdir/', patientID, 'opt/' ); % The '/workdir/' needs the first backslash coz it uses absolute path
 
 % Make the path to the VTK
-%patient_MRTI_path = strcat ( 'StudyDatabase/', patientID, 'vtk/referenceBased/' );
-patient_MRTI_path = strcat ( '/tmp/outputs/dakota/',inputdatavars.UID,'/');
+patient_MRTI_path = strcat ( 'StudyDatabase/', patientID, 'vtk/referenceBased/' );
+%patient_MRTI_path = strcat ( '/tmp/outputs/dakota/',inputdatavars.UID,'/');
 % Read in the power and identify the max power moment.
 pwr_hist = str2num(inputdatavars.powerhistory); % Gets just the numbers. (Al a "Just the facts, ma'am.")
 
@@ -160,20 +160,20 @@ tmap_model_scaled_to_MRTI = imresize (tmap_unique , 1/scaling.x); % Set the mode
 
 % Change directory and load the temperature from VTK
 cd (patient_MRTI_path);
-MRTI_crop = readVTK_one_time22('roimrtidose.heating', inputdatavars.maxheatid);   % This 'vtkNumber' should b
-%MRTI = readVTK_one_time('temperature', inputdatavars.maxheatid);   % This 'vtkNumber' should b
+%MRTI_crop = readVTK_one_time22('roimrtidose.heating', inputdatavars.maxheatid);   % This 'vtkNumber' should b
+MRTI = readVTK_one_time('temperature', inputdatavars.maxheatid);   % This 'vtkNumber' should b
 % Go to the workdir
 cd (patient_opt_path);
 
 % Crop the MRTI using the VOI.
 % This is the VOI.x and VOI.y swapped for ParaView
-% MRTI ( 1:(VOI.y(1)-1), :, : ) = 0;  % The -1 and +1 make sure the VOI indices aren't cut
-% MRTI ( (VOI.y(2)+1):end, :, : )  = 0;
-% MRTI ( :, 1:(VOI.x(1)-1), : ) = 0;
-% MRTI ( :,(VOI.x(2)+1):end, : ) = 0;
-% 
-% 
-% MRTI_crop = MRTI( (VOI.y(1) ):(VOI.y(2) ) , (VOI.x(1) ):(VOI.x(2) ) ); % Set the cropped region
+MRTI ( 1:(VOI.y(1)-1), :, : ) = 0;  % The -1 and +1 make sure the VOI indices aren't cut
+MRTI ( (VOI.y(2)+1):end, :, : )  = 0;
+MRTI ( :, 1:(VOI.x(1)-1), : ) = 0;
+MRTI ( :,(VOI.x(2)+1):end, : ) = 0;
+
+
+MRTI_crop = MRTI( (VOI.y(1) ):(VOI.y(2) ) , (VOI.x(1) ):(VOI.x(2) ) ); % Set the cropped region
 %MRTI_crop22 = MRTI_hottest_DF2( (VOI.y(1) ):(VOI.y(2) ) , (VOI.x(1) ):(VOI.x(2) ) );
 % MRTI_crop = MRTI_hottest( (VOI.y(1)-1):(VOI.y(2)+1) , (VOI.x(1)-1):(VOI.x(2)+1) ); % Set the cropped region with odd border
 
@@ -191,23 +191,23 @@ temperature_diff = tmap_model_scaled_to_MRTI - MRTI_crop;
 metric = ( norm ( temperature_diff , 2 ) )^2;
 cd (path22);
 
-% model_deg_threshold = tmap_model_scaled_to_MRTI >= 57;
-% MRTI_deg_threshold = MRTI_crop >= 57;
-% n_model = sum(sum( model_deg_threshold ));
-% n_MRTI = sum(sum( MRTI_deg_threshold ));
-% intersection = model_deg_threshold + MRTI_deg_threshold;
-% intersection = intersection > 1;
-% n_intersection = sum(sum( intersection ));
-% dice = 2*n_intersection / (n_model + n_MRTI) ;
-
 model_deg_threshold = tmap_model_scaled_to_MRTI >= 57;
-MRTI_dose_threshold = MRTI_crop >= 1;
+MRTI_deg_threshold = MRTI_crop >= 57;
 n_model = sum(sum( model_deg_threshold ));
-n_MRTI = sum(sum( MRTI_dose_threshold ));
-intersection = model_deg_threshold + MRTI_dose_threshold;
+n_MRTI = sum(sum( MRTI_deg_threshold ));
+intersection = model_deg_threshold + MRTI_deg_threshold;
 intersection = intersection > 1;
 n_intersection = sum(sum( intersection ));
 dice = 2*n_intersection / (n_model + n_MRTI) ;
+
+% model_deg_threshold = tmap_model_scaled_to_MRTI >= 57;
+% MRTI_dose_threshold = MRTI_crop >= 1;
+% n_model = sum(sum( model_deg_threshold ));
+% n_MRTI = sum(sum( MRTI_dose_threshold ));
+% intersection = model_deg_threshold + MRTI_dose_threshold;
+% intersection = intersection > 1;
+% n_intersection = sum(sum( intersection ));
+% dice = 2*n_intersection / (n_model + n_MRTI) ;
 
 % %%%%% The remaining code is exclusively for testing / debugging / checking
 % %%%%% the registration.
