@@ -2,15 +2,13 @@
 
 % Paths. Be in the folder you want to process. E.g.:
 % '/FUS4/data2/sjfahrenholtz/gitMATLAB/optpp_pds/workdir/Patient0002/000/opt'
+
+cd /FUS4/data2/BioTex/BrainNonMDA/processed/Patient0006/007/laser
 setenv ( 'PATH22' , pwd);
 path22 = getenv ( 'PATH22' );
 
-setenv ( 'PATHPT' , '/workdir/Patient0006/007/opt' );
-pathpt = getenv ( 'PATHPT' );
+time = 143;
+crop_big = 25;
+crop_small = 5;
 
-%load index.txt
-index = 1;
-[metric] = fast_temperature_obj_fxn ( path22, pathpt, index );
-
-% index = index + 1;
-% csvwrite ('index.txt' , index);
+[ center, VOI ] = check_reg ( path22 ,time,crop_big,crop_small );
