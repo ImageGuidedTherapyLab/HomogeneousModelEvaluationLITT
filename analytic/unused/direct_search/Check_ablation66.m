@@ -24,14 +24,15 @@
 % This silly script is a sensitivity study. I put some of the data in
 % /FUS4/data2/sjfahrenholtz/Matlab/Tests
 
-function [ total, dice ] = Check_ablation55 ( Study_paths, opttype );
+function [ total, dice ] = Check_ablation66 ( Study_paths, opttype );
 
 cd /FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
 % Make the LOOCV iteration system
 n_patients = size( Study_paths,1); % This is the number of patients
 % n_patients = 1;
 mu_eff(1) = 0.008;
-mu_eff(2:10001) = linspace(1,10000,10000);
+mu_eff(2:502) = linspace(0,5000,501);
+mu_eff(2) = [];
 threshold_temps = 51:65;
 num_threshold_temps = length(threshold_temps);
 dice = zeros( length(mu_eff),num_threshold_temps); % Initialize the number of DSC (dice) values
@@ -50,7 +51,7 @@ for ii = 1:n_patients
     % This section prepares the varied parameters into a .mat file for the
     % thermal code to run. It needs to be there so that the paths are OK.
     % Sample:  'python ./brainsearch.py --param_file '
-    load( strcat ( path_base, '/optpp_pds.', opttype, '.in.2.mat') );
+    load( strcat ( path_base, '/optpp_pds.', opttype, '.in.1.mat') );
 
     
     %params_iter = load(   'TmpDataInput.mat' ); % Read in one dakota.in file to find the constant parameters
