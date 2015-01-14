@@ -200,39 +200,6 @@ intersection = intersection > 1;
 n_intersection = sum(sum( intersection ));
 dice = 2*n_intersection / (n_model + n_MRTI) ;
 
-% model_deg_threshold = tmap_model_scaled_to_MRTI >= 57;
-% MRTI_dose_threshold = MRTI_crop >= 1;
-% n_model = sum(sum( model_deg_threshold ));
-% n_MRTI = sum(sum( MRTI_dose_threshold ));
-% intersection = model_deg_threshold + MRTI_dose_threshold;
-% intersection = intersection > 1;
-% n_intersection = sum(sum( intersection ));
-% dice = 2*n_intersection / (n_model + n_MRTI) ;
-
-% %%%%% The remaining code is exclusively for testing / debugging / checking
-% %%%%% the registration.
-% MRTI_size = size ( MRTI );
-% % Resize the tmap_unique model into the same spacing as the MRTI and find
-% % the max heating
-% aa = imresize (tmap_unique , 1/scaling.x);  
-% 
-% % This section writes the model data to the upper left of a matrix
-% aa_size = size ( aa );
-% size_diff=[(MRTI_size(1)-aa_size(1)) (MRTI_size(2)-aa_size(2))];
-% upper_left_mod = zeros((size(aa,1)+size_diff(1)),(size(aa,2)+size_diff(2)));
-% upper_left_mod(1:size(aa,1),1:size(aa,2)) = aa; % Write the data to the upper left
-% 
-% % Register the model data to the MRTI
-% matched_mod = zeros (MRTI_size(1), MRTI_size(2));
-% matched_mod ( VOI.x(1): VOI.x(2), VOI.y(1): VOI.y(2) ) = upper_left_mod( 1:aa_size(1) , 1:aa_size(2) );  % Write the data to the correct region
-% 
-% % This is useful for confirming registration, but not for running with
-% % DAKMATLAB.
-% 
-% figure(1); imagesc(tmap_model_scaled_to_MRTI );
-% figure(2); imagesc(MRTI_crop , [30 80]);
-% figure(3); imagesc(temperature_diff );
-% figure(4); imagesc(matched_mod);
-% figure(5); imagesc(MRTI(:,:,max_temperature_timepoint), [30 80]);
+% [dice, ~, ~, ~] = dice_maps (tmap_model_scaled_to_MRTI, MRTI_crop, 57);
 
 end
