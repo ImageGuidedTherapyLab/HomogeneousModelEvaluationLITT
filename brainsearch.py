@@ -24,7 +24,7 @@ os.system('mkdir -p %s' % workDirectory )
 
 #FIXME global vars
 globalconfig = ConfigParser.SafeConfigParser({})
-globalconfig.read('./global.ini')
+globalconfig.read('./global_sf.ini')
 databaseDIR     = globalconfig.get('exec','databaseDIR')
 c3dexe          = globalconfig.get('exec','c3dexe')
 brainNekDIR     = globalconfig.get('exec','brainNekDIR')
