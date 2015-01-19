@@ -5,11 +5,11 @@ tic;
 % mu_eff_data = cell2mat(cell_data(2:end,:));
 
 % Identify the studies to be examined.
-opttype = 'bestfit1' ;
+opttype = 'bestfit50' ;
 
 Study_paths = cell (1,2);
-Study_paths {1,1} = 'Study0035';
-Study_paths {1,2} = '0530';
+Study_paths {1,1} = 'Study0030';
+Study_paths {1,2} = '0495';
 % Study_paths {2,1} = 'Study0030';
 % Study_paths {2,2} = '0495';
 % Study_paths {3,1} = 'Study0030';
@@ -80,7 +80,7 @@ for ii = 1:num_studies
     total_path{ii,1} = strcat(Study_paths{ii,1}, '/', Study_paths{ii,2});
     input_path{1,1} = Study_paths{ii,1};
     input_path{1,2} = Study_paths{ii,2};
-    [ total_path{ii,2}, total_path{ii,3} ] = Check_ablation44 ( input_path , opttype);
+    [ total_path{ii,2}, total_path{ii,3} ] = Check_ablation66 ( input_path , opttype);
 end
 %[ H0, H1, dice_values ] = Check_ablation ( Study_paths, mu_eff_opt );
 toc

@@ -31,7 +31,7 @@ cd /FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
 n_patients = size( Study_paths,1); % This is the number of patients
 % n_patients = 1;
 mu_eff(1) = 0.008;
-mu_eff(2:502) = linspace(0,5000,501);
+mu_eff(2:10002) = linspace(0,10000,10001);
 mu_eff(2) = [];
 threshold_temps = 51:65;
 num_threshold_temps = length(threshold_temps);
@@ -77,8 +77,8 @@ for ii = 1:n_patients
         end
         inputdatavars.cv.mu_eff_healthy = num2str( mu_eff (jj) );
         
-        %[metric, thermal_model, MRTI_crop] = fast_temperature_obj_fxn33 ( params_iter );
-        [metric, ~, thermal_model,MRTI_crop] = temperature_obj_fxn ( inputdatavars, 10 );
+        %[metric, ~, thermal_model,MRTI_crop] = temperature_obj_fxn_GPU ( inputdatavars, 10 );
+        %[metric, ~, thermal_model,MRTI_crop] = temperature_obj_fxn ( inputdatavars, 10 );
         % Column 2 of 'total' is based on conservation of energy (only cares
         % about summation of temperatures in the FOV)
         base_level=ones(size(thermal_model,1),size(thermal_model,2))*37;
