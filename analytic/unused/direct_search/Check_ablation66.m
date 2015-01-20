@@ -32,7 +32,7 @@ n_patients = size( Study_paths,1); % This is the number of patients
 % n_patients = 1;
 mu_eff(1) = 0.008;
 %mu_eff(2:10002) = linspace(0,10000,10001);
-mu_eff(2:302) = linspace(0,300,301);
+mu_eff(2:10002) = linspace(0,10000,10001);
 mu_eff(2) = [];
 threshold_temps = 51:65;
 num_threshold_temps = length(threshold_temps);
@@ -71,43 +71,43 @@ for ii = 1:n_patients
     
     % This section runs the thermal code
     %mu_eff = linspace(1000,5000,8001);
-    total = zeros(length(mu_eff),5);
-    for jj = 1:length(mu_eff)
-        if rem( jj , 10 ) == 0
-            disp (jj);
-        end
+    %total = zeros(length(mu_eff),5);
+%     for jj = 1:length(mu_eff)
+%         if rem( jj , 10 ) == 0
+%             disp (jj);
+%         end
         %inputdatavars.cv.mu_eff_healthy = num2str( mu_eff (jj) );
         
-        [metric, ~, thermal_model,MRTI_crop] = temperature_obj_fxn_GPU ( inputdatavars, 10, mu_eff );
+        [total,dice] = temperature_obj_fxn_GPU ( inputdatavars, 10, mu_eff );
         %[metric, ~, thermal_model,MRTI_crop] = temperature_obj_fxn ( inputdatavars, 10 );
         % Column 2 of 'total' is based on conservation of energy (only cares
         % about summation of temperatures in the FOV)
-        base_level=ones(size(thermal_model,1),size(thermal_model,2))*37;
-        total(jj,1) = mu_eff(jj);
-        total(jj,2) = sum(sum(thermal_model))-sum(sum(base_level));
-        total(jj,3) = sum(sum(thermal_model))-sum(sum(MRTI_crop))+sum(sum(base_level));
-        total(jj,4) = max(max(thermal_model));
-        total(jj,5) = metric;
+%         base_level=ones(size(thermal_model,1),size(thermal_model,2))*37;
+%         total(jj,1) = mu_eff(jj);
+%         total(jj,2) = sum(sum(thermal_model))-sum(sum(base_level));
+%         total(jj,3) = sum(sum(thermal_model))-sum(sum(MRTI_crop))+sum(sum(base_level));
+%         total(jj,4) = max(max(thermal_model));
+%         total(jj,5) = metric;
         
-        
-        for kk = 1:num_threshold_temps
-            
-            %Comment this out (until 'end') if running a long sensitivity
-            %study, or maybe just exclude the figure displays.
-            model_deg = thermal_model >= threshold_temps(kk);
-            MRTI_deg = MRTI_crop >= threshold_temps(kk);
-            n_model = sum(sum( model_deg ));
-            n_MRTI = sum(sum( MRTI_deg ));
-            intersection = model_deg + MRTI_deg;
-            intersection = intersection > 1;
-            n_intersection = sum(sum( intersection ));
-            dice_values = 2*n_intersection / (n_model + n_MRTI) ;
-            dice(jj,kk) = dice_values;
-            %         figure(1); imagesc(MRTI_crop,[30 80]);
-            %         figure(2);imagesc(thermal_model, [30 80]);
-            %         figure(3);imagesc(intersection);
-        end
-    end
+%         
+%         for kk = 1:num_threshold_temps
+%             
+%             %Comment this out (until 'end') if running a long sensitivity
+%             %study, or maybe just exclude the figure displays.
+%             model_deg = thermal_model >= threshold_temps(kk);
+%             MRTI_deg = MRTI_crop >= threshold_temps(kk);
+%             n_model = sum(sum( model_deg ));
+%             n_MRTI = sum(sum( MRTI_deg ));
+%             intersection = model_deg + MRTI_deg;
+%             intersection = intersection > 1;
+%             n_intersection = sum(sum( intersection ));
+%             dice_values = 2*n_intersection / (n_model + n_MRTI) ;
+%             dice(jj,kk) = dice_values;
+%             %         figure(1); imagesc(MRTI_crop,[30 80]);
+%             %         figure(2);imagesc(thermal_model, [30 80]);
+%             %         figure(3);imagesc(intersection);
+%         end
+    %end
 end
 %end
 

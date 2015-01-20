@@ -103,13 +103,12 @@ ssptx.GridSize=[numSMs*32               1];
 %For loop here
 Temp = zeros(npixelx,npixely,npixelz/5);
 for ii = 1:Numruns
-    if mod (ii,100) == 0
+    if mod (ii,1000) == 0
         toc
-        fprintf('iter %d', ii);
+        fprintf('iter %d \n', ii);
     end
+    %%  transfer device to host
     [d_temperature] = feval(ssptx,ntissue,materialID,perfusion,conduction, para(ii,:), R1, R2, nsource, power ,xloc,yloc,zloc, u0 ,u_artery , c_blood, spacingX,spacingY,spacingZ,npixelx,npixely,npixelz, d_temperature);
-%%  transfer device to host
-    %[d_temperature] = feval(ssptx,ntissue,materialID,perfusion,conduction, para(ii,:), R1, R2, nsource, power ,xloc,yloc,zloc, u0 ,u_artery , c_blood, spacingX,spacingY,spacingZ,npixelx,npixely,npixelz, d_temperature);
     tmp = gather( d_temperature );
     Temp(:,:,ii) = mean(tmp,3);
     
