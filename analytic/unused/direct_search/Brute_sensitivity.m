@@ -80,6 +80,7 @@ for ii = 1:num_studies
     total{ii,1} = strcat(Study_paths{ii,1}, '/', Study_paths{ii,2});
     input_path{1,1} = Study_paths{ii,1};
     input_path{1,2} = Study_paths{ii,2};
+    %[ total{ii,2}, total{ii,3} ] = Check_ablation_one_iter ( input_path , opttype);
     [ total{ii,2}, total{ii,3} ] = Check_ablation66 ( input_path , opttype);
 end
 %[ H0, H1, dice_values ] = Check_ablation ( Study_paths, mu_eff_opt );
