@@ -42,7 +42,7 @@ legend_string = strcat( ['Optimization']);
 legend( legend_string, 'Location','southwest');
 hold all
 legend('-DynamicLegend', 'Location','southwest');
-legend_string = strcat(['Naive '], num2str(naive_tag(1)), ' m^-1');
+legend_string = strcat(['Naive '], num2str(naive_tag(1)), ' m^{-1}');
 plot (thresholds, pass_naive_opt, 'DisplayName',legend_string, 'LineWidth',5);
 hold off
 
@@ -74,7 +74,7 @@ for ii = 1:sizes.mu
                         legend('-DynamicLegend', 'Location','southwest');
                         
                         if naive_tag(2) ==1
-                            legend_string = strcat(['Naive '], num2str(naive_tag(1)), ' m^-1');
+                            legend_string = strcat(['Naive '], num2str(naive_tag(1)), ' m^{-1}');
                             plot (thresholds, naive_pass{ii,jj}, 'DisplayName',legend_string, 'LineWidth',5);
                         end
                         

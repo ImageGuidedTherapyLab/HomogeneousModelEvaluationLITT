@@ -1,4 +1,4 @@
-function [opt, LOOCV, fig_labels] = master_LOOCV_onlySS ( data_filename, dice_thresholds, mu_thresholds, naive_mu);
+function [opt, LOOCV, fig_labels] = master_LOOCV_onlySS_LoHi ( data_filename, dice_thresholds, mu_thresholds, naive_mu, mu_eff_tag);
 
 datasummary = dlmread(data_filename,',',1,0);
 datasummary(any(isnan(datasummary), 2), 7) = 1;
@@ -23,8 +23,45 @@ total(ix,:) = [];
 
 ix=find(~cellfun(@isempty,regexp(total(:,1),'0457'))==1);
 total(ix,:) = [];
+
+% Must program new optimal values!!! I.e. total{:,4} and total{:,5}
+
+if mu_eff_tag(1) == 1    % Eliminate the higher values
+    [~, mx] = min( abs( total{1,2}(:,1) - mu_eff_tag(2))); 
+    for ii=1:size(total,1)
+        aa_iter = total{ii,2};
+        aa_iter( aa_iter(:,1)>mx,: ) = []; 
+        total{ii,2} = aa_iter;
+        aa_iter = total{ii,3};
+        aa_iter( aa_iter(:,1)>mx, : ) = [];
+        total{ii,3} = aa_iter;
+        [total{ii,4}(1), total{ii,4}(3) ] = min(total{ii,2}(:,2));
+        total{ii,4}(2) = total{ii,2}( total{ii,4}(3),1);
+        [total{ii,5}(1), total{ii,5}(3) ] = max(total{ii,3}(:,7));
+        total{ii,5}(2) = total{ii,2}( total{ii,5}(3),1);
+    end
+    
+    %total(:,2) = 
+
+elseif mu_eff_tag(2) ==2   % Eliminate the lower values
+    [~, mx] = min( abs( total{1,2}(:,1) - mu_eff_tag(2))); 
+    for ii=1:size(total,1)
+        aa_iter = total{ii,2};
+        aa_iter( aa_iter(:,1)<mx, : ) = []; 
+        total{ii,2} = aa_iter;
+        aa_iter = total{ii,3};
+        aa_iter( aa_iter(:,1)<mx, : ) = [];
+        total{ii,3} = aa_iter;
+        [total{ii,4}(1), total{ii,4}(3) ] = min(total{ii,2}(:,2));
+        total{ii,4}(2) = total{ii,2}( total{ii,4}(3),1);
+        [total{ii,5}(1), total{ii,5}(3) ] = max(total{ii,3}(:,7));
+        total{ii,5}(2) = total{ii,2}( total{ii,5}(3),1);
+    end
+end
+
+   
 opt.paths = total(:,1);
-clear ix
+clear ix mx
 
 % variable initialization
 if isempty(dice_thresholds) ==1
