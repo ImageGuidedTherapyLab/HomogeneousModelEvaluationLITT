@@ -10,7 +10,7 @@ DSC_thresholds = sort(DSC_thresholds);
 mu_thresholds = [ ];  % Intervals: 0 to 100, 100 to 150, 150 to 200, 200
 mu_thresholds = sort(mu_thresholds);
 naive_mu = [ 180 1];
-mu_eff_tag = [0 900];
+mu_eff_tag = [2 900];
 
 [opt, LOOCV, fig_labels, total] = master_LOOCV_onlySS( datafilename, DSC_thresholds, mu_thresholds,naive_mu(1), mu_eff_tag);
 
