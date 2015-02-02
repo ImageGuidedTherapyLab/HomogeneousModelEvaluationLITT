@@ -1,4 +1,4 @@
-function [opt, LOOCV, fig_labels, total] = master_LOOCV_onlySS ( data_filename, dice_thresholds, mu_thresholds, naive_mu, mu_eff_tag);
+function [opt, LOOCV, fig_labels, total, total_all] = master_LOOCV_onlySS ( data_filename, dice_thresholds, mu_thresholds, naive_mu, mu_eff_tag);
 datasummary = dlmread(data_filename,',',1,0);
 datasummary(any(isnan(datasummary), 2), 7) = 1;
 
@@ -26,6 +26,7 @@ total(ix,:) = [];
 % Must program new optimal values!!! I.e. total{:,4} and total{:,5}
 
 if mu_eff_tag(1) == 1    % Eliminate the higher values
+    total_all = total;
     [~, mx] = min( abs( total{1,2}(:,1) - mu_eff_tag(2))); 
     for ii=1:size(total,1)
         aa_iter = total{ii,2};
@@ -43,6 +44,7 @@ if mu_eff_tag(1) == 1    % Eliminate the higher values
     %total(:,2) = 
 
 elseif mu_eff_tag(1) ==2   % Eliminate the lower values
+    total_all = total;
     [~, mx] = min( abs( total{1,2}(:,1) - mu_eff_tag(2))); 
     for ii=1:size(total,1)
         aa_iter = total{ii,2};
@@ -56,6 +58,8 @@ elseif mu_eff_tag(1) ==2   % Eliminate the lower values
         [total{ii,5}(1), total{ii,5}(3) ] = max(total{ii,3}(:,7));
         total{ii,5}(2) = total{ii,2}( total{ii,5}(3),1);
     end
+else
+    total_all = 1;
 end
 
    
