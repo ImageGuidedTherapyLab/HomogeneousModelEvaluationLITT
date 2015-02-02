@@ -19,10 +19,10 @@ dice_mean = mean( dice,2);
 dice_median = median( dice,2);
 dice_stDev  = std ( dice')';
 
-[best.L2_mean.val best.L2_mean.ix]= max( L2_mean);
-[best.L2_median.val best.L2_median.ix] = max( L2_median );
-[best.dice_mean.val best.dice_mean.ix] = max( dice_mean );
-[best.dice_median.val best.dice_median.ix] = max( dice_median );
+[best.L2_mean.L2 best.L2_mean.ix]= max( L2_mean);
+[best.L2_median.L2 best.L2_median.ix] = max( L2_median );
+[best.dice_mean.DSC best.dice_mean.ix] = max( dice_mean );
+[best.dice_median.DSC best.dice_median.ix] = max( dice_median );
 
 figure; h_title = title( 'L_2 mean, median, and st. dev.'); hold all;
 [h1] = plot (total{1,2}(:,1), [L2_mean L2_median L2_stDev]);

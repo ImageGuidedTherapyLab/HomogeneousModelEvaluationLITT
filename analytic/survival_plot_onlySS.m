@@ -1,5 +1,5 @@
 %
-function [] = survival_plot_onlySS (dice_values, naive_values, run_mu_eff_val, dice_opt, fig_labels,run1,run2,naive_tag);
+function [] = survival_plot_onlySS (dice_values, naive_values, run_mu_eff_val, dice_opt, fig_labels,run1,run2,naive_tag,best);
 
 %close all
 
@@ -37,7 +37,7 @@ for kk = 1:10001
 end
 clear kk
 
-figure(1); plot (thresholds, passes_opt, 'LineWidth',5);
+figure; plot (thresholds, passes_opt, 'LineWidth',5);
 title('DSC performance for optimization compared to naive guess');
 legend_string = strcat( ['Optimization']);
 legend( legend_string, 'Location','southwest');
@@ -54,7 +54,7 @@ for ii = 1:sizes.mu
 
     if sum(run2(ii,:)) >=1
         
-        figure(kk);
+        figure;
         
         h_title = title( strcat( fig_labels.mu_groups(ii), [' and DSC thresholds of ']));
         hold on
@@ -109,7 +109,7 @@ for ii = 1:sizes.mu
 
     if sum(run2(ii,:)) >=1
         
-        figure(kk);
+        figure;
         
         h_title = title( strcat( fig_labels.mu_groups(ii), [' and DSC thresholds of ']));
         hold on
