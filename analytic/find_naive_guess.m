@@ -1,4 +1,4 @@
-function [best] = find_naive_guess ( total );
+function [best] = find_naive_guess ( total, total_all );
 
 num_runs = size(total,1);
 num_mu   = size(total{1,2},1);
@@ -23,6 +23,11 @@ dice_stDev  = std ( dice')';
 [best.L2_median.L2 best.L2_median.ix] = max( L2_median );
 [best.dice_mean.DSC best.dice_mean.ix] = max( dice_mean );
 [best.dice_median.DSC best.dice_median.ix] = max( dice_median );
+
+best.L2_mean
+for ii = 1:num_runs
+    
+best.L2_mean.corresponding_DSC = total{
 
 figure; h_title = title( 'L_2 mean, median, and st. dev.'); hold all;
 [h1] = plot (total{1,2}(:,1), [L2_mean L2_median L2_stDev]);

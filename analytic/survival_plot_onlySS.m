@@ -9,11 +9,19 @@ sizes.dice = size(dice_values,2);
 thresholds = linspace ( 0.0, 1, 10001);
 passes = cell(sizes.mu,sizes.dice);
 naive_pass = passes;
+L2_mean_pass =passes;
+L2_median_pass = passes;
+dice_mean_pass = passes;
+dice_median_pass = passes;
 for ii = 1:sizes.mu
     
     for jj = 1:sizes.dice
         passes{ii,jj} = zeros(10001,1);
         naive_pass{ii,jj} = passes{ii,jj};
+        L2_mean_pass{ii,jj} = passes{ii,jj};
+        L2_median_pass{ii,jj} = passes{ii,jj};
+        dice_mean_pass{ii,jj} = passes{ii,jj};
+        dice_median_pass{ii,jj} = passes{ii,jj};
         
         if run1(ii,jj) >= 2
             
@@ -21,6 +29,10 @@ for ii = 1:sizes.mu
                 
                 passes{ii,jj}(kk) = sum( dice_values{ii,jj} > thresholds(kk));
                 naive_pass{ii,jj}(kk) = sum( naive_values{ii,jj} > thresholds(kk));
+                L2_mean_pass{ii,jj}(kk) = sum( best.group.L2_mean.val{ii,jj} > thresholds(kk));
+                L2_median_pass{ii,jj}(kk) = sum( best.group.L2_median.val{ii,jj} > thresholds(kk));
+                dice_mean_pass{ii,jj}(kk) = sum( best.group.dice_mean.val{ii,jj} > thresholds(kk));
+                dice_median_pass{ii,jj}(kk) = sum( best.group.dice_median.val{ii,jj} > thresholds(kk));
                 
             end
         end
@@ -36,6 +48,16 @@ for kk = 1:10001
     pass_naive_opt (kk) = sum ( dice_opt.naive.val > thresholds(kk) );
 end
 clear kk
+
+figure; plot (thresholds, passes_opt, 'LineWidth',5);
+title('DSC performance for optimization compared to naive guess');
+legend_string = strcat( ['Optimization']);
+legend( legend_string, 'Location','southwest');
+hold all
+legend('-DynamicLegend', 'Location','southwest');
+legend_string = strcat(['Naive '], num2str(naive_tag(1)), ' m^{-1}');
+plot (thresholds, pass_naive_opt, 'DisplayName',legend_string, 'LineWidth',5);
+hold off
 
 figure; plot (thresholds, passes_opt, 'LineWidth',5);
 title('DSC performance for optimization compared to naive guess');

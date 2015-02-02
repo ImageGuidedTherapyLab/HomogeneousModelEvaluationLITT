@@ -1,8 +1,6 @@
-function [total,total_all] = arrange_total_dataset ( total );
+function [total,best,datasummary] = arrange_total_dataset ( data_filename, mu_eff_tag );
 datasummary = dlmread(data_filename,',',1,0);
 datasummary(any(isnan(datasummary), 2), 7) = 1;
-
-
 
 setenv ( 'PATH22' , pwd);
 path22 = getenv ( 'PATH22' );
@@ -11,8 +9,6 @@ cd ../../../MATLAB/Tests/direct_search
 load total
 
 cd ( path22 );
-
-
 
 ix=find(~cellfun(@isempty,regexp(total(:,1),'0476'))==1);
 total(ix,:) = [];
@@ -55,104 +51,60 @@ elseif mu_eff_tag(1) ==2   % Eliminate the lower values
     end
 end
 
-   
-opt.paths = total(:,1);
-clear ix mx
+num_runs = size(total_all,1);
+num_mu   = size(total_all{1,2},1);
+L2 = zeros( num_mu, num_runs);
+dice = L2;
+for ii = 1:num_runs
+    
+    L2(:,ii) = total_all{ii,2}(:,2);
+    dice(:,ii) = total_all{ii,3}(:,7);
 
-% variable initialization
-if opt_tag ==1
-    
-    if isempty(dice_thresholds) ==1
-        
-        opt.labels = 'opt';
-        opt.dice.stats = cell(1,1);
-        length_dice_thresholds = 0;
-    else
-        
-        % Setup 'total' indexing
-        opt_data = cell2mat(total(:,5));
-        
-        length_dice_thresholds = length(dice_thresholds);
-        toss_dice = cell(length_dice_thresholds,1);
-        for jj = 1:length_dice_thresholds
-            
-            toss_dice{jj}= find(dice_thresholds(jj) > opt_data(:,1));
-            
-        end
-        
-    end
-    clear jj
-    
-    if isempty(mu_thresholds) ==1
-        
-        opt.mu_eff.values = cell(1,1);
-        length_mu_groups = 1;
-        
-    else
-        
-        length_mu_groups = length(mu_thresholds)+1;
-        toss_mu = cell(length_mu_groups,1);
-        
-        
-        toss_mu{1} = find( opt_data(:,2) > mu_thresholds(1));
-        toss_mu{end} = find(mu_thresholds(end) >= opt_data(:,2));
-        
-        for ii=2:(length_mu_groups-1)
-            
-            toss_mu{ii} = find(  (mu_thresholds(ii-1) >= opt_data(:,2)) + (opt_data(:,2) > mu_thresholds(ii))  );
-            
-        end
-    end
-    
-elseif opt_tag ==2
-    if isempty(dice_thresholds) ==1
-        
-        opt.labels = 'opt';
-        opt.dice.stats = cell(1,1);
-        length_dice_thresholds = 0;
-    else
-        
-        % Setup 'total' indexing
-        opt_data = cell2mat(total(:,4));
- 
-        for ii = 1:size(opt_data,1)
-            dice_data = total{ii,3};
-            opt_data(ii,1) = dice_data( opt_data(ii,3), 7);
-            
-        end
-        length_dice_thresholds = length(dice_thresholds);
-        toss_dice = cell(length_dice_thresholds,1);
-        for jj = 1:length_dice_thresholds
-            
-            toss_dice{jj}= find(dice_thresholds(jj) > opt_data(:,1));
-            
-        end
-        
-    end
-    clear jj
-    
-    if isempty(mu_thresholds) ==1
-        
-        opt.mu_eff.values = cell(1,1);
-        length_mu_groups = 1;
-        
-    else
-        
-        length_mu_groups = length(mu_thresholds)+1;
-        toss_mu = cell(length_mu_groups,1);
-        
-        
-        toss_mu{1} = find( opt_data(:,2) > mu_thresholds(1));
-        toss_mu{end} = find(mu_thresholds(end) >= opt_data(:,2));
-        
-        for ii=2:(length_mu_groups-1)
-            
-            toss_mu{ii} = find(  (mu_thresholds(ii-1) >= opt_data(:,2)) + (opt_data(:,2) > mu_thresholds(ii))  );
-            
-        end
-    end
-    
 end
+clear ii
 
+L2_mean = mean( L2,2);
+L2_median = median( L2,2);
+L2_stDev  = std ( L2')';
+dice_mean = mean( dice,2);
+dice_median = median( dice,2);
+dice_stDev  = std ( dice')';
 
-clear ii jj
+[best.all.L2_mean.L2 best.all.L2_mean.ix]= min( L2_mean);
+[best.all.L2_median.L2 best.all.L2_median.ix] = min( L2_median );
+[best.all.dice_mean.DSC best.all.dice_mean.ix] = max( dice_mean );
+[best.all.dice_median.DSC best.all.dice_median.ix] = max( dice_median );
+
+figure; h_title = title( 'L_2 mean, median, and st. dev.'); hold all;
+[h1] = plot (total_all{1,2}(:,1), [L2_mean L2_median L2_stDev]);
+legend( h1, 'L_2 mean', 'L_2 median', 'L_2 st. dev.'); hold off;
+
+figure; h_title = title( 'DSC mean, median, and st. dev.'); hold all;
+[h1] = plot (total_all{1,2}(:,1), [dice_mean dice_median dice_stDev]);
+legend( h1, 'DSC mean', 'DSC median', 'DSC st. dev.'); hold off;
+
+clear L2 dice
+
+% num_runs = size(total,1);
+% num_mu   = size(total{1,2},1);
+% L2 = zeros( num_mu, num_runs);
+% dice = L2;
+% for ii = 1:num_runs
+%     
+%     L2(:,ii) = total{ii,2}(:,2);
+%     dice(:,ii) = total{ii,3}(:,7);
+% 
+% end
+% clear ii
+% 
+% L2_mean = mean( L2,2);
+% L2_median = median( L2,2);
+% dice_mean = mean( dice,2);
+% dice_median = median( dice,2);
+% 
+% [best.all.L2_mean.L2 best.all.L2_mean.ix]= min( L2_mean);
+% [best.all.L2_median.L2 best.all.L2_median.ix] = min( L2_median );
+% [best.all.dice_mean.DSC best.all.dice_mean.ix] = max( dice_mean );
+% [best.all.dice_median.DSC best.all.dice_median.ix] = max( dice_median );
+
+end  
