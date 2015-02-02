@@ -14,4 +14,6 @@ mu_eff_tag = [2 900];
 
 [opt, LOOCV, fig_labels, total] = master_LOOCV_onlySS( datafilename, DSC_thresholds, mu_thresholds,naive_mu(1), mu_eff_tag);
 
-survival_plot_onlySS (LOOCV.dice.values, LOOCV.dice.naive.val, opt.dice.all, fig_labels, LOOCV.run1, LOOCV.run2, naive_mu);
+survival_plot_onlySS (LOOCV.dice.values, LOOCV.dice.naive.val, LOOCV.mu_eff.run, opt.dice.all, fig_labels, LOOCV.run1, LOOCV.run2, naive_mu);
+
+[best] = find_naive_guess (total);

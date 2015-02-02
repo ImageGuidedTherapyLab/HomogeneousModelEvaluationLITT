@@ -111,6 +111,8 @@ clear ii jj
 total_toss = cell(length_mu_groups, length_dice_thresholds);
 opt.mu_eff.values = total_toss;
 opt.mu_eff.stats  = total_toss;
+opt.mu_eff.run    = total_toss;
+opt.mu_eff.run_stat=total_toss;
 opt.mu_eff.all.values= dice_data(:,2);
 opt.mu_eff.all.stats= Descriptive_statistics(opt.mu_eff.all.values);
 opt.dice.values   = total_toss;
@@ -127,19 +129,21 @@ for ii = 1: size(dice_data,1)
 end
 opt.dice.all.naive.stats = Descriptive_statistics_LOOCV(opt.dice.all.naive.val);
 
-LOOCV.dice.values = total_toss;
-LOOCV.dice.naive.val  = total_toss;
-LOOCV.dice.naive.stats= total_toss;
-LOOCV.dice.stats  = total_toss;
-LOOCV.dice.hh     = total_toss;
-LOOCV.run1        = zeros(size(total_toss,1),size(total_toss,2));
-LOOCV.run2        = zeros(size(total_toss,1),size(total_toss,2));
-LOOCV.labels      = total_toss;
-LOOCV.paths.paths = total_toss;
-LOOCV.paths.table   = cell(length_mu_groups, length_dice_thresholds);
-LOOCV.toss_index  = total_toss;
-fig_labels.mu_groups = cell(size(total_toss,1),1);
-fig_labels.DSC    = zeros(size(total_toss,2),1);
+LOOCV.dice.values         = total_toss;
+LOOCV.mu_eff.run          = total_toss;
+LOOCV.mu_eff.run_stat     = total_toss;
+LOOCV.dice.naive.val      = total_toss;
+LOOCV.dice.naive.stats    = total_toss;
+LOOCV.dice.stats          = total_toss;
+LOOCV.dice.hh             = total_toss;
+LOOCV.run1                = zeros(size(total_toss,1),size(total_toss,2));
+LOOCV.run2                = zeros(size(total_toss,1),size(total_toss,2));
+LOOCV.labels              = total_toss;
+LOOCV.paths.paths         = total_toss;
+LOOCV.paths.table         = cell(length_mu_groups, length_dice_thresholds);
+LOOCV.toss_index          = total_toss;
+fig_labels.mu_groups      = cell(size(total_toss,1),1);
+fig_labels.DSC            = zeros(size(total_toss,2),1);
 
 alpha = total_toss;
 best_iter = total_toss;
@@ -226,22 +230,25 @@ for ii = 1:length_mu_groups
                     length_iter = length(opt.mu_eff.values{ii,jj});
                     LOOCV.dice.values{ii,jj} = zeros(length_iter,1);
                     LOOCV.dice.naive.val{ii,jj} = zeros(length_iter,1);
+                    LOOCV.mu_eff.run{ii,jj}  = zeros(length_iter,1);
                     for ll = 1:length_iter
                         
                         mu = mu_iter;
                         mu(ll) = [];
                         mu = round(mean(mu));
+                        LOOCV.mu_eff.run{ii,jj}(ll) = mu;
                         [~, ix] = min( abs( total_iter{1,2}(:,1) - mu));
                         [~, nx] = min( abs( total_iter{1,2}(:,1) - naive_mu)); % naive min
                         LOOCV.dice.values{ii,jj}(ll) = total_iter{ll,3}(ix,7);
                         LOOCV.dice.naive.val{ii,jj}(ll) = total_iter{ll,3}(nx,7);
+                        
                     end
                     [ LOOCV.dice.hh{ii,jj}.H,  LOOCV.dice.hh{ii,jj}.ptest,  LOOCV.dice.hh{ii,jj}.ci,  LOOCV.dice.hh{ii,jj}.stats] = ttest( LOOCV.dice.values{ii,jj}, 0.7, 0.05, 'right');
                     LOOCV.run1(ii,jj) = 2;
                     LOOCV.run2(ii,jj) = 1;
                     LOOCV.dice.stats{ii,jj} = Descriptive_statistics_LOOCV( LOOCV.dice.values{ii,jj});   
                     LOOCV.dice.naive.stats{ii,jj} = Descriptive_statistics_LOOCV( LOOCV.dice.naive.val{ii,jj});
-                    
+                    LOOCV.mu_eff.run_stat{ii,jj} = Descriptive_statistics( LOOCV.mu_eff.run{ii,jj});
                 end
             else
                 
@@ -270,11 +277,13 @@ for ii = 1:length_mu_groups
                 mu_iter = opt.mu_eff.values{ii,jj};
                 length_iter = length(opt.mu_eff.values{ii,jj});
                 LOOCV.dice.values{ii,jj} = zeros(length_iter,1);
+                LOOCV.mu_eff.run{ii,jj}  = zeros(length_iter,1);
                 for ll = 1:length_iter
                     
                     mu = mu_iter;
                     mu(ll) = [];
                     mu = round(mean(mu));
+                    LOOCV.mu_eff.run{ii,jj}(ll)=mu;
                     [~, ix] = min( abs( total_iter{1,2}(:,1) - mu));
                     [~, nx] = min( abs( total_iter{1,2}(:,1) - naive_mu)); % naive min
                     LOOCV.dice.values{ii,jj}(ll) = total_iter{ll,3}(ix,7);
@@ -284,7 +293,8 @@ for ii = 1:length_mu_groups
                 LOOCV.run1(ii,jj) = 2;
                 LOOCV.run2(ii,jj) = 1;
                 LOOCV.dice.stats{ii,jj} = Descriptive_statistics_LOOCV( LOOCV.dice.values{ii,jj});
-                LOOCV.dice.naive.stats{ii,jj} = Descriptive_statistics_LOOCV( LOOCV.dice.naive.val{ii,jj});                                  
+                LOOCV.dice.naive.stats{ii,jj} = Descriptive_statistics_LOOCV( LOOCV.dice.naive.val{ii,jj});  
+                LOOCV.mu_eff.run_stat{ii,jj} = Descriptive_statistics( LOOCV.mu_eff.run{ii,jj});
                 
             end
             LOOCV.paths.mix{ii,jj} = cell( length(LOOCV.paths.paths{ii,jj}),3);

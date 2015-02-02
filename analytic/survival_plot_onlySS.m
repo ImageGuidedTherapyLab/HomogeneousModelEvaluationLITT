@@ -1,5 +1,5 @@
 %
-function [] = survival_plot_onlySS (dice_values, naive_values, dice_opt, fig_labels,run1,run2,naive_tag);
+function [] = survival_plot_onlySS (dice_values, naive_values, run_mu_eff_val, dice_opt, fig_labels,run1,run2,naive_tag);
 
 %close all
 
@@ -101,5 +101,42 @@ for ii = 1:sizes.mu
     end
     
 end
+
+
+for ii = 1:sizes.mu
+    
+
+    if sum(run2(ii,:)) >=1
+        
+        figure(kk);
+        
+        h_title = title( strcat( fig_labels.mu_groups(ii), [' and DSC thresholds of ']));
+        hold on
+        for jj = 1:sizes.dice
+            
+            if run1(ii,jj) >=2
+                hold all
+                origtitle = get(h_title,'String');
+                set(h_title, 'String', strcat(origtitle, [', DSC >'], num2str(fig_labels.DSC(jj)),', histogram of run mu_{eff} values'));
+                
+                if run1(ii,jj) == 2
+                    
+                    if jj == 1
+                        hist( run_mu_eff_val{ii,jj} );
+
+                    end
+                end
+                
+                
+            end
+        end
+        
+        hold off
+        kk=kk+1;
+        
+    end
+    
+end
+
 
 end
