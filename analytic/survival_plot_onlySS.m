@@ -13,6 +13,7 @@ for ii = 1:sizes.mu
     
     for jj = 1:sizes.dice
         passes{ii,jj} = zeros(10001,1);
+        naive_pass{ii,jj} = passes{ii,jj};
         
         if run1(ii,jj) >= 2
             

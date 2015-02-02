@@ -1,4 +1,4 @@
-function [opt, LOOCV, fig_labels, total, total_all] = master_LOOCV_onlySS ( data_filename, dice_thresholds, mu_thresholds, naive_mu, mu_eff_tag);
+function [opt, LOOCV, fig_labels, total, total_all] = master_LOOCV_onlySS ( data_filename, dice_thresholds, mu_thresholds, naive_mu, mu_eff_tag, opt_tag);
 datasummary = dlmread(data_filename,',',1,0);
 datasummary(any(isnan(datasummary), 2), 7) = 1;
 
@@ -23,10 +23,8 @@ total(ix,:) = [];
 ix=find(~cellfun(@isempty,regexp(total(:,1),'0457'))==1);
 total(ix,:) = [];
 
-% Must program new optimal values!!! I.e. total{:,4} and total{:,5}
-
+total_all = total;
 if mu_eff_tag(1) == 1    % Eliminate the higher values
-    total_all = total;
     [~, mx] = min( abs( total{1,2}(:,1) - mu_eff_tag(2))); 
     for ii=1:size(total,1)
         aa_iter = total{ii,2};
@@ -41,10 +39,7 @@ if mu_eff_tag(1) == 1    % Eliminate the higher values
         total{ii,5}(2) = total{ii,2}( total{ii,5}(3),1);
     end
     
-    %total(:,2) = 
-
 elseif mu_eff_tag(1) ==2   % Eliminate the lower values
-    total_all = total;
     [~, mx] = min( abs( total{1,2}(:,1) - mu_eff_tag(2))); 
     for ii=1:size(total,1)
         aa_iter = total{ii,2};
@@ -58,8 +53,6 @@ elseif mu_eff_tag(1) ==2   % Eliminate the lower values
         [total{ii,5}(1), total{ii,5}(3) ] = max(total{ii,3}(:,7));
         total{ii,5}(2) = total{ii,2}( total{ii,5}(3),1);
     end
-else
-    total_all = 1;
 end
 
    
@@ -67,47 +60,100 @@ opt.paths = total(:,1);
 clear ix mx
 
 % variable initialization
-if isempty(dice_thresholds) ==1
+if opt_tag ==1
     
-    opt.labels = 'opt';
-    opt.dice.stats = cell(1,1);
-    length_dice_thresholds = 0;
-else
-    
-    % Setup 'total' indexing
-    dice_data = cell2mat(total(:,5));
-    
-    length_dice_thresholds = length(dice_thresholds);
-    toss_dice = cell(length_dice_thresholds,1);
-    for jj = 1:length_dice_thresholds
+    if isempty(dice_thresholds) ==1
         
-        toss_dice{jj}= find(dice_thresholds(jj) > dice_data(:,1));
-
+        opt.labels = 'opt';
+        opt.dice.stats = cell(1,1);
+        length_dice_thresholds = 0;
+    else
+        
+        % Setup 'total' indexing
+        opt_data = cell2mat(total(:,5));
+        
+        length_dice_thresholds = length(dice_thresholds);
+        toss_dice = cell(length_dice_thresholds,1);
+        for jj = 1:length_dice_thresholds
+            
+            toss_dice{jj}= find(dice_thresholds(jj) > opt_data(:,1));
+            
+        end
+        
+    end
+    clear jj
+    
+    if isempty(mu_thresholds) ==1
+        
+        opt.mu_eff.values = cell(1,1);
+        length_mu_groups = 1;
+        
+    else
+        
+        length_mu_groups = length(mu_thresholds)+1;
+        toss_mu = cell(length_mu_groups,1);
+        
+        
+        toss_mu{1} = find( opt_data(:,2) > mu_thresholds(1));
+        toss_mu{end} = find(mu_thresholds(end) >= opt_data(:,2));
+        
+        for ii=2:(length_mu_groups-1)
+            
+            toss_mu{ii} = find(  (mu_thresholds(ii-1) >= opt_data(:,2)) + (opt_data(:,2) > mu_thresholds(ii))  );
+            
+        end
+    end
+    
+elseif opt_tag ==2
+    if isempty(dice_thresholds) ==1
+        
+        opt.labels = 'opt';
+        opt.dice.stats = cell(1,1);
+        length_dice_thresholds = 0;
+    else
+        
+        % Setup 'total' indexing
+        opt_data = cell2mat(total(:,4));
+ 
+        for ii = 1:size(opt_data,1)
+            dice_data = total{ii,3};
+            opt_data(ii,1) = dice_data( opt_data(ii,3), 7);
+            
+        end
+        length_dice_thresholds = length(dice_thresholds);
+        toss_dice = cell(length_dice_thresholds,1);
+        for jj = 1:length_dice_thresholds
+            
+            toss_dice{jj}= find(dice_thresholds(jj) > opt_data(:,1));
+            
+        end
+        
+    end
+    clear jj
+    
+    if isempty(mu_thresholds) ==1
+        
+        opt.mu_eff.values = cell(1,1);
+        length_mu_groups = 1;
+        
+    else
+        
+        length_mu_groups = length(mu_thresholds)+1;
+        toss_mu = cell(length_mu_groups,1);
+        
+        
+        toss_mu{1} = find( opt_data(:,2) > mu_thresholds(1));
+        toss_mu{end} = find(mu_thresholds(end) >= opt_data(:,2));
+        
+        for ii=2:(length_mu_groups-1)
+            
+            toss_mu{ii} = find(  (mu_thresholds(ii-1) >= opt_data(:,2)) + (opt_data(:,2) > mu_thresholds(ii))  );
+            
+        end
     end
     
 end
-clear jj
 
-if isempty(mu_thresholds) ==1
-    
-    opt.mu_eff.values = cell(1,1);
-    length_mu_groups = 1;
-    
-else
-    
-    length_mu_groups = length(mu_thresholds)+1;
-    toss_mu = cell(length_mu_groups,1);
-
-
-    toss_mu{1} = find( dice_data(:,2) > mu_thresholds(1));
-    toss_mu{end} = find(mu_thresholds(end) >= dice_data(:,2));
-    
-    for ii=2:(length_mu_groups-1)
-        
-        toss_mu{ii} = find(  (mu_thresholds(ii-1) >= dice_data(:,2)) + (dice_data(:,2) > mu_thresholds(ii))  );
-        
-    end
-end
 
 clear ii jj
 
@@ -117,16 +163,29 @@ opt.mu_eff.values = total_toss;
 opt.mu_eff.stats  = total_toss;
 opt.mu_eff.run    = total_toss;
 opt.mu_eff.run_stat=total_toss;
-opt.mu_eff.all.values= dice_data(:,2);
+opt.mu_eff.all.values= opt_data(:,2);
 opt.mu_eff.all.stats= Descriptive_statistics(opt.mu_eff.all.values);
 opt.dice.values   = total_toss;
 opt.dice.stats    = total_toss;
-opt.dice.all.values = dice_data(:,1);
+
+if opt_tag ==1
+    opt.dice.all.values = opt_data(:,1);
+elseif opt_tag==2
+    
+    opt.dice.all.values = zeros( size(total_toss,1));
+    for ii = 1:size(total,1)
+        dice_data = total{ii,3};
+        opt.dice.all.values(ii) = dice_data( opt.mu_eff.all.values(ii), 7);
+        
+    end
+    
+    
+end
 opt.dice.all.stats= Descriptive_statistics_LOOCV(opt.dice.all.values);
 opt.labels        = total_toss;
 
-opt.dice.all.naive.val = zeros( size(dice_data,1),1);
-for ii = 1: size(dice_data,1)
+opt.dice.all.naive.val = zeros( size(opt_data,1),1);
+for ii = 1: size(opt_data,1)
     
     [~, nx] = min( abs( total{1,2}(:,1) - naive_mu)); % naive min
     opt.dice.all.naive.val(ii) = total{ii,3}(nx,7);
@@ -203,7 +262,7 @@ for ii = 1:length_mu_groups
                     LOOCV.dice.stats{ii,jj} = LOOCV.dice.stats{ii,jj-1};
                     LOOCV.dice.values{ii,jj} = LOOCV.dice.values{ii,jj-1};
                     LOOCV.paths.paths{ii,jj} = LOOCV.paths.paths{ii,jj-1};
-                    LOOCV.dice.naive.val{ii,jj}(ll) = LOOCV.dice.naive.val{ii,jj-1};
+                    LOOCV.dice.naive.val{ii,jj} = LOOCV.dice.naive.val{ii,jj-1};
                     LOOCV.dice.naive.stats{ii,jj} = LOOCV.dice.naive.stats{ii,jj-1};
                     
                     
@@ -211,16 +270,16 @@ for ii = 1:length_mu_groups
                     total_iter = total;
                     total_iter( total_toss{ii,jj} , :) = [];
                     
-                    opt.mu_eff.values{ii,jj} = dice_data(:,2);
+                    opt.mu_eff.values{ii,jj} = opt_data(:,2);
                     opt.mu_eff.values{ii,jj} (total_toss{ii,jj})=[];
                     
                     alpha{ii,jj} = datasummary(:,5);
                     alpha{ii,jj} (total_toss{ii,jj}) = [];
                     
-                    best_iter{ii,jj} = dice_data(:,3);
+                    best_iter{ii,jj} = opt_data(:,3);
                     best_iter{ii,jj} (total_toss{ii,jj})=[];
                     
-                    opt.dice.values{ii,jj} = dice_data(:,1);
+                    opt.dice.values{ii,jj} = opt_data(:,1);
                     opt.dice.values{ii,jj}(total_toss{ii,jj}) = [];
                     
                     opt.dice.stats{ii,jj} = Descriptive_statistics(opt.dice.values{ii,jj});
@@ -259,16 +318,16 @@ for ii = 1:length_mu_groups
                 total_iter = total;
                 total_iter( total_toss{ii,jj} , :) = [];
                 
-                opt.mu_eff.values{ii,jj} = dice_data(:,2);
+                opt.mu_eff.values{ii,jj} = opt_data(:,2);
                 opt.mu_eff.values{ii,jj} (total_toss{ii,jj})=[];
                 
                 alpha{ii,jj} = datasummary(:,5);
                 alpha{ii,jj} (total_toss{ii,jj}) = [];
                 
-                best_iter{ii,jj} = dice_data(:,3);
+                best_iter{ii,jj} = opt_data(:,3);
                 best_iter{ii,jj} (total_toss{ii,jj})=[];
                 
-                opt.dice.values{ii,jj} = dice_data(:,1);
+                opt.dice.values{ii,jj} = opt_data(:,1);
                 opt.dice.values{ii,jj}(total_toss{ii,jj}) = [];
                 
                 opt.dice.stats{ii,jj} = Descriptive_statistics(opt.dice.values{ii,jj});
