@@ -13,7 +13,7 @@ naive_mu = [ 180 1];
 mu_eff_tag = [0 400];
 opt_tag = 1; % DSC is 1; L2 is 2
 
-[total,best] = arrange_total_dataset ( datafilename, mu_eff_tag );
+[total,best,total_all] = arrange_total_dataset ( datafilename, mu_eff_tag );
 
 [opt, LOOCV, fig_labels,best] = master_LOOCV_onlySS( total, DSC_thresholds, mu_thresholds,naive_mu(1), opt_tag, best);
 

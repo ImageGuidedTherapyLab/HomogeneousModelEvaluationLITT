@@ -1,4 +1,4 @@
-function [total,best,datasummary] = arrange_total_dataset ( data_filename, mu_eff_tag );
+function [total,best,total_all] = arrange_total_dataset ( data_filename, mu_eff_tag );
 datasummary = dlmread(data_filename,',',1,0);
 datasummary(any(isnan(datasummary), 2), 7) = 1;
 

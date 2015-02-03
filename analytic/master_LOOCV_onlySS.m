@@ -244,10 +244,10 @@ for ii = 1:length_mu_groups
                     dice_mean = mean( dice,2);
                     dice_median = median( dice,2);
                     
-                    [L2_mean.bestVal L2_mean.ix]= min( L2_mean);
-                    [L2_median.bestVal L2_median.ix] = min( L2_median );
-                    [dice_mean.bestVal dice_mean.ix] = max( dice_mean );
-                    [dice_median.bestVal dice_median.ix] = max( dice_median );
+                    [~, L2_mean_ix]= min( L2_mean);
+                    [~, L2_median_ix] = min( L2_median );
+                    [~, dice_mean_ix] = max( dice_mean );
+                    [~, dice_median_ix] = max( dice_median );
                     
                     opt.mu_eff.values{ii,jj} = opt_data(:,2);
                     opt.mu_eff.values{ii,jj} (total_toss{ii,jj})=[];
@@ -286,10 +286,10 @@ for ii = 1:length_mu_groups
                         LOOCV.dice.values{ii,jj}(ll) = total_iter{ll,3}(ix,7);
                         LOOCV.dice.naive.val{ii,jj}(ll) = total_iter{ll,3}(nx,7);
                         
-                        [~, ix] = min( abs( total_iter{1,2}(:,1) - total_iter{1,2}( L2_mean.ix,1)));
-                        [~, jx] = min( abs( total_iter{1,2}(:,1) - total_iter{1,2}( L2_median.ix,1))); % naive min
-                        [~, kx] = min( abs( total_iter{1,2}(:,1) - total_iter{1,2}( dice_mean.ix,1)));
-                        [~, lx] = min( abs( total_iter{1,2}(:,1) - total_iter{1,2}( dice_median.ix,1))); % naive min
+                        [~, ix] = min( abs( total_iter{1,2}(:,1) - total_iter{1,2}( L2_mean_ix,1)));
+                        [~, jx] = min( abs( total_iter{1,2}(:,1) - total_iter{1,2}( L2_median_ix,1))); % naive min
+                        [~, kx] = min( abs( total_iter{1,2}(:,1) - total_iter{1,2}( dice_mean_ix,1)));
+                        [~, lx] = min( abs( total_iter{1,2}(:,1) - total_iter{1,2}( dice_median_ix,1))); % naive min
                         best.group.L2_mean.val{ii,jj}(ll)        = total_iter{ll,3}(ix,7);
                         best.group.L2_median.val{ii,jj}(ll)      = total_iter{ll,3}(jx,7);
                         best.group.dice_mean.val{ii,jj}(ll)      = total_iter{ll,3}(kx,7);
@@ -329,10 +329,10 @@ for ii = 1:length_mu_groups
                 dice_mean = mean( dice,2);
                 dice_median = median( dice,2);
                 
-                [L2_mean.bestVal L2_mean.ix]= min( L2_mean);
-                [L2_median.bestVal L2_median.ix] = min( L2_median );
-                [dice_mean.bestVal dice_mean.ix] = max( dice_mean );
-                [dice_median.bestVal dice_median.ix] = max( dice_median );
+                [~, L2_mean_ix]= min( L2_mean);
+                [~, L2_median_ix] = min( L2_median );
+                [~, dice_mean_ix] = max( dice_mean );
+                [~, dice_median_ix] = max( dice_median );
                 
                 opt.mu_eff.values{ii,jj} = opt_data(:,2);
                 opt.mu_eff.values{ii,jj} (total_toss{ii,jj})=[];
@@ -371,10 +371,10 @@ for ii = 1:length_mu_groups
                     LOOCV.dice.values{ii,jj}(ll) = total_iter{ll,3}(ix,7);
                     LOOCV.dice.naive.val{ii,jj}(ll) = total_iter{ll,3}(nx,7);
                     
-                    [~, ix] = min( abs( total_iter{1,2}(:,1) - total_iter{1,2}( L2_mean.ix,1)));
-                    [~, jx] = min( abs( total_iter{1,2}(:,1) - total_iter{1,2}( L2_median.ix,1))); % naive min
-                    [~, kx] = min( abs( total_iter{1,2}(:,1) - total_iter{1,2}( dice_mean.ix,1)));
-                    [~, lx] = min( abs( total_iter{1,2}(:,1) - total_iter{1,2}( dice_median.ix,1))); % naive min
+                    [~, ix] = min( abs( total_iter{1,2}(:,1) - total_iter{1,2}( L2_mean_ix,1)));
+                    [~, jx] = min( abs( total_iter{1,2}(:,1) - total_iter{1,2}( L2_median_ix,1))); % naive min
+                    [~, kx] = min( abs( total_iter{1,2}(:,1) - total_iter{1,2}( dice_mean_ix,1)));
+                    [~, lx] = min( abs( total_iter{1,2}(:,1) - total_iter{1,2}( dice_median_ix,1))); % naive min
                     best.group.L2_mean.val{ii,jj}(ll)        = total_iter{ll,3}(ix,7);
                     best.group.L2_median.val{ii,jj}(ll)      = total_iter{ll,3}(jx,7);
                     best.group.dice_mean.val{ii,jj}(ll)      = total_iter{ll,3}(kx,7);
