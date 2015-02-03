@@ -10,13 +10,16 @@ load total
 
 cd ( path22 );
 
-ix=find(~cellfun(@isempty,regexp(total(:,1),'0476'))==1);
-total(ix,:) = [];
+% ix=find(~cellfun(@isempty,regexp(total(:,1),'0476'))==1);
+% total(ix,:) = [];
+% 
+% ix=find(~cellfun(@isempty,regexp(total(:,1),'0436'))==1);
+% total(ix,:) = [];
+% 
+% ix=find(~cellfun(@isempty,regexp(total(:,1),'0457'))==1);
+% total(ix,:) = [];
 
-ix=find(~cellfun(@isempty,regexp(total(:,1),'0436'))==1);
-total(ix,:) = [];
-
-ix=find(~cellfun(@isempty,regexp(total(:,1),'0457'))==1);
+ix=find(~cellfun(@isempty,regexp(total(:,1),'0409'))==1);
 total(ix,:) = [];
 
 total_all = total;

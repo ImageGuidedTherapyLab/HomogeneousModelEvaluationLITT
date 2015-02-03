@@ -10,8 +10,8 @@ DSC_thresholds = sort(DSC_thresholds);
 mu_thresholds = [ ];  % Intervals: 0 to 100, 100 to 150, 150 to 200, 200
 mu_thresholds = sort(mu_thresholds);
 naive_mu = [ 180 1];
-mu_eff_tag = [1 400];
-opt_tag = 2; % DSC is 1; L2 is 2
+mu_eff_tag = [0 400];
+opt_tag = 1; % DSC is 1; L2 is 2
 
 [total,best] = arrange_total_dataset ( datafilename, mu_eff_tag );
 
