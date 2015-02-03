@@ -42,12 +42,30 @@ clear ii jj kk
 
 passes_opt = zeros(10001,1);
 pass_naive_opt = passes_opt;
+% all_L2_mean_pass = passes_opt;
+% all_L2_median_pass = passes_opt;
+all_dice_mean_pass = passes_opt;
+all_dice_median_pass = passes_opt;
 for kk = 1:10001
     
     passes_opt (kk) = sum( dice_opt.values > thresholds(kk) );
     pass_naive_opt (kk) = sum ( dice_opt.naive.val > thresholds(kk) );
+%     all_L2_mean_pass (kk) = sum( best.all.L2_mean.val > thresholds(kk) );
+%     all_L2_median_pass (kk) = sum( best.all.L2_median.val > thresholds(kk) );
+    all_dice_mean_pass (kk) = sum( best.all.dice_mean.val > thresholds(kk) );
+    all_dice_median_pass (kk) = sum( best.all.dice_median.val > thresholds(kk) );
 end
 clear kk
+
+% figure; h_title = title( 'DSC performance for optimization versus literature and single best guesses'); hold all;
+% [h1] = plot (thresholds, [passes_opt pass_naive_opt all_L2_mean_pass all_L2_median_pass all_dice_mean_pass all_dice_median_pass]);
+% legend( h1, 'Optimization', strcat(['Literature '], num2str(naive_tag(1))), 'L_2 mean','L_2 median','dice mean','dice median') ;
+% legend('-DynamicLegend', 'Location','southwest');hold off;
+
+figure; h_title = title( 'DSC performance for optimization versus literature and single best guesses'); hold all;
+[h1] = plot (thresholds, [passes_opt pass_naive_opt all_dice_mean_pass all_dice_median_pass]);
+legend( h1, 'Optimization', strcat(['Literature '], num2str(naive_tag(1))), 'dice mean','dice median') ;
+legend('-DynamicLegend', 'Location','southwest');hold off;
 
 figure; plot (thresholds, passes_opt, 'LineWidth',5);
 title('DSC performance for optimization compared to naive guess');

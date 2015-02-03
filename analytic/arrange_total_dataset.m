@@ -83,28 +83,18 @@ figure; h_title = title( 'DSC mean, median, and st. dev.'); hold all;
 [h1] = plot (total_all{1,2}(:,1), [dice_mean dice_median dice_stDev]);
 legend( h1, 'DSC mean', 'DSC median', 'DSC st. dev.'); hold off;
 
-clear L2 dice
+best.all.L2_mean.val = zeros( num_runs,1);
+best.all.L2_median.val = best.all.L2_mean.val;
+best.all.dice_mean.val = best.all.L2_mean.val;
+best.all.dice_median.val = best.all.L2_mean.val;
+for ii = 1:num_runs
+    
+    best.all.L2_mean.val(ii)        = total_all{ii,3}(best.all.L2_mean.ix,    7);
+    best.all.L2_median.val(ii)      = total_all{ii,3}(best.all.L2_median.ix,  7);
+    best.all.dice_mean.val(ii)      = total_all{ii,3}(best.all.dice_mean.ix,  7);
+    best.all.dice_median.val(ii)    = total_all{ii,3}(best.all.dice_median.ix,7);
+    
+end
 
-% num_runs = size(total,1);
-% num_mu   = size(total{1,2},1);
-% L2 = zeros( num_mu, num_runs);
-% dice = L2;
-% for ii = 1:num_runs
-%     
-%     L2(:,ii) = total{ii,2}(:,2);
-%     dice(:,ii) = total{ii,3}(:,7);
-% 
-% end
-% clear ii
-% 
-% L2_mean = mean( L2,2);
-% L2_median = median( L2,2);
-% dice_mean = mean( dice,2);
-% dice_median = median( dice,2);
-% 
-% [best.all.L2_mean.L2 best.all.L2_mean.ix]= min( L2_mean);
-% [best.all.L2_median.L2 best.all.L2_median.ix] = min( L2_median );
-% [best.all.dice_mean.DSC best.all.dice_mean.ix] = max( dice_mean );
-% [best.all.dice_median.DSC best.all.dice_median.ix] = max( dice_median );
 
 end  
