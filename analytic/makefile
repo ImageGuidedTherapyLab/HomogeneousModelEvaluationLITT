@@ -1,17 +1,35 @@
-# This makefile works on a Sandia Linux machine.
-# For other platforms, you may need to adjust the "E =", "B =",
-# "L =", and "W =" lines below.
+#
+# file : Makefile (UNIX)
+#
+#  mexGPUArray   from 
+# 
+#     $(MATLABROOT)/toolbox/distcomp/gpu/extern/src/mex/mexGPUExample.cu
+#
+# You can invoke this Makefile using 
+#  make -f Makefile MATLABROOT=[directory where MATLAB is installed]
+#
+# If you do not want to specify the MATLABROOT at the gmake command line 
+# every single time, you can define it by uncommenting the line below
+# and assigning the correct root of MATLAB (with no trailing '/') on
+# the right hand side.
+#
+MATLABROOT	:= /opt/apps/matlab/2013a/
+#
 
-E = /opt/MATLAB/R2012a
-I = $E/extern/include
-B = $E/bin/glnxa64
-L = -L$B -leng -lmx
-W = -Wl,-rpath,$B -Wl,-rpath-link,$B
-CFLAGS = -O0 -g
-CC = cc
+#
+# Defaults
+#
 
-dakmatlab: dakmatlab.o
-	$(CC) -o dakmatlab $W dakmatlab.o $L
+MEX=$(MATLABROOT)/bin/mex
+MCC=$(MATLABROOT)/bin/mcc
+CUDADIR = /opt/apps/cuda/5.0/cuda
+CUDADIR = /opt/apps/cuda/5.5/
 
-dakmatlab.o: dakmatlab.c
-	$(CC) -c $(CFLAGS) -I$I dakmatlab.c
+# The following are the definitions for each target individually.
+
+steadyStatePennesLaser.ptx:   steadyStatePennesLaser.cu
+	$(CUDADIR)/bin/nvcc -g -G -ptx -gencode=arch=compute_20,code=sm_20   $<
+
+tags:
+	ctags -R  --langmap=c++:+.cu $(MATLABROOT) . 
+

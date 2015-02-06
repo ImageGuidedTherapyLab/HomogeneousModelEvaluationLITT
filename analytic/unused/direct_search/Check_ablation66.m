@@ -31,7 +31,8 @@ cd /FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
 n_patients = size( Study_paths,1); % This is the number of patients
 %mu_eff=207;
 mu_eff(1) = 0.008;
-mu_eff(2:10001) = linspace(1,10000,10000);
+mu_eff(2:101) = linspace(1,100,100);
+% mu_eff(2:10001) = linspace(1,10000,10000);
 threshold_temps = 51:65;
 num_threshold_temps = length(threshold_temps);
 dice = zeros( length(mu_eff),num_threshold_temps); % Initialize the number of DSC (dice) values

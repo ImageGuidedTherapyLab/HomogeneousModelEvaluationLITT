@@ -107,7 +107,7 @@ void steadyStatePennesLaser(
 		{
                     sourcetemperature = InitialTemperature;
 		}
-           if (radius <= innerRadius && NSource == 12)
+           if (radius <= innerRadius && NSource == 10)
 		{
                     sourcetemperature = InitialTemperature+55;
 		}

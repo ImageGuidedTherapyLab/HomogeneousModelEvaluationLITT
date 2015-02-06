@@ -258,7 +258,7 @@ for ii = 1:length_mu_groups
                     opt.dice.values{ii,jj} = opt_data(:,1);
                     opt.dice.values{ii,jj}(total_toss{ii,jj}) = [];
                     
-                    opt.dice.stats{ii,jj} = Descriptive_statistics(opt.dice.values{ii,jj});
+                    opt.dice.stats{ii,jj} = Descriptive_statistics_LOOCV(opt.dice.values{ii,jj});
                     opt.mu_eff.stats{ii,jj} = Descriptive_statistics(opt.mu_eff.values{ii,jj});
                     
                     disp(opt.labels{ii,jj});
@@ -343,7 +343,7 @@ for ii = 1:length_mu_groups
                 opt.dice.values{ii,jj} = opt_data(:,1);
                 opt.dice.values{ii,jj}(total_toss{ii,jj}) = [];
                 
-                opt.dice.stats{ii,jj} = Descriptive_statistics(opt.dice.values{ii,jj});
+                opt.dice.stats{ii,jj} = Descriptive_statistics_LOOCV(opt.dice.values{ii,jj});
                 opt.mu_eff.stats{ii,jj} = Descriptive_statistics(opt.mu_eff.values{ii,jj});
                 
                 disp(opt.labels{ii,jj});
