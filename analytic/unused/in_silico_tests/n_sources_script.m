@@ -55,29 +55,16 @@ save ('in_silico_test.mat','total');
 cd (path22);
 
 for ii = 1:2
-    tmap_gold = total{ii,2}(:,:,end);
+    total{ii,3} = zeros(l_n_sources,3);
     total{ii,4} = zeros( l_n_sources,15);
     total{ii,5} = total{ii,4};
     total{ii,6} = total{ii,4};
-    total{ii,3} = zeros(n_sources,3);
+
     for jj = 1:l_n_sources
         
         tmap_iter = total{ii,2}(:,:,jj);
-        if jj ==l_n_sources
-            
-            if ii ==1
-                tmap_gold = total{ii+1,2}(:,:,end);
-                t_diff = tmap_gold - tmap_iter;
-                
-            else
-                tmap_gold = total{ii-11,2}(:,:,end);
-                t_diff = tmap_gold - tmap_iter;
-            end
-        else
-            tmap_gold = total{ii,2}(:,:,end);
-            t_diff = tmap_gold - tmap_iter;
-            
-        end
+        tmap_gold = total{ii,2}(:,:,end);
+        t_diff = tmap_gold - tmap_iter;
 
         total{ii,3}(jj,1)= n_sources(jj);
         total{ii,3}(jj,2)= ( norm ( t_diff , 2 ) )^2; % L2 norm
@@ -93,9 +80,14 @@ for ii = 1:2
             n_intersection = sum( sum( intersection ));
             total{ii,4}(jj,kk) = n_model - n_intersection; % False positive count
             total{ii,5}(jj,kk) = n_gold - n_intersection; % False negative count
-            total{ii,6}(jj,kk) = 2 * n_intersection / ( n_model + n_MRTI );
+            total{ii,6}(jj,kk) = 2 * n_intersection / ( n_model + n_gold );
         end
         
     end
 end
+
+cd ../../../MATLAB/Tests/in_silico/
+save ('in_silico_test.mat','total');
+cd (path22);
+
 
