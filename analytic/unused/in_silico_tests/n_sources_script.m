@@ -19,7 +19,7 @@ Study_paths{1,2} = strcat( '0',num2str(datasummary(1,2)));
 
 
 % From mu_eff_data, find the matching study's(ies') mu_eff value(s)
-total = cell(2,5);
+total = cell(2,7);
 mat_string = ['workdir/',Study_paths{1,1},'/',Study_paths{1,2},'/opt/optpp_pds.',opttype,'.in.1.mat'];
 load (mat_string);
 
@@ -59,6 +59,7 @@ for ii = 1:2
     total{ii,4} = zeros( l_n_sources,15);
     total{ii,5} = total{ii,4};
     total{ii,6} = total{ii,4};
+    total{ii,7} = total{ii,4};
 
     for jj = 1:l_n_sources
         
@@ -72,7 +73,11 @@ for ii = 1:2
         
         for kk = 1:15
             model_deg_threshold = tmap_iter >= ( 50 + kk);
+            [mod_row, mod_column] = find( model_deg_threshold ==1);
+            mod_list = [(mod_row .* inputdatavars.spacing(1)) (mod_column .* inputdatavars.spacing(2))];
             gold_deg_threshold = tmap_gold >= ( 50 + kk);
+            [gold_row, gold_column] = find( gold_deg_threshold ==1);
+            gold_list = [(gold_row .* inputdatavars.spacing(1)) (gold_column .* inputdatavars.spacing(2))];
             n_model = sum( sum( model_deg_threshold ));
             n_gold =  sum( sum( gold_deg_threshold  ));
             intersection = model_deg_threshold + gold_deg_threshold;
@@ -80,7 +85,8 @@ for ii = 1:2
             n_intersection = sum( sum( intersection ));
             total{ii,4}(jj,kk) = n_model - n_intersection; % False positive count
             total{ii,5}(jj,kk) = n_gold - n_intersection; % False negative count
-            total{ii,6}(jj,kk) = 2 * n_intersection / ( n_model + n_gold );
+            total{ii,6}(jj,kk) = 2 * n_intersection / ( n_model + n_gold );  % DSC
+            total{ii,7}(jj,kk) = HausdorffDist( mod_list, gold_list);
         end
         
     end

@@ -57,7 +57,7 @@ num_studies = size(Study_paths,1);
 %     mu_eff_opt(ii) = mu_eff_data(mu_eff_index(ii),2);
 % end
 % clear ii
-total = cell(num_studies,5);
+total = cell(num_studies,7);
 input_path = cell(1,2);
 
 for ii = 1:num_studies
@@ -70,31 +70,37 @@ for ii = 1:num_studies
     % Do global optimization
     input_path{1,1} = Study_paths{ii,1};
     input_path{1,2} = Study_paths{ii,2};
-    [ total{ii,2}, total{ii,3} ] = Check_ablation66 ( input_path , opttype);
+    [ total{ii,2}, total{ii,3}, total{ii,4} ] = Check_ablation66 ( input_path , opttype);
     
     % Record optimal L2 information
-    total{ii,4} = zeros(1,2);
-    [total{ii,4}(1) , index] = min (total{ii,2}(:,2));  % record optimal L2
-    total{ii,4}(2) = total{ii,2}(index,1);   % record mu_eff that produces optimal L2
-    total{ii,4}(3) = index; % record index that produces optimal L2
+    total{ii,5} = zeros(1,3);
+    [total{ii,5}(1) , index] = min (total{ii,2}(:,2));  % record optimal L2
+    total{ii,5}(2) = total{ii,2}(index,1);   % record mu_eff that produces optimal L2
+    total{ii,5}(3) = index; % record index that produces optimal L2
     
     % Record optimal 57 C isotherm DSC information
-    total{ii,5} = zeros(1,2);
-    [total{ii,5}(1) , index] = max (total{ii,3}(:,7));  % record optimal Dice
-    total{ii,5}(2) = total{ii,2}(index,1);   % record index mu_eff that produces optimal Dice
-    total{ii,5}(3) = index; % record index that produces optimal Dice
+    total{ii,6} = zeros(1,3);
+    [total{ii,6}(1) , index] = max (total{ii,3}(:,7));  % record optimal Dice
+    total{ii,6}(2) = total{ii,2}(index,1);   % record mu_eff that produces optimal Dice
+    total{ii,6}(3) = index; % record index that produces optimal Dice
+    
+    % Record optima 57 C Hausdorff distance information
+    total{ii,7} = zeros(1,3);
+    [total{ii,7}(1) , index] = min (total{ii,4}(:,7)); % record optimal Hausdorff Distance
+    total{ii,7}(2) = total{ii,2}(index,1); % record mu_eff that produces optimal Hausdorff distance
+    total{ii,7}(3) = index;
 end
 %[ H0, H1, dice_values ] = Check_ablation ( Study_paths, mu_eff_opt );
 toc
 
 % Save
 cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search
-save ('GPU_global_search.mat','total')
+save ('GPU_global_search_hd.mat','total')
 
 cd /mnt/FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
 
 data_filename = 'datasummaryL2_10sourceNewton50.txt';
-data_filename_out= 'data_summary_GPU.txt';
+data_filename_out= 'data_summary_GPU_hd.txt';
 
 fin  = fopen(data_filename);
 fout = fopen( data_filename_out,'w');
@@ -107,8 +113,8 @@ fprintf(fout,'%s\n',f_line);
 fclose(fin);
 for ii = 1:num_studies
     
-    first_half  = strcat( Study_paths{ii,1}(6:end),',',Study_paths{ii,2},',1,', num2str( total{ii,5}(2)) , ',1.3854600e-07,','0.00e+00,'); % beginning to robin
-    second_half = strcat( num2str( total{ii,5}(1)),',', num2str( total{ii,4}(1)),',', num2str( total{ii,4}(1)),',', num2str( 1-total{ii,5}(1) )); % obj fxns
+    first_half  = strcat( Study_paths{ii,1}(6:end),',',Study_paths{ii,2},',1,', num2str( total{ii,6}(2)) , ',1.3854600e-07,','0.00e+00,'); % beginning to robin
+    second_half = strcat( num2str( total{ii,6}(1)),',', num2str( total{ii,5}(1)),',', num2str( total{ii,5}(1)),',', num2str( 1-total{ii,6}(1) )); % obj fxns
     f_line = strcat( first_half,second_half);    
     fprintf( fout, '%s\n', f_line);
 
