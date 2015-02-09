@@ -110,7 +110,7 @@ for ii = 1:Numruns
         fprintf('iter %d \n', ii);
     end
     %%  transfer device to host
-    [d_temperature] = feval(ssptx,ntissue,materialID,para(:,ii),k_cond, mu_eff, R1, R2, nsource, power ,xloc,yloc,zloc, u0 ,u_artery , c_blood, spacingX,spacingY,spacingZ,npixelx,npixely,npixelz, d_temperature);
+    [d_temperature] = feval(ssptx,ntissue,materialID,para(ii,:),k_cond, mu_eff, R1, R2, nsource, power ,xloc,yloc,zloc, u0 ,u_artery , c_blood, spacingX,spacingY,spacingZ,npixelx,npixely,npixelz, d_temperature);
     tmp = gather( d_temperature );
     Temp(:,:,ii) = mean(tmp,3);
     

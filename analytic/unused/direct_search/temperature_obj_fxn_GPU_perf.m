@@ -156,8 +156,10 @@ spacing.x = spacing.x/scaling.x;
 spacing.y = spacing.y/scaling.y;
 spacing.z = spacing.z/(scaling.z * dom.z_subslice);
 
-w_perf = linspace ( 0, 30,61);
-%k_cond = linspace ( 0.01,2,200);
+w_perf = 0.01;
+%w_perf(2:35) = linspace ( 0.5, 17, 34);
+%w_perf(2:34) = linspace ( 0.5, 16.5,33);
+w_perf(2:133) = linspace ( 0.125, 16.5,132);
 
 [tmap_unique] = Human_GPU_perf ( power_log,spacing,scaling,mod_point,source,w_perf,k_cond,g_anisotropy,mu_eff_list,probe_u,robin_co,c_blood);
 
