@@ -1,6 +1,6 @@
 % Needs matrix in input
 
-function [Temp] = Human_GPU (power_log,spacing,scaling,mod_point,source,w_perf,k_cond,g_anisotropy,mu_eff,probe_u,robin_co,c_blood)
+function [Temp] = Human_GPU_cond (power_log,spacing,scaling,mod_point,source,w_perf,k_cond,g_anisotropy,mu_eff,probe_u,robin_co,c_blood)
 
 %,g_anisotropy,mu_a,mu_s,probe_u,robin_co,c_blood,   matrix, power_log,source,w_perf,k_cond);
 
@@ -8,13 +8,15 @@ function [Temp] = Human_GPU (power_log,spacing,scaling,mod_point,source,w_perf,k
 % clear all
 % close all
 format shortg
-Numruns = length(mu_eff);
+%Numruns = length(mu_eff);
+Numruns = length(k_cond);
 
 %% Simulate disjoint material/tissue types
 % create npixel^3 image
 % load rundata_rnd_6D_1e5_z
 % load rundata_GL5_4D_low
-para=[zeros(Numruns,1) mu_eff'];
+mu_eff=[ 0 mu_eff];
+para= [ zeros(Numruns,1) k_cond'];
 %para=[zeros(Numruns,1) para];
 % npixel   = 100;
 % materialID = int32(10*phantom3d('Modified Shepp-Logan',npixel));
@@ -101,14 +103,14 @@ ssptx.GridSize=[numSMs*32               1];
 %tic
 %[x0 y0 z0] = ndgrid(point
 %For loop here
-Temp = zeros(npixelx,npixely,npixelz/5);
+Temp = zeros(npixelx,npixely,Numruns);
 for ii = 1:Numruns
     if mod (ii,1000) == 0
         toc
         fprintf('iter %d \n', ii);
     end
     %%  transfer device to host
-    [d_temperature] = feval(ssptx,ntissue,materialID,perfusion,conduction, para(ii,:), R1, R2, nsource, power ,xloc,yloc,zloc, u0 ,u_artery , c_blood, spacingX,spacingY,spacingZ,npixelx,npixely,npixelz, d_temperature);
+    [d_temperature] = feval(ssptx,ntissue,materialID,perfusion,para(ii,:), mu_eff, R1, R2, nsource, power ,xloc,yloc,zloc, u0 ,u_artery , c_blood, spacingX,spacingY,spacingZ,npixelx,npixely,npixelz, d_temperature);
     tmp = gather( d_temperature );
     Temp(:,:,ii) = mean(tmp,3);
     

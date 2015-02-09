@@ -70,7 +70,7 @@ for ii = 1:num_studies
     % Do global optimization
     input_path{1,1} = Study_paths{ii,1};
     input_path{1,2} = Study_paths{ii,2};
-    [ total{ii,2}, total{ii,3}, total{ii,4} ] = Check_ablation66 ( input_path , opttype);
+    [ total{ii,2}, total{ii,3}, total{ii,4} ] = Check_ablation_perf ( input_path , opttype);
     
     % Record optimal L2 information
     total{ii,5} = zeros(1,3);
@@ -84,7 +84,7 @@ for ii = 1:num_studies
     total{ii,6}(2) = total{ii,2}(index,1);   % record mu_eff that produces optimal Dice
     total{ii,6}(3) = index; % record index that produces optimal Dice
     
-    % Record optima 57 C Hausdorff distance information
+    % Record optimal 57 C Hausdorff distance information
     total{ii,7} = zeros(1,3);
     [total{ii,7}(1) , index] = min (total{ii,4}(:,7)); % record optimal Hausdorff Distance
     total{ii,7}(2) = total{ii,2}(index,1); % record mu_eff that produces optimal Hausdorff distance
