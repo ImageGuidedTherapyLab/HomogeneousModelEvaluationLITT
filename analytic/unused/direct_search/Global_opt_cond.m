@@ -95,53 +95,53 @@ toc
 
 % Save
 cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search
-save ('GPU_global_search_hd.mat','total')
+save ('GPU_global_cond.mat','total')
 
 cd /mnt/FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
 
-data_filename = 'datasummaryL2_10sourceNewton50.txt';
-data_filename_out= 'data_summary_GPU_hd.txt';
-
-fin  = fopen(data_filename);
-fout = fopen( data_filename_out,'w');
-
-
-
-%% This records the optimal Dice
-f_line = fgetl(fin); % basically skip first line
-fprintf(fout,'%s\n',f_line);
-fclose(fin);
-for ii = 1:num_studies
-    
-    first_half  = strcat( Study_paths{ii,1}(6:end),',',Study_paths{ii,2},',1,', num2str( total{ii,6}(2)) , ',1.3854600e-07,','0.00e+00,'); % beginning to robin
-    second_half = strcat( num2str( total{ii,6}(1)),',', num2str( total{ii,5}(1)),',', num2str( total{ii,5}(1)),',', num2str( 1-total{ii,6}(1) )); % obj fxns
-    f_line = strcat( first_half,second_half);    
-    fprintf( fout, '%s\n', f_line);
-
-end
-
-fclose(fout);
-
-
-
-data_filename_out= 'data_summary_GPU_L2.txt';
-
-fin  = fopen(data_filename);
-fout = fopen( data_filename_out,'w');
-
-
-
-%% This records the optimal L2
-f_line = fgetl(fin); % basically skip first line
-fprintf(fout,'%s\n',f_line);
-fclose(fin);
-for ii = 1:num_studies
-    
-    first_half  = strcat( Study_paths{ii,1}(6:end),',',Study_paths{ii,2},',1,', num2str( total{ii,4}(2)) , ',1.3854600e-07,','0.00e+00,'); % beginning to robin
-    second_half = strcat( num2str( total{ii,3}( total{ii,4}(2), 7)),',', num2str( total{ii,4}(1)),',', num2str( total{ii,4}(1)),',', num2str( 1-total{ii,3}( total{ii,4}(2), 7) )); % obj fxns
-    f_line = strcat( first_half,second_half);    
-    fprintf( fout, '%s\n', f_line);
-
-end
-
-fclose(fout);
+% data_filename = 'datasummaryL2_10sourceNewton50.txt';
+% data_filename_out= 'data_summary_GPU_hd.txt';
+% 
+% fin  = fopen(data_filename);
+% fout = fopen( data_filename_out,'w');
+% 
+% 
+% 
+% %% This records the optimal Dice
+% f_line = fgetl(fin); % basically skip first line
+% fprintf(fout,'%s\n',f_line);
+% fclose(fin);
+% for ii = 1:num_studies
+%     
+%     first_half  = strcat( Study_paths{ii,1}(6:end),',',Study_paths{ii,2},',1,', num2str( total{ii,6}(2)) , ',1.3854600e-07,','0.00e+00,'); % beginning to robin
+%     second_half = strcat( num2str( total{ii,6}(1)),',', num2str( total{ii,5}(1)),',', num2str( total{ii,5}(1)),',', num2str( 1-total{ii,6}(1) )); % obj fxns
+%     f_line = strcat( first_half,second_half);    
+%     fprintf( fout, '%s\n', f_line);
+% 
+% end
+% 
+% fclose(fout);
+% 
+% 
+% 
+% data_filename_out= 'data_summary_GPU_L2.txt';
+% 
+% fin  = fopen(data_filename);
+% fout = fopen( data_filename_out,'w');
+% 
+% 
+% 
+% %% This records the optimal L2
+% f_line = fgetl(fin); % basically skip first line
+% fprintf(fout,'%s\n',f_line);
+% fclose(fin);
+% for ii = 1:num_studies
+%     
+%     first_half  = strcat( Study_paths{ii,1}(6:end),',',Study_paths{ii,2},',1,', num2str( total{ii,4}(2)) , ',1.3854600e-07,','0.00e+00,'); % beginning to robin
+%     second_half = strcat( num2str( total{ii,3}( total{ii,4}(2), 7)),',', num2str( total{ii,4}(1)),',', num2str( total{ii,4}(1)),',', num2str( 1-total{ii,3}( total{ii,4}(2), 7) )); % obj fxns
+%     f_line = strcat( first_half,second_half);    
+%     fprintf( fout, '%s\n', f_line);
+% 
+% end
+% 
+% fclose(fout);
