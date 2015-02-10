@@ -1,7 +1,7 @@
 % This is the updated Bioheat_script that should be used with DF's DAKOTA
 % run. The metric is based on temperature (not dose and isotherms).
 
-function [total, dice, hd] = temperature_obj_fxn_GPU_perf ( inputdatavars, sources, mu_eff_list );
+function [total, dice, hd] = temperature_obj_fxn_GPU_perf ( inputdatavars, sources, mu_eff_list, w_perf );
 % Record the working directory
 setenv ( 'PATH22' , pwd);
 path22 = getenv ( 'PATH22' );
@@ -16,6 +16,7 @@ patient_MRTI_path = strcat ( 'StudyDatabase/', patientID, 'vtk/referenceBased/' 
 % Read in the power and identify the max power moment.
 pwr_hist = str2num(inputdatavars.powerhistory); % Gets just the numbers. (Al a "Just the facts, ma'am.")
 mu_length = length(mu_eff_list);
+w_length = length(w_perf);
 % This for loop identifies the power history's times versus powers for
 % later parsing.
 for ii = 1:(length(pwr_hist) - 1)  % Write the for loop to iterate through all but the last index of 'pwr_hsitory'
@@ -43,7 +44,7 @@ alpha = str2num(inputdatavars.cv.alpha_healthy);
 rho = inputdatavars.cv.rho;
 c_p = str2num(inputdatavars.cv.c_p_healthy);
 c_blood = str2num(inputdatavars.cv.c_blood_healthy);
-w_perf = inputdatavars.cv.w_0;
+%w_perf = inputdatavars.cv.w_0;
 geometry.x_disp = str2num(inputdatavars.cv.x_displace);
 geometry.y_disp = str2num(inputdatavars.cv.y_displace);
 geometry.z_disp = str2num(inputdatavars.cv.z_displace);
@@ -156,10 +157,7 @@ spacing.x = spacing.x/scaling.x;
 spacing.y = spacing.y/scaling.y;
 spacing.z = spacing.z/(scaling.z * dom.z_subslice);
 
-w_perf = 0.01;
-%w_perf(2:35) = linspace ( 0.5, 17, 34);
-%w_perf(2:34) = linspace ( 0.5, 16.5,33);
-w_perf(2:133) = linspace ( 0.125, 16.5,132);
+
 
 [tmap_unique] = Human_GPU_perf ( power_log,spacing,scaling,mod_point,source,w_perf,k_cond,g_anisotropy,mu_eff_list,probe_u,robin_co,c_blood);
 

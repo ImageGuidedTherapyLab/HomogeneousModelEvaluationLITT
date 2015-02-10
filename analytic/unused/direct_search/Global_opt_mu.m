@@ -95,7 +95,7 @@ toc
 
 % Save
 cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search
-save ('GPU_global_search_hd.mat','total')
+save ('GPU_global_mu.mat','total')
 
 cd /mnt/FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
 

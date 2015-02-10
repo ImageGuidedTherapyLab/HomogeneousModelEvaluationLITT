@@ -33,6 +33,10 @@ n_patients = size( Study_paths,1); % This is the number of patients
 mu_eff = 130;
 %mu_eff(2:5001) = linspace(1,5000,5000);
 threshold_temps = 51:65;
+w_perf = 0.01;
+%w_perf(2:35) = linspace ( 0.5, 17, 34);
+%w_perf(2:34) = linspace ( 0.5, 16.5,33);
+w_perf(2:133) = linspace ( 0.125, 16.5,132);
 num_threshold_temps = length(threshold_temps);
 dice = zeros( length(mu_eff),num_threshold_temps); % Initialize the number of DSC (dice) values
 path_base = strcat ( 'workdir/',Study_paths{1,1}, '/', Study_paths{1,2}, '/opt');
@@ -76,7 +80,7 @@ for ii = 1:n_patients
 %         end
         %inputdatavars.cv.mu_eff_healthy = num2str( mu_eff (jj) );
         
-        [total,dice, hd] = temperature_obj_fxn_GPU_perf ( inputdatavars, 25, mu_eff );
+        [total,dice, hd] = temperature_obj_fxn_GPU_perf ( inputdatavars, 25, mu_eff, w_perf );
         %[metric, ~, thermal_model,MRTI_crop] = temperature_obj_fxn ( inputdatavars, 10 );
         % Column 2 of 'total' is based on conservation of energy (only cares
         % about summation of temperatures in the FOV)

@@ -1,7 +1,7 @@
 % This is the updated Bioheat_script that should be used with DF's DAKOTA
 % run. The metric is based on temperature (not dose and isotherms).
 
-function [total, dice, hd] = temperature_obj_fxn_GPU ( inputdatavars, sources, mu_eff_list );
+function [total, dice, hd] = temperature_obj_fxn_GPU_choice ( inputdatavars, sources, mu_eff_list, w_perf, k_cond, choice );
 % Record the working directory
 setenv ( 'PATH22' , pwd);
 path22 = getenv ( 'PATH22' );
@@ -33,17 +33,12 @@ clear diff
 % Read in the CVs from inputdatavars . Some need str2num coz they were
 % written as strings.
 probe_u = str2num(inputdatavars.cv.probe_init);
-%g_anisotropy = str2num(inputdatavars.cv.gamma_healthy);
 g_anisotropy = inputdatavars.cv.anfact;
-%mu_a = inputdatavars.cv.mu_a;
-% mu_s = inputdatavars.cv.mu_s;
-% mu_eff = str2num(inputdatavars.cv.mu_eff_healthy); % This should typically be str2num
-%k_cond = inputdatavars.cv.k_0;
-alpha = str2num(inputdatavars.cv.alpha_healthy);
-rho = inputdatavars.cv.rho;
-c_p = str2num(inputdatavars.cv.c_p_healthy);
+% alpha = str2num(inputdatavars.cv.alpha_healthy);
+% rho = inputdatavars.cv.rho;
+% c_p = str2num(inputdatavars.cv.c_p_healthy);
 c_blood = str2num(inputdatavars.cv.c_blood_healthy);
-w_perf = inputdatavars.cv.w_0;
+
 geometry.x_disp = str2num(inputdatavars.cv.x_displace);
 geometry.y_disp = str2num(inputdatavars.cv.y_displace);
 geometry.z_disp = str2num(inputdatavars.cv.z_displace);
@@ -73,10 +68,6 @@ else
 %     geometry.z_rot  = geometry.z_rot - str2num(aaa.inputdatavars.cv.z_rotate);
 end
 
-% mu_s_p = mu_s * ( 1 - g_anisotropy );
-% mu_a = (-3*mu_s_p + sqrt( 9*mu_s_p^2 + 12 * mu_eff^2))/6;
-
-k_cond = alpha * rho * c_p;
 
 robin_co=0; %dummy var
 
@@ -155,10 +146,8 @@ source.laser = [source.laser z_dim];
 spacing.x = spacing.x/scaling.x;
 spacing.y = spacing.y/scaling.y;
 spacing.z = spacing.z/(scaling.z * dom.z_subslice);
-[tmap_unique] = Human_GPU_mu ( power_log,spacing,scaling,mod_point,source,w_perf,k_cond,g_anisotropy,mu_eff_list,probe_u,robin_co,c_blood);
+[tmap_unique] = Human_GPU_choice ( power_log,spacing,scaling,mod_point,source,w_perf,k_cond,g_anisotropy,mu_eff_list,probe_u,robin_co,c_blood,choice);
 
-
-%[tmap_unique]=Bioheat1D_SSS( power_log,dom,source,w_perf,k_cond,g_anisotropy,mu_a,mu_s,probe_u,robin_co,c_blood);
 
 tmap_unique=tmap_unique+37;
 tmap_model_scaled_to_MRTI = imresize (tmap_unique , 1/scaling.x); % Set the model's spacing to MRTI

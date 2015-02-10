@@ -4,6 +4,8 @@ clear
 close all
 clc
 
+choice = 3; % 1 = mu; 2 = perf; 3 = cond;
+
 % Identify the studies to be examined.
 cd /mnt/FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
 data_filename = 'datasummaryL2_10sourceNewton50.txt';  % Name the datasummary file
@@ -70,8 +72,11 @@ for ii = 1:num_studies
     % Do global optimization
     input_path{1,1} = Study_paths{ii,1};
     input_path{1,2} = Study_paths{ii,2};
-    [ total{ii,2}, total{ii,3}, total{ii,4} ] = Check_ablation_cond ( input_path , opttype);
-    
+    if ii == num_studies
+        [ total{ii,2}, total{ii,3}, total{ii,4}, summary ] = Check_ablation_choice ( input_path , opttype, choice);
+    else
+        [ total{ii,2}, total{ii,3}, total{ii,4}, ~ ] = Check_ablation_choice ( input_path , opttype, choice);
+    end
     % Record optimal L2 information
     total{ii,5} = zeros(1,3);
     [total{ii,5}(1) , index] = min (total{ii,2}(:,2));  % record optimal L2
@@ -93,9 +98,27 @@ end
 %[ H0, H1, dice_values ] = Check_ablation ( Study_paths, mu_eff_opt );
 toc
 
+
+load( strcat ( path_base, '/optpp_pds.', opttype, '.in.1.mat') );
 % Save
 cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search
-save ('GPU_global_cond.mat','total')
+
+
+
+if choice == 1
+    
+    
+    save ('GPU_global_mu.mat','total','summary');
+    
+elseif choice == 2
+    
+    save ('GPU_global_perf.mat','total','summary');
+    
+elseif choice == 3
+    
+    save ('GPU_global_cond.mat','total','summary');
+    
+end
 
 cd /mnt/FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
 
