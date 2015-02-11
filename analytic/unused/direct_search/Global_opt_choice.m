@@ -64,7 +64,7 @@ clear ii
 num_studies = size(Study_paths,1);
 
 % clear ii
-total = cell(num_studies,8);
+total = cell(num_studies,10);
 input_path = cell(1,2);
 
 for ii = 1:num_studies
@@ -78,32 +78,50 @@ for ii = 1:num_studies
     input_path{1,1} = Study_paths{ii,1};
     input_path{1,2} = Study_paths{ii,2};
     if ii == num_studies
-        % L2 + temperature MI, DSC, HD, MI
+        % L2 + temperature MI, DSC, HD, MI, false_pix, summary
         [ total{ii,2}, total{ii,3}, total{ii,4}, total{ii,5}, total{ii,6}, summary ] = Check_ablation_choice ( input_path , opttype, choice);
     else
         [ total{ii,2}, total{ii,3}, total{ii,4}, total{ii,5}, total{ii,6}, ~ ] = Check_ablation_choice ( input_path , opttype, choice);
     end
-    % Record optimal L2 information
-    total{ii,6} = zeros(1,3);
-    [total{ii,6}(1) , index] = min (total{ii,2}(:,2));  % record optimal L2
-    total{ii,6}(2) = total{ii,2}(index,1);   % record mu_eff that produces optimal L2
-    total{ii,6}(3) = index; % record index that produces optimal L2
+    % Record optimal L information
+    total{ii,7} = zeros(3);
+    [total{ii,7}(1,1) , index] = min (total{ii,2}(:,2));  % record optimal L1
+    total{ii,7}(1,2) = total{ii,2}(index,1);   % record value that produces optimal L1
+    total{ii,7}(1,3) = index; % record index that produces optimal L1
+    [total{ii,7}(2,1) , index] = min (total{ii,2}(:,3));  % record optimal L2
+    total{ii,7}(2,2) = total{ii,2}(index,1);   % record value that produces optimal L2
+    total{ii,7}(2,3) = index; % record index that produces optimal L2
+    [total{ii,7}(3,1) , index] = min (total{ii,2}(:,4));  % record optimal L_inf
+    total{ii,7}(3,2) = total{ii,2}(index,1);   % record value that produces optimal L_inf
+    total{ii,7}(3,3) = index; % record index that produces optimal L_inf
     
     % Record optimal 57 C isotherm DSC information
-    total{ii,7} = zeros(1,3);
-    [total{ii,7}(1) , index] = max (total{ii,3}(:,7));  % record optimal Dice
-    total{ii,7}(2) = total{ii,2}(index,1);   % record mu_eff that produces optimal Dice
-    total{ii,7}(3) = index; % record index that produces optimal Dice
+    total{ii,8} = zeros(1,3);
+    [total{ii,8}(1) , index] = max (total{ii,3}(:,7));  % record optimal Dice
+    total{ii,8}(2) = total{ii,2}(index,1);   % record value that produces optimal Dice
+    total{ii,8}(3) = index; % record index that produces optimal Dice
     
     % Record optimal 57 C Hausdorff distance information
-    total{ii,8} = zeros(1,3);
-    [total{ii,8}(1) , index] = min (total{ii,4}(:,7)); % record optimal Hausdorff Distance
-    total{ii,8}(2) = total{ii,2}(index,1); % record mu_eff that produces optimal Hausdorff distance
-    total{ii,8}(3) = index;
+    total{ii,9} = zeros(1,3);
+    [total{ii,9}(1) , index] = min (total{ii,4}(:,7)); % record optimal Hausdorff Distance
+    total{ii,9}(2) = total{ii,2}(index,1); % record value that produces optimal Hausdorff distance
+    total{ii,9}(3) = index;
     
-    % Record optimal 57 C mutual information
-    total{ii,8} = zeros(1,3);
-    [total{ii,8}(1) , index] = max (total{ii,4}(:,5));
+    % Record optimal temperature MI and 57 C isotherm MI
+    total{ii,10} = zeros(2,3);
+    [total{ii,10}(1,1) , index] = max (total{ii,2}(:,5));  % MI for temperature
+    total{ii,10}(1,2) = total{ii,2}(index,1); % record value that produces optimal MI for temperature
+    total{ii,10}(1,3) = index;
+    [total{ii,10}(2,1) , index] = max (total{ii,5}(:,7));  % MI for 57 C isotherm
+    total{ii,10}(2,2) = total{ii,2}(index,1); % record value that produces optimal MI for 57 C isotherm
+    total{ii,10}(2,3) = index;
+    
+    % Record optimal number of false pixels for 57 C isotherm
+    total{ii,11} = zeros(1,3);
+    [total{ii,11}(1,1) , index] = max (total{ii,6}(:,7,3));  % False pixel number for 57 C isotherm
+    total{ii,11}(1,2) = total{ii,2}(index,1); % record value that produces number of false pixels
+    total{ii,11}(1,3) = index;
+
 end
 %[ H0, H1, dice_values ] = Check_ablation ( Study_paths, mu_eff_opt );
 toc

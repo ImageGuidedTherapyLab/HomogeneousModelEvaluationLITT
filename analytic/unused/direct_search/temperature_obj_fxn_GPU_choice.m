@@ -206,7 +206,7 @@ hd = dice;
 mutual_threshold = dice;
 false_pix = zeros(n_length,15,3);
 
-base_level= sum( sum( ones(size(MRTI_crop,1),size(MRTI_crop,2))*37 ));
+base_level= size(MRTI_crop,1).*size(MRTI_crop,2).*37;
 for ii = 1:n_length
     
     % Dice
@@ -225,9 +225,9 @@ for ii = 1:n_length
         n_intersection = sum( sum( intersection ));
         dice(ii,kk) = 2 * n_intersection / ( n_model + n_MRTI );  % DSC
         mutual_threshold(ii,kk) = mi( model_deg_threshold, MRTI_deg_threshold); % MI for label map
-        false_pix (ii,kk,1) = n_MRTI - intersection;  % False negative
-        false_pix (ii,kk,2) = n_model - intersection; % False positive
-        false_pix(ii,kk,3) = FN + FP; % total false pixels
+        false_pix (ii,kk,1) = n_MRTI - n_intersection;  % False negative
+        false_pix (ii,kk,2) = n_model - n_intersection; % False positive
+        false_pix(ii,kk,3) = false_pix(ii,kk,1)+false_pix(ii,kk,2); % total false pixels
         if isempty(mod_list)==1
             hd(ii,kk) = 1;
         else
@@ -246,10 +246,10 @@ for ii = 1:n_length
     total(ii,5) = mi(tmap_model_scaled_to_MRTI(:,:,ii), MRTI_crop); % MI for temperature
     
     % model-base
-    total(ii,6) = sum(sum(sum( tmap_model_scaled_to_MRTI(:,:,ii) ))) - base_level;
+    total(ii,6) = sum(sum( tmap_model_scaled_to_MRTI(:,:,ii) )) - base_level;
     
     % max temp
-    total(ii,7) = max(max(max( tmap_model_scaled_to_MRTI(:,:,ii) )));
+    total(ii,7) = max(max( tmap_model_scaled_to_MRTI(:,:,ii) ));
 
 
 end
