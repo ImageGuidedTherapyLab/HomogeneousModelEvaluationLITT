@@ -47,19 +47,24 @@ clear ii
 % opt.paths(toss_index_phantom-num_studies,:)=[];
 % datasummary(toss_index_phantom-num_studies,:)=[];
 
+% 0491 is suspect: small ROI, ablation fills entire ROI (ie not good)
+% 0490 is suspect: small ROI, ablation fills entire ROI
+% 0378 is suspect: has very funny shape
+% 0385 is really small (but nice and round)
+% 0476 is really small (and funny shaped)
+% 0435 is really funny shaped
+% 0436 small
+% 0466 small
+% 0468 Really small
+% 0471 small and funny shaped
+% 0477 small
+% 0450 almost small
+
 % From mu_eff_data, find the matching study's(ies') mu_eff value(s)
 num_studies = size(Study_paths,1);
-% matching_num = zeros(1,num_studies);
-% mu_eff_index = zeros(1,num_studies);
-% mu_eff_opt   = zeros(1,num_studies);
-% for ii = 1:num_studies
-%     
-%     matching_num(ii) = str2num(Study_paths{(ii),2});
-%     mu_eff_index(ii) = find( mu_eff_data(:,1) == matching_num(ii));
-%     mu_eff_opt(ii) = mu_eff_data(mu_eff_index(ii),2);
-% end
+
 % clear ii
-total = cell(num_studies,7);
+total = cell(num_studies,8);
 input_path = cell(1,2);
 
 for ii = 1:num_studies
@@ -73,40 +78,40 @@ for ii = 1:num_studies
     input_path{1,1} = Study_paths{ii,1};
     input_path{1,2} = Study_paths{ii,2};
     if ii == num_studies
-        [ total{ii,2}, total{ii,3}, total{ii,4}, summary ] = Check_ablation_choice ( input_path , opttype, choice);
+        % L2 + temperature MI, DSC, HD, MI
+        [ total{ii,2}, total{ii,3}, total{ii,4}, total{ii,5}, total{ii,6}, summary ] = Check_ablation_choice ( input_path , opttype, choice);
     else
-        [ total{ii,2}, total{ii,3}, total{ii,4}, ~ ] = Check_ablation_choice ( input_path , opttype, choice);
+        [ total{ii,2}, total{ii,3}, total{ii,4}, total{ii,5}, total{ii,6}, ~ ] = Check_ablation_choice ( input_path , opttype, choice);
     end
     % Record optimal L2 information
-    total{ii,5} = zeros(1,3);
-    [total{ii,5}(1) , index] = min (total{ii,2}(:,2));  % record optimal L2
-    total{ii,5}(2) = total{ii,2}(index,1);   % record mu_eff that produces optimal L2
-    total{ii,5}(3) = index; % record index that produces optimal L2
+    total{ii,6} = zeros(1,3);
+    [total{ii,6}(1) , index] = min (total{ii,2}(:,2));  % record optimal L2
+    total{ii,6}(2) = total{ii,2}(index,1);   % record mu_eff that produces optimal L2
+    total{ii,6}(3) = index; % record index that produces optimal L2
     
     % Record optimal 57 C isotherm DSC information
-    total{ii,6} = zeros(1,3);
-    [total{ii,6}(1) , index] = max (total{ii,3}(:,7));  % record optimal Dice
-    total{ii,6}(2) = total{ii,2}(index,1);   % record mu_eff that produces optimal Dice
-    total{ii,6}(3) = index; % record index that produces optimal Dice
+    total{ii,7} = zeros(1,3);
+    [total{ii,7}(1) , index] = max (total{ii,3}(:,7));  % record optimal Dice
+    total{ii,7}(2) = total{ii,2}(index,1);   % record mu_eff that produces optimal Dice
+    total{ii,7}(3) = index; % record index that produces optimal Dice
     
     % Record optimal 57 C Hausdorff distance information
-    total{ii,7} = zeros(1,3);
-    [total{ii,7}(1) , index] = min (total{ii,4}(:,7)); % record optimal Hausdorff Distance
-    total{ii,7}(2) = total{ii,2}(index,1); % record mu_eff that produces optimal Hausdorff distance
-    total{ii,7}(3) = index;
+    total{ii,8} = zeros(1,3);
+    [total{ii,8}(1) , index] = min (total{ii,4}(:,7)); % record optimal Hausdorff Distance
+    total{ii,8}(2) = total{ii,2}(index,1); % record mu_eff that produces optimal Hausdorff distance
+    total{ii,8}(3) = index;
+    
+    % Record optimal 57 C mutual information
+    total{ii,8} = zeros(1,3);
+    [total{ii,8}(1) , index] = max (total{ii,4}(:,5));
 end
 %[ H0, H1, dice_values ] = Check_ablation ( Study_paths, mu_eff_opt );
 toc
 
-
-load( strcat ( path_base, '/optpp_pds.', opttype, '.in.1.mat') );
 % Save
 cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search
 
-
-
 if choice == 1
-    
     
     save ('GPU_global_mu.mat','total','summary');
     

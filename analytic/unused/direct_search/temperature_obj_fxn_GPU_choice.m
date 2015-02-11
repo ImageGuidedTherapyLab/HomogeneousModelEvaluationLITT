@@ -1,7 +1,7 @@
 % This is the updated Bioheat_script that should be used with DF's DAKOTA
 % run. The metric is based on temperature (not dose and isotherms).
 
-function [total, dice, hd] = temperature_obj_fxn_GPU_choice ( inputdatavars, sources, mu_eff_list, w_perf, k_cond, choice );
+function [total, dice, hd, mutual_threshold, false_pix] = temperature_obj_fxn_GPU_choice ( inputdatavars, sources, mu_eff_list, w_perf, k_cond, choice );
 % Record the working directory
 setenv ( 'PATH22' , pwd);
 path22 = getenv ( 'PATH22' );
@@ -15,7 +15,22 @@ patient_MRTI_path = strcat ( 'StudyDatabase/', patientID, 'vtk/referenceBased/' 
 %patient_MRTI_path = strcat ( '/tmp/outputs/dakota/',inputdatavars.UID,'/');
 % Read in the power and identify the max power moment.
 pwr_hist = str2num(inputdatavars.powerhistory); % Gets just the numbers. (Al a "Just the facts, ma'am.")
-mu_length = length(mu_eff_list);
+
+
+if choice ==1
+    n_length = length(mu_eff_list);
+    total = zeros(n_length,7);
+    total(:,1) = mu_eff_list;
+elseif choice ==2
+    n_length = length(w_perf);
+    total = zeros(n_length,7);
+    total(:,1) = w_perf;
+elseif choice ==3
+    n_length = length(k_cond);
+    total = zeros(n_length,7);
+    total(:,1) = k_cond;
+end
+
 % This for loop identifies the power history's times versus powers for
 % later parsing.
 for ii = 1:(length(pwr_hist) - 1)  % Write the for loop to iterate through all but the last index of 'pwr_hsitory'
@@ -185,18 +200,14 @@ cd (path22);
 %temperature_diff = tmap_model_scaled_to_MRTI - MRTI_crop ( 2:(end-1), 2:(end-1));
 %temperature_diff = tmap_model_scaled_to_MRTI - MRTI_crop;
 
-%temperature_diff = tmap_model_scaled_to_MRTI - MRTI_big;
-total = zeros(mu_length,6);
-total(:,1) = mu_eff_list;
-% mu_eff   L2     weird metric     model-base   max(model)
-
 % isotherms = 51:65
-dice = zeros(mu_length,15);
+dice = zeros(n_length,15);
 hd = dice;
-
+mutual_threshold = dice;
+false_pix = zeros(n_length,15,3);
 
 base_level= sum( sum( ones(size(MRTI_crop,1),size(MRTI_crop,2))*37 ));
-for ii = 1:mu_length
+for ii = 1:n_length
     
     % Dice
     for kk=1:15
@@ -204,6 +215,7 @@ for ii = 1:mu_length
         [mod_row, mod_column] = find( model_deg_threshold ==1);
         mod_list = [(mod_row .* inputdatavars.spacing(1)) (mod_column .* inputdatavars.spacing(2))];
         MRTI_deg_threshold = MRTI_crop >= ( 50 + kk);
+        MRTI_deg_threshold = imfill( ExtractNLargestBlobs(MRTI_deg_threshold,1) , 'holes')  ;  % 1st, it keeps the largest contiguous region, then it fills in any holes
         [MRTI_row, MRTI_column] = find( MRTI_deg_threshold ==1);
         MRTI_list = [(MRTI_row .* inputdatavars.spacing(1)) (MRTI_column .* inputdatavars.spacing(2))];
         n_model = sum( sum( model_deg_threshold ));
@@ -211,7 +223,11 @@ for ii = 1:mu_length
         intersection = model_deg_threshold + MRTI_deg_threshold;
         intersection = intersection > 1;
         n_intersection = sum( sum( intersection ));
-        dice(ii,kk) = 2 * n_intersection / ( n_model + n_MRTI );
+        dice(ii,kk) = 2 * n_intersection / ( n_model + n_MRTI );  % DSC
+        mutual_threshold(ii,kk) = mi( model_deg_threshold, MRTI_deg_threshold); % MI for label map
+        false_pix (ii,kk,1) = n_MRTI - intersection;  % False negative
+        false_pix (ii,kk,2) = n_model - intersection; % False positive
+        false_pix(ii,kk,3) = FN + FP; % total false pixels
         if isempty(mod_list)==1
             hd(ii,kk) = 1;
         else
@@ -227,11 +243,13 @@ for ii = 1:mu_length
     
     total(ii,4) = norm ( temperature_diff , inf); %L_inf norm
     
+    total(ii,5) = mi(tmap_model_scaled_to_MRTI(:,:,ii), MRTI_crop); % MI for temperature
+    
     % model-base
-    total(ii,5) = sum(sum(sum( tmap_model_scaled_to_MRTI(:,:,ii) ))) - base_level;
+    total(ii,6) = sum(sum(sum( tmap_model_scaled_to_MRTI(:,:,ii) ))) - base_level;
     
     % max temp
-    total(ii,6) = max(max(max( tmap_model_scaled_to_MRTI(:,:,ii) )));
+    total(ii,7) = max(max(max( tmap_model_scaled_to_MRTI(:,:,ii) )));
 
 
 end
