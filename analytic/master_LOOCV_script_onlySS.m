@@ -2,6 +2,8 @@ close all
 clear
 clc
 
+choice =1;  % 1 = mu; 2 = perf; 3 = cond;
+
 opttype = 'bestfit50';          % Name the opttype
 datafilename = 'data_summary_GPU_L2.txt';
 %datafilename = 'datasummaryL2_10sourceNewton50.txt';  % Name the datasummary file

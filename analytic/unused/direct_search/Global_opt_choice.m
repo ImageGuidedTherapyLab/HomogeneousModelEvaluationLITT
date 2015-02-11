@@ -4,7 +4,7 @@ clear
 close all
 clc
 
-choice = 3; % 1 = mu; 2 = perf; 3 = cond;
+choice = 1; % 1 = mu; 2 = perf; 3 = cond;
 
 % Identify the studies to be examined.
 cd /mnt/FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
@@ -64,20 +64,35 @@ clear ii
 num_studies = size(Study_paths,1);
 
 % clear ii
-total = cell(num_studies,10);
+total = cell(num_studies+1,11);
 input_path = cell(1,2);
 
-for ii = 1:num_studies
+% Labels for the sundry cell columns
+total{1,1} = 'Study';
+total{1,2}{1} = '1= Parameter value';
+total{1,2}{2} = '2:4 = L1, L2, L_inf norms';
+total{1,2}{3} = '5:7 = Temp MI, Total heating, Max temp';
+total{1,3}    = 'DSC isotherms 51:65; column index 7 is 57';
+total{1,4}    = 'HD for isotherms';
+total{1,5}    = 'MI for isotherms';
+total{1,6}    = 'False pixel count for isotherms';
+total{1,7}    = 'Optimal L norms;';
+total{1,8}    = 'Optimal DSC for 57 C';
+total{1,9}    = 'Optimal HD for 57 C';
+total{1,10}   = 'Optimal temp and 57 C MI';
+total{1,11}   = 'Optimal false pixel count for 57 C';
+
+for ii = 2:(num_studies+1)
     % Display run information
     disp('Start ')
-    disp(strcat (num2str(ii),' of ', num2str(num_studies)))
-    total{ii,1} = strcat(Study_paths{ii,1}, '/', Study_paths{ii,2});
+    disp(strcat (num2str(ii-1),' of ', num2str(num_studies)))
+    total{ii,1} = strcat(Study_paths{ii-1,1}, '/', Study_paths{ii-1,2});
     fprintf('iter %s \n', total{ii,1});
     
     % Do global optimization
-    input_path{1,1} = Study_paths{ii,1};
-    input_path{1,2} = Study_paths{ii,2};
-    if ii == num_studies
+    input_path{1,1} = Study_paths{ii-1,1};
+    input_path{1,2} = Study_paths{ii-1,2};
+    if ii == (num_studies+1)
         % L2 + temperature MI, DSC, HD, MI, false_pix, summary
         [ total{ii,2}, total{ii,3}, total{ii,4}, total{ii,5}, total{ii,6}, summary ] = Check_ablation_choice ( input_path , opttype, choice);
     else

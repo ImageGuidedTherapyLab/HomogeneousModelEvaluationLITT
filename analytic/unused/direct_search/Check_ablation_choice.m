@@ -10,8 +10,8 @@ num_threshold_temps = length(threshold_temps);
 if choice ==1
     
     mu_eff(1) = 0.008;
-    mu_eff(2:101) = linspace(101,200,100);
-    %mu_eff(2:5001) = linspace(1,5000,5000);
+    %mu_eff(2:101) = linspace(101,200,100);
+    mu_eff(2:5001) = linspace(1,5000,5000);
     
     dice = zeros( length(mu_eff),num_threshold_temps); % Initialize the number of DSC (dice) values
     
@@ -27,8 +27,8 @@ elseif choice ==2
 elseif choice ==3
     
     %k_cond = linspace ( 0.01,2,200);
-    %k_cond = linspace ( 0.52, 3, 249);
-    k_cond = [0.527 0.55];
+    k_cond = linspace ( 0.52, 3, 249);
+    %k_cond = [0.527 0.55];
     
     dice = zeros( length(k_cond),num_threshold_temps); % Initialize the number of DSC (dice) values
     
