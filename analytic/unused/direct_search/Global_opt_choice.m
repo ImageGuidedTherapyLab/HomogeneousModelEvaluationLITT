@@ -133,7 +133,7 @@ for ii = 2:(num_studies+1)
     
     % Record optimal number of false pixels for 57 C isotherm
     total{ii,11} = zeros(1,3);
-    [total{ii,11}(1,1) , index] = max (total{ii,6}(:,7,3));  % False pixel number for 57 C isotherm
+    [total{ii,11}(1,1) , index] = min (total{ii,6}(:,7,3));  % False pixel number for 57 C isotherm
     total{ii,11}(1,2) = total{ii,2}(index,1); % record value that produces number of false pixels
     total{ii,11}(1,3) = index;
 

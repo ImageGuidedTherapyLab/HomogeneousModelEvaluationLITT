@@ -17,10 +17,11 @@ if choice ==1
     
 elseif choice ==2
     
-    w_perf = 0.01;
+    %w_perf = 0.01;
     %w_perf(2:35) = linspace ( 0.5, 17, 34);
     %w_perf(2:34) = linspace ( 0.5, 16.5,33);
-    w_perf(2:133) = linspace ( 0.125, 16.5,132);
+    %w_perf(2:133) = linspace ( 0.125, 16.5,132);
+    w_perf = linspace( 0.5, 16.5, 129);
     
     dice = zeros( length(w_perf),num_threshold_temps); % Initialize the number of DSC (dice) values
     
