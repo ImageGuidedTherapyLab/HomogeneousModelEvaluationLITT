@@ -1,11 +1,7 @@
 % This script finds the best mu_eff for the different studies.
-tic;
-clear
-close all
-clc
-
-choice = 1; % 1 = mu; 2 = perf; 3 = cond;
-
+function Global_opt_choice (choice);
+%choice = 1; % 1 = mu; 2 = perf; 3 = cond;
+tic
 % Identify the studies to be examined.
 cd /mnt/FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
 data_filename = 'datasummaryL2_10sourceNewton50.txt';  % Name the datasummary file
@@ -146,15 +142,15 @@ cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search
 
 if choice == 1
     
-    save ('GPU_global_mu.mat','total','summary');
+   save ('GPU_global_mu2.mat','total','summary');
     
 elseif choice == 2
     
-    save ('GPU_global_perf.mat','total','summary');
+    save ('GPU_global_perf2.mat','total','summary');
     
 elseif choice == 3
     
-    save ('GPU_global_cond.mat','total','summary');
+    save ('GPU_global_cond2.mat','total','summary');
     
 end
 

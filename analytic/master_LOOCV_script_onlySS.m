@@ -2,7 +2,7 @@ close all
 clear
 clc
 
-choice =2;  % 1 = mu; 2 = perf; 3 = cond;
+choice =1;  % 1 = mu; 2 = perf; 3 = cond;
 
 if choice == 1;   % mu
     naive_var = [180 1];
@@ -28,10 +28,10 @@ datafilename = 'data_summary_GPU_L2.txt';
 %datafilename = 'datasummaryL2_10sourceNewton50.txt';  % Name the datasummary file
 DSC_thresholds = [ 0.3 ];
 DSC_thresholds = sort(DSC_thresholds);
-opt_tag = 2; % DSC is 1; L2 is 2
+opt_tag = 1; % DSC is 1; L2 is 2
 
 [total,total_all,summary] = arrange_total_dataset ( datafilename, var_tag, choice );
-[opt, LOOCV, fig_labels] = master_LOOCV_onlySS_choice( total, DSC_thresholds, var_thresholds,naive_var(1), opt_tag, summary,choice);
+[opt, LOOCV, fig_labels] = master_LOOCV_onlySS_choice( total, DSC_thresholds, var_thresholds,naive_var(1), opt_tag, choice);
 
 
 

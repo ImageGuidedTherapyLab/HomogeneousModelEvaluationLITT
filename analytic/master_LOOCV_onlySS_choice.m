@@ -1,4 +1,4 @@
-function [opt, LOOCV, fig_labels] = master_LOOCV_onlySS_choice ( total, dice_thresholds, var_thresholds, naive_var, opt_tag,summary, choice);
+function [opt, LOOCV, fig_labels] = master_LOOCV_onlySS_choice ( total, dice_thresholds, var_thresholds, naive_var, opt_tag, choice);
 
 opt.paths = total(:,1);
 
@@ -14,7 +14,7 @@ if opt_tag ==1
     else
         
         % Setup 'total' indexing
-        opt_data = cell2mat(total(:,5));
+        opt_data = cell2mat(total(:,8));
         
         length_dice_thresholds = length(dice_thresholds);
         toss_dice = cell(length_dice_thresholds,1);
@@ -57,9 +57,9 @@ elseif opt_tag ==2  % optimize on L2
     else
         
         % Setup 'total' indexing
-        aa = cell2mat( total(:,7) );
+        aa = cell2mat( total(:,7) );  % Find the optimal L2 info
         sz_a = size(aa);
-        opt_L2 = aa( (sz_a(1)/3 +1): (sz_a(1)/3*2),:);
+        opt_L2 = aa( (sz_a(1)/3 +1): (sz_a(1)/3*2),:);    % Keep the L2 portion
         opt_data = zeros( size(opt_L2,1),2);
         opt_data(:,2) = opt_L2(:,3);
         for ii = 1:size( opt_L2,1)

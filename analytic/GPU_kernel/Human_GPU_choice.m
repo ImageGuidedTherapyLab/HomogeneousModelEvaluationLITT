@@ -16,17 +16,21 @@ format shortg
 % load rundata_GL5_4D_low
 if choice == 1            % mu
     Numruns = length(mu_eff);
-    para=[zeros(Numruns,1) mu_eff'];
+    mu_eff=[zeros(Numruns,1) mu_eff'];
+    k_cond=[0 k_cond];
+    w_perf=[0 w_perf];
     
 elseif choice ==2           % w_perf
     Numruns = length(w_perf);
     mu_eff = [0 mu_eff];
-    para=[zeros(Numruns,1) w_perf'];
+    w_perf=[zeros(Numruns,1) w_perf'];
+    k_cond=[0 k_cond];
     
 elseif choice ==3           % k_cond
     Numruns = length(k_cond);
     mu_eff = [0 mu_eff];
-    para=[zeros(Numruns,1) k_cond'];
+    k_cond=[zeros(Numruns,1) k_cond'];
+    w_perf=[0 w_perf];
     
 end
 
@@ -120,18 +124,29 @@ ssptx.GridSize=[numSMs*32               1];
 %For loop here
 Temp = zeros(npixelx,npixely,Numruns);
 
-if choice ==1       % mu 
+if choice ==1       % mu
     
     for ii = 1:Numruns
+        ssptx = parallel.gpu.CUDAKernel('steadyStatePennesLaser.ptx', 'steadyStatePennesLaser.cu');
+        threadsPerBlock = 256;
+        ssptx.ThreadBlockSize=[threadsPerBlock  1];
+        ssptx.GridSize=[numSMs*32               1];
+        
         if mod (ii,1000) == 0
             toc
             fprintf('iter %d \n', ii);
         end
         %%  transfer device to host
-        [d_temperature] = feval(ssptx,ntissue,materialID,perfusion,conduction, para(ii,:), R1, R2, nsource, power ,xloc,yloc,zloc, u0 ,u_artery , c_blood, spacingX,spacingY,spacingZ,npixelx,npixely,npixelz, d_temperature);
+        %         keyboard
+        [d_temperature] = feval(ssptx,ntissue,materialID,perfusion,conduction, mu_eff(ii,:), R1, R2, nsource, power ,xloc,yloc,zloc, u0 ,u_artery , c_blood, spacingX,spacingY,spacingZ,npixelx,npixely,npixelz, d_temperature);
         tmp = gather( d_temperature );
         Temp(:,:,ii) = mean(tmp,3);
-        
+        if isnan(Temp)
+            
+            cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search/troubleshoot
+            save -v7.3 mu_nan.mat
+            keyboard
+        end
     end
     
     
@@ -143,11 +158,19 @@ elseif choice ==2   %w_perf
             toc
             fprintf('iter %d \n', ii);
         end
+        ssptx = parallel.gpu.CUDAKernel('steadyStatePennesLaser.ptx', 'steadyStatePennesLaser.cu');
+        threadsPerBlock = 256;
+        ssptx.ThreadBlockSize=[threadsPerBlock  1];
+        ssptx.GridSize=[numSMs*32               1];
         %%  transfer device to host
-        [d_temperature] = feval(ssptx,ntissue,materialID,para(ii,:),conduction, mu_eff, R1, R2, nsource, power ,xloc,yloc,zloc, u0 ,u_artery , c_blood, spacingX,spacingY,spacingZ,npixelx,npixely,npixelz, d_temperature);
+        [d_temperature] = feval(ssptx,ntissue,materialID,perfusion(ii,:),conduction, mu_eff, R1, R2, nsource, power ,xloc,yloc,zloc, u0 ,u_artery , c_blood, spacingX,spacingY,spacingZ,npixelx,npixely,npixelz, d_temperature);
         tmp = gather( d_temperature );
         Temp(:,:,ii) = mean(tmp,3);
-        
+        if isnan(Temp)
+            cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search/troubleshoot
+            save -v7.3 perf_nan.mat
+            keyboard
+        end
     end
     
     
@@ -158,16 +181,24 @@ elseif choice ==3 %k_cond
             toc
             fprintf('iter %d \n', ii);
         end
+        ssptx = parallel.gpu.CUDAKernel('steadyStatePennesLaser.ptx', 'steadyStatePennesLaser.cu');
+        threadsPerBlock = 256;
+        ssptx.ThreadBlockSize=[threadsPerBlock  1];
+        ssptx.GridSize=[numSMs*32               1];
         %%  transfer device to host
-        [d_temperature] = feval(ssptx,ntissue,materialID,perfusion,para(ii,:), mu_eff, R1, R2, nsource, power ,xloc,yloc,zloc, u0 ,u_artery , c_blood, spacingX,spacingY,spacingZ,npixelx,npixely,npixelz, d_temperature);
+        [d_temperature] = feval(ssptx,ntissue,materialID,perfusion,conduction(ii,:), mu_eff, R1, R2, nsource, power ,xloc,yloc,zloc, u0 ,u_artery , c_blood, spacingX,spacingY,spacingZ,npixelx,npixely,npixelz, d_temperature);
         tmp = gather( d_temperature );
         Temp(:,:,ii) = mean(tmp,3);
-        
+        if isnan(Temp)
+            cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search/troubleshoot
+            save -v7.3 cond_nan.mat
+            keyboard
+        end
     end
     
 end
-
 toc
+keyboard
 end
 
 
