@@ -1,4 +1,4 @@
-function [opt, LOOCV, fig_labels] = master_LOOCV_onlySS_choice ( total, dice_thresholds, var_thresholds, naive_var, opt_tag, choice);
+function [opt, LOOCV, fig_labels] = master_LOOCV_onlySS_choice ( total, dice_thresholds, var_thresholds, naive_var, opt_tag);
 
 opt.paths = total(:,1);
 

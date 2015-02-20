@@ -145,7 +145,7 @@ if choice ==1       % mu
             
             cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search/troubleshoot
             save -v7.3 mu_nan.mat
-            keyboard
+         %   keyboard
         end
     end
     
@@ -169,7 +169,7 @@ elseif choice ==2   %w_perf
         if isnan(Temp)
             cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search/troubleshoot
             save -v7.3 perf_nan.mat
-            keyboard
+           % keyboard
         end
     end
     
@@ -192,13 +192,13 @@ elseif choice ==3 %k_cond
         if isnan(Temp)
             cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search/troubleshoot
             save -v7.3 cond_nan.mat
-            keyboard
+           % keyboard
         end
     end
     
 end
 toc
-keyboard
+%keyboard
 end
 
 

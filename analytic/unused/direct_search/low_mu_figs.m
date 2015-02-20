@@ -10,15 +10,15 @@ cd ../../../MATLAB/Tests/direct_search
 choice=3;
 if choice == 1   % mu
     
-    load ('GPU_global_mu.mat');
+    load ('GPU_global_mu2.mat');
     
 elseif choice == 2  % perf
     
-    load ('GPU_global_perf.mat');
+    load ('GPU_global_perf2.mat');
     
 elseif choice == 3   % cond
     
-    load ('GPU_global_cond.mat');
+    load ('GPU_global_cond2.mat');
     
 end
 

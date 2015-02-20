@@ -11,15 +11,15 @@ cd ../../../MATLAB/Tests/direct_search
 
 if choice == 1   % mu
     
-    load ('GPU_global_mu.mat');
+    load ('GPU_global_mu2.mat');
     
 elseif choice == 2  % perf
     
-    load ('GPU_global_perf.mat');
+    load ('GPU_global_perf2.mat');
     
 elseif choice == 3   % cond
     
-    load ('GPU_global_cond.mat');
+    load ('GPU_global_cond2.mat');
     
 end
 
@@ -205,6 +205,8 @@ legend( h1, 'L_1 mean', 'L_2 mean', 'L_{inf} mean'); hold off;
 
 figure; h_title = title( 'DSC mean, HD mean'); hold all;
 [AX, h1,h2] = plotyy (total_all{1,2}(:,1), dice_mean, total_all{1,2}(:,1), HD_mean );
+set( AX(2),'YLim',[0 0.15]);
+set( AX(2),'YTick',[0:0.03:0.15]);
 legend( [h1;h2], 'DSC mean', 'HD mean' ); hold off;
 
 figure; h_title = title( 'MI of temperature and 57 ^{o}C'); hold all;
