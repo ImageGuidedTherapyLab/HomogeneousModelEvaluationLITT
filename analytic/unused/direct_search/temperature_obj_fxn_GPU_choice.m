@@ -91,6 +91,20 @@ VOI.x = double( inputdatavars.voi(3:4)); % The weird index assignment is coz it'
 VOI.y = double( inputdatavars.voi(1:2));
 VOI.z = double( inputdatavars.voi(5:6));
 
+if sum( inputdatavars.UID == '0496' ) ==4
+    VOI.x = VOI.x + 2;
+    VOI.y = VOI.y + 1;
+elseif sum( inputdatavars.UID == '0402' ) ==4
+    VOI.x = VOI.x + 1;
+    VOI.y = VOI.y + 3;
+elseif sum( inputdatavars.UID == '0389' ) ==4
+    VOI.x = VOI.x + 2;
+    VOI.y = VOI.y + 2;
+elseif sum( inputdatavars.UID == '0385' ) ==4
+    VOI.x = VOI.x - 2;
+    VOI.y = VOI.y - 2;
+end
+
 % Define the domain and scaling
 mod_point.x = abs ( VOI.x(1) - VOI.x(2) ) +1;  % x dimension distance
 % The '+ 1' is important becasue there are **51** pixels for

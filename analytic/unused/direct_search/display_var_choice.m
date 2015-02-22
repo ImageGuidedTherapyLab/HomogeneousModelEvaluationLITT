@@ -84,29 +84,29 @@ var_opt = cell2mat( total(:,8));
 for ii = patient_ix
     path_base = strcat ( 'workdir/',Study_paths{ii,1}, '/', Study_paths{ii,2}, '/opt');
     load( strcat ( path_base, '/optpp_pds.', opttype, '.in.1.mat') );
-    inputdatavars.spacing
-%     if choice == 1  % mu
-%         
-%         [ tmap_model, MRTI_crop, intersection ] = display_obj_fxn_GPU_choice ( inputdatavars, 25, var_opt(ii,2) , summary.w_perf, summary.k_cond, choice );
-%         
-%     elseif choice == 2 % perf
-%         
-%         [ tmap_model, MRTI_crop, intersection ] = display_obj_fxn_GPU_choice ( inputdatavars, 25, summary.mu_eff , var_opt(ii,2), summary.k_cond, choice );
-%         
-%     elseif choice == 3 % cond
-%         
-%         [ tmap_model, MRTI_crop, intersection ] = display_obj_fxn_GPU_choice ( inputdatavars, 25, summary.mu_eff , summary.w_perf, var_opt(ii,2), choice );
-%         
-%     end
-%     
-%     figure; imagesc(tmap_model, [30 100]);
-%     figure; imagesc(MRTI_crop, [30 100]);
-%     figure; imagesc(intersection(:,:,7)); title( Study_paths{ii,2} );
-%     figure; [AX h1 h2] = plotyy(total{ii,2}(:,1),total{ii,2}(:,3),total{ii,2}(:,1),total{ii,3}(:,7));
-%     legend([h1;h2],'L_2','DSC'); title( Study_paths{ii,2});
-%     var_opt(ii,:)
-%     keyboard
-%     close all
+    %inputdatavars.spacing
+    if choice == 1  % mu
+        
+        [ tmap_model, MRTI_crop, intersection ] = display_obj_fxn_GPU_choice ( inputdatavars, 25, var_opt(ii,2) , summary.w_perf, summary.k_cond, choice );
+        
+    elseif choice == 2 % perf
+        
+        [ tmap_model, MRTI_crop, intersection ] = display_obj_fxn_GPU_choice ( inputdatavars, 25, summary.mu_eff , var_opt(ii,2), summary.k_cond, choice );
+        
+    elseif choice == 3 % cond
+        
+        [ tmap_model, MRTI_crop, intersection ] = display_obj_fxn_GPU_choice ( inputdatavars, 25, summary.mu_eff , summary.w_perf, var_opt(ii,2), choice );
+        
+    end
+    
+    figure; imagesc(tmap_model, [30 100]);
+    figure; imagesc(MRTI_crop, [30 100]);
+    figure; imagesc(intersection(:,:,7)); title( Study_paths{ii,2} );
+    figure; [AX h1 h2] = plotyy(total{ii,2}(:,1),total{ii,2}(:,3),total{ii,2}(:,1),total{ii,3}(:,7));
+    legend([h1;h2],'L_2','DSC'); title( Study_paths{ii,2});
+    var_opt(ii,:)
+    keyboard
+    close all
 
     
 end

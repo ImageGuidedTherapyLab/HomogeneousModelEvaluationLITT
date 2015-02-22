@@ -91,6 +91,72 @@ VOI.x = double( inputdatavars.voi(3:4)); % The weird index assignment is coz it'
 VOI.y = double( inputdatavars.voi(1:2));
 VOI.z = double( inputdatavars.voi(5:6));
 
+if sum( inputdatavars.UID == '0496' ) ==4
+    VOI.x = VOI.x + 2;
+    VOI.y = VOI.y + 1;
+elseif sum( inputdatavars.UID == '0402' ) ==4
+    VOI.x = VOI.x + 1;
+    VOI.y = VOI.y + 3;
+elseif sum( inputdatavars.UID == '0389' ) ==4
+    VOI.x = VOI.x + 2;
+    VOI.y = VOI.y + 2;
+elseif sum( inputdatavars.UID == '0385' ) ==4
+    VOI.x = VOI.x + 1;
+    VOI.y = VOI.y - 1;
+    inputdatavars.maxheatid = 109;
+elseif sum( inputdatavars.UID == '0476' ) ==4
+    VOI.x = VOI.x + 5;
+    VOI.y = VOI.y - 5;
+elseif sum( inputdatavars.UID == '0477' ) ==4
+    VOI.x = VOI.x + 3;
+    VOI.y = VOI.y - 2;
+elseif sum( inputdatavars.UID == '0438' ) ==4
+    VOI.x = VOI.x - 1;
+    VOI.y = VOI.y + 0;
+elseif sum( inputdatavars.UID == '0435' ) ==4
+    VOI.x = VOI.x - 3;
+    VOI.y = VOI.y + 3;
+elseif sum( inputdatavars.UID == '0436' ) ==4
+    VOI.x = VOI.x + 1;
+    VOI.y = VOI.y + 6;
+    power_log = 10.05;
+    inputdatavars.maxheatid = 39;
+elseif sum( inputdatavars.UID == '0466' ) ==4
+    VOI.x = VOI.x + 0;
+    VOI.y = VOI.y + 1;
+    power_log = 12;
+elseif sum( inputdatavars.UID == '0468' ) ==4
+    VOI.x = VOI.x - 3;
+    VOI.y = VOI.y + 1;
+elseif sum( inputdatavars.UID == '0471' ) ==4
+    VOI.x = VOI.x + 3;
+    VOI.y = VOI.y + 1;
+elseif sum( inputdatavars.UID == '0447' ) ==4
+    VOI.x = VOI.x + 0;
+    VOI.y = VOI.y + 1;
+elseif sum( inputdatavars.UID == '0453' ) ==4
+    VOI.x = VOI.x + 0;
+    VOI.y = VOI.y + 1;
+elseif sum( inputdatavars.UID == '0451' ) ==4
+    VOI.x = VOI.x + 0;
+    VOI.y = VOI.y + 1;
+elseif sum( inputdatavars.UID == '0418' ) ==4
+    VOI.x = VOI.x + 0;
+    VOI.y = VOI.y + 0;
+    %inputdatavars.maxheatid = 85;
+elseif sum( inputdatavars.UID == '0414' ) ==4
+    VOI.x = VOI.x + 2;
+    VOI.y = VOI.y + 1;
+elseif sum( inputdatavars.UID == '0415' ) ==4
+    VOI.x = VOI.x + 1;
+    VOI.y = VOI.y + 1;
+end
+
+% VOI.x(1) = VOI.x(1)-8;
+% VOI.x(2) = VOI.x(2)+3;
+% VOI.y(1) = VOI.y(1)-4;
+% VOI.y(2) = VOI.y(2)+4;
+
 % Define the domain and scaling
 mod_point.x = abs ( VOI.x(1) - VOI.x(2) ) +1;  % x dimension distance
 % The '+ 1' is important becasue there are **51** pixels for
