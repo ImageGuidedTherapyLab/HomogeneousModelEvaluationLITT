@@ -36,7 +36,7 @@ end
 for ii = 1:(length(pwr_hist) - 1)  % Write the for loop to iterate through all but the last index of 'pwr_hsitory'
     diff = pwr_hist(ii) - pwr_hist( ii + 1); % Record the difference between neighboring array elements
     if diff >= 0 % If 'diff' is non-negative, it means the times have stopped and the powers are starting.
-        break;  % Stop the for-loop.      
+        break;  % Stop the for-loop.
     end
 end
 % Based on immediately previous for-loop, parse the times from powers.
@@ -69,18 +69,18 @@ if inputdatavars.fileID == 1
     geometry.x_disp = 0;
     geometry.y_disp = 0;
     geometry.z_disp = 0;
-%     geometry.x_rot  = 0;
-%     geometry.y_rot  = 0;
-%     geometry.z_rot  = 0;
+    %     geometry.x_rot  = 0;
+    %     geometry.y_rot  = 0;
+    %     geometry.z_rot  = 0;
 else
     aaa = load( strcat( patient_opt_path, 'optpp_pds.', inputdatavars.opttype, '.in.1.mat') );
     
     geometry.x_disp = geometry.x_disp - str2num(aaa.inputdatavars.cv.x_displace);
     geometry.y_disp = geometry.y_disp - str2num(aaa.inputdatavars.cv.y_displace);
     geometry.z_disp = geometry.z_disp - str2num(aaa.inputdatavars.cv.z_displace);
-%     geometry.x_rot  = geometry.x_rot - str2num(aaa.inputdatavars.cv.x_rotate);
-%     geometry.y_rot  = geometry.y_rot - str2num(aaa.inputdatavars.cv.y_rotate);
-%     geometry.z_rot  = geometry.z_rot - str2num(aaa.inputdatavars.cv.z_rotate);
+    %     geometry.x_rot  = geometry.x_rot - str2num(aaa.inputdatavars.cv.x_rotate);
+    %     geometry.y_rot  = geometry.y_rot - str2num(aaa.inputdatavars.cv.y_rotate);
+    %     geometry.z_rot  = geometry.z_rot - str2num(aaa.inputdatavars.cv.z_rotate);
 end
 
 
@@ -145,19 +145,19 @@ source.n=sources;
 source.length=0.01;  %~0.033 is when n=5 is visible
 if source.n > 1;
     source.base = linspace((-source.length/2),(source.length/2),source.n);
-   % source.laser = [geometry.x_disp, geometry.y_disp, geometry.z_disp];
+    % source.laser = [geometry.x_disp, geometry.y_disp, geometry.z_disp];
 else
     source.base = 0;
 end
-    
+
 % source.laser = zeros(source.n,3);
-% 
+%
 % for jj = 1:source.n
-%     
+%
 %     source.laser(jj,:) = [ source.base(jj)+geometry.x_disp, geometry.y_disp, geometry.z_disp ]; % Columns are for x,y,z displacement; Rows are for different sources
-%     
+%
 % end
-% 
+%
 % source.laser = source.laser*rodrigues( [geometry.x_rot*pi/180,(geometry.y_rot+90)*pi/180,geometry.z_rot*pi/180]);
 
 source.laser = zeros(source.n,2);
@@ -175,12 +175,12 @@ source.laser = [source.laser z_dim];
 spacing.x = spacing.x/scaling.x;
 spacing.y = spacing.y/scaling.y;
 spacing.z = spacing.z/(scaling.z * dom.z_subslice);
-[tmap_unique] = Human_GPU_choice ( power_log,spacing,scaling,mod_point,source,w_perf,k_cond,g_anisotropy,mu_eff_list,probe_u,robin_co,c_blood,choice);
+[tmap_unique] = Human_GPU_choice_sym ( power_log,spacing,scaling,mod_point,source,w_perf,k_cond,g_anisotropy,mu_eff_list,probe_u,robin_co,c_blood,choice);
 
 
 tmap_unique=tmap_unique+37;
 tmap_model_scaled_to_MRTI = imresize (tmap_unique , 1/scaling.x); % Set the model's spacing to MRTI
- 
+
 
 % Change directory and load the temperature from VTK
 cd (patient_MRTI_path);
@@ -214,6 +214,19 @@ cd (path22);
 %temperature_diff = tmap_model_scaled_to_MRTI - MRTI_crop ( 2:(end-1), 2:(end-1));
 %temperature_diff = tmap_model_scaled_to_MRTI - MRTI_crop;
 
+MRTI_deg_threshold = zeros( size(MRTI_crop,1), size(MRTI_crop,2) ,15);
+n_MRTI = zeros(15,1);
+MRTI_list = cell(15,1);
+
+for kk=1:15
+    MRTI_tmp = MRTI_crop >= ( 50 + kk);
+    MRTI_deg_threshold(:,:,kk) = imfill( ExtractNLargestBlobs(MRTI_tmp,1) , 'holes')  ;  % 1st, it keeps the largest contiguous region, then it fills in any holes
+    [MRTI_row, MRTI_column] = find( MRTI_deg_threshold(:,:,kk) ==1);
+    MRTI_list{kk} = [(MRTI_row .* inputdatavars.spacing(1)) (MRTI_column .* inputdatavars.spacing(2))];
+    n_MRTI(kk) =  sum( sum( MRTI_deg_threshold(:,:,kk)  ));
+end
+clear kk
+
 % isotherms = 51:65
 dice = zeros(n_length,15);
 hd = dice;
@@ -228,24 +241,20 @@ for ii = 1:n_length
         model_deg_threshold = tmap_model_scaled_to_MRTI(:,:,ii) >= ( 50 + kk);
         [mod_row, mod_column] = find( model_deg_threshold ==1);
         mod_list = [(mod_row .* inputdatavars.spacing(1)) (mod_column .* inputdatavars.spacing(2))];
-        MRTI_deg_threshold = MRTI_crop >= ( 50 + kk);
-        MRTI_deg_threshold = imfill( ExtractNLargestBlobs(MRTI_deg_threshold,1) , 'holes')  ;  % 1st, it keeps the largest contiguous region, then it fills in any holes
-        [MRTI_row, MRTI_column] = find( MRTI_deg_threshold ==1);
-        MRTI_list = [(MRTI_row .* inputdatavars.spacing(1)) (MRTI_column .* inputdatavars.spacing(2))];
+
         n_model = sum( sum( model_deg_threshold ));
-        n_MRTI =  sum( sum( MRTI_deg_threshold  ));
-        intersection = model_deg_threshold + MRTI_deg_threshold;
+        intersection = model_deg_threshold + MRTI_deg_threshold(:,:,kk);
         intersection = intersection > 1;
         n_intersection = sum( sum( intersection ));
-        dice(ii,kk) = 2 * n_intersection / ( n_model + n_MRTI );  % DSC
-        mutual_threshold(ii,kk) = mi( model_deg_threshold, MRTI_deg_threshold); % MI for label map
-        false_pix (ii,kk,1) = n_MRTI - n_intersection;  % False negative
+        dice(ii,kk) = 2 * n_intersection / ( n_model + n_MRTI(kk) );  % DSC
+        mutual_threshold(ii,kk) = mi( model_deg_threshold, MRTI_deg_threshold(:,:,kk)); % MI for label map
+        false_pix (ii,kk,1) = n_MRTI(kk) - n_intersection;  % False negative
         false_pix (ii,kk,2) = n_model - n_intersection; % False positive
         false_pix(ii,kk,3) = false_pix(ii,kk,1)+false_pix(ii,kk,2); % total false pixels
         if isempty(mod_list)==1
             hd(ii,kk) = 1;
         else
-            hd(ii,kk) = HausdorffDist( mod_list, MRTI_list);
+            hd(ii,kk) = HausdorffDist( mod_list, MRTI_list{kk});
         end
     end
     
@@ -264,8 +273,8 @@ for ii = 1:n_length
     
     % max temp
     total(ii,7) = max(max( tmap_model_scaled_to_MRTI(:,:,ii) ));
-
-
+    
+    
 end
 
 end

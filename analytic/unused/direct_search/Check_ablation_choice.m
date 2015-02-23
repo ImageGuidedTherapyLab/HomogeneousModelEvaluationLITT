@@ -16,12 +16,13 @@ ww = inputdatavars.cv.w_0;
 for ii = 1:n_patients
     
     if choice ==1   % Mu
-        mu_eff(1) = 0.008;
+        %mu_eff(1) = 0.008;
         %         mu_eff(2:101) = linspace(101,200,100);
-        %mu_eff=[200 500];
+        mu_eff=[200 300 400 500 600 700];
         %mu_eff(2:1001) = linspace(1,1000,1000);
         %mu_eff=180;
-        mu_eff(2:5001) = linspace(1,5000,5000);
+        %mu_eff(2:301) = linspace(1,300,300);
+        %mu_eff(2:5001) = linspace(1,5000,5000);
         %mu_eff(1) = 0.008;
         %mu_eff(2:101) = linspace(101,200,100);
         %mu_eff = linspace(100,500,401);
