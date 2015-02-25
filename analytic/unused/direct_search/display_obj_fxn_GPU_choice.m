@@ -144,6 +144,9 @@ elseif sum( inputdatavars.UID == '0418' ) ==4
     VOI.x = VOI.x + 0;
     VOI.y = VOI.y + 0;
     %inputdatavars.maxheatid = 85;
+elseif sum( inputdatavars.UID == '0409' ) ==4
+    VOI.x = VOI.x - 2;
+    VOI.y = VOI.y + 11;
 elseif sum( inputdatavars.UID == '0414' ) ==4
     VOI.x = VOI.x + 2;
     VOI.y = VOI.y + 1;

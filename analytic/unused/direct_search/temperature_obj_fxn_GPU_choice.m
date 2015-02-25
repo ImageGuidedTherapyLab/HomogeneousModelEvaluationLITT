@@ -174,7 +174,7 @@ source.laser = [source.laser z_dim];
 % Run the Bioheat model with the unique powers, and then scale it to MRTI
 spacing.x = spacing.x/scaling.x;
 spacing.y = spacing.y/scaling.y;
-spacing.z = spacing.z/(scaling.z * dom.z_subslice);
+spacing.z = spacing.z/(scaling.z * dom.z_subslice); % Denominator needs a "-1"
 [tmap_unique] = Human_GPU_choice_sym ( power_log,spacing,scaling,mod_point,source,w_perf,k_cond,g_anisotropy,mu_eff_list,probe_u,robin_co,c_blood,choice);
 
 

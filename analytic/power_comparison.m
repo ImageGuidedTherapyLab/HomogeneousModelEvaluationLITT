@@ -7,8 +7,8 @@ pwr10= load('pwr10.mat');
 pwr15= load('pwr15.mat');
 
 neg3 = load('neg3.mat');
-
-hi_pwr = pwr15.Temp(:,:,1)./15 + (14/15).*pwr0.Temp(:,:,1);
+% arbitrary to 1 W
+hi_pwr = pwr15.Temp(:,:,1)./15; %+ (14/15).*pwr0.Temp(:,:,1);
 diff = pwr1.Temp(:,:,1)-hi_pwr;
 
 figure; imagesc( pwr1.Temp(:,:,1));
@@ -32,6 +32,8 @@ figure; imagesc( hi_pwr );
 figure; imagesc( diff);
 figure; imagesc( pwr10.Temp(:,:,3));
 
+
+% 1 W to arbitrary
 hi_pwr = pwr1.Temp(:,:,1).*15 - (15-1).*pwr0.Temp(:,:,1);
 diff = pwr15.Temp(:,:,1)-hi_pwr;
 
