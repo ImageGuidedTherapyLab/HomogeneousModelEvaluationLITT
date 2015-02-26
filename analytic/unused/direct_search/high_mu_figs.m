@@ -5,20 +5,24 @@ clear
 setenv ( 'PATH22' , pwd);
 path22 = getenv ( 'PATH22' );
 
-cd ../../../MATLAB/Tests/direct_search
+% cd ../../../MATLAB/Tests/direct_search/
+cd ../../../MATLAB/Tests/direct_search/libraries
 
-choice=3;
+choice=2;
 if choice == 1   % mu
     
-    load ('GPU_global_mu2.mat');
+    %load ('GPU_global_mu2.mat');
+    load ('GPU_dict_mu.mat');
     
 elseif choice == 2  % perf
     
-    load ('GPU_global_perf2.mat');
+    %load ('GPU_global_perf2.mat');
+    load ('GPU_dict_perf.mat');
     
 elseif choice == 3   % cond
     
-    load ('GPU_global_cond2.mat');
+    %load ('GPU_global_cond2.mat');
+    load ('GPU_dict_cond.mat');
     
 end
 
@@ -30,7 +34,7 @@ aa = cell2mat( total(:,8));
 
 if choice == 1   % mu
     
-    index=find( (aa(:,2)>700)==1);
+    index=find( (aa(:,2)>-1)==1);
     
 elseif choice == 2  % perf
     

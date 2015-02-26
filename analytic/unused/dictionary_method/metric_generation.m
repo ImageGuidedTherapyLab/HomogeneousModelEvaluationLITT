@@ -166,8 +166,11 @@ elseif choice == 2
     
 elseif choice == 3
     
-    save ('GPU_dice_cond.mat','total','summary');
+    save ('GPU_dict_cond.mat','total','summary');
     
+elseif choice == 4
+    
+    save ('GPU_dict_perf_mu_global','total','summary');
 end
-
-cd /mnt/FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
+ 
+end

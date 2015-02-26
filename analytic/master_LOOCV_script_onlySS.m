@@ -2,7 +2,7 @@ close all
 clear
 clc
 
-choice = 1;  % 1 = mu; 2 = perf; 3 = cond;
+choice = 3;  % 1 = mu; 2 = perf; 3 = cond;
 
 if choice == 1;   % mu
     naive_var = [180 1];
