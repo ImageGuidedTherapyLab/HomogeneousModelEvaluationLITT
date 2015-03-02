@@ -49,7 +49,7 @@ pass_naive_opt = passes_opt;
 for kk = 1:10001
     
     passes_opt (kk) = sum( dice_opt.values > thresholds(kk) );
-    pass_naive_opt (kk) = sum ( dice_opt.naive.val > thresholds(kk) );
+    pass_naive_opt (kk) = sum ( naive_values{1} > thresholds(kk) );
 %     all_L2_mean_pass (kk) = sum( best.all.L2_mean.val > thresholds(kk) );
 %     all_L2_median_pass (kk) = sum( best.all.L2_median.val > thresholds(kk) );
 %     all_dice_mean_pass (kk) = sum( best.all.dice_mean.val > thresholds(kk) );

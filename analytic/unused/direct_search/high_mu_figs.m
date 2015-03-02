@@ -30,6 +30,43 @@ cd(path22);
 
 total(1,:)=[];
 
+% List of excluded datasets   
+total(1,:) = []; % Drop the labels
+ix=find(~cellfun(@isempty,regexp(total(:,1),'0497'))==1); % Absolutely should be excluded
+total(ix,:) = [];
+
+ix=find(~cellfun(@isempty,regexp(total(:,1),'0378'))==1); % Strongly suggest exclusion
+total(ix,:) = [];
+
+ix=find(~cellfun(@isempty,regexp(total(:,1),'0476'))==1); % Strongly suggest exclusion
+total(ix,:) = [];
+
+ix=find(~cellfun(@isempty,regexp(total(:,1),'0436'))==1); % Absolutely should be excluded
+total(ix,:) = [];
+
+ix=find(~cellfun(@isempty,regexp(total(:,1),'0466'))==1); % Very probably suggest exclusion
+total(ix,:) = [];
+
+ix=find(~cellfun(@isempty,regexp(total(:,1),'0468'))==1); % Very probably suggest exclusion
+total(ix,:) = [];
+
+ix=find(~cellfun(@isempty,regexp(total(:,1),'0471'))==1); % Strongly suggest exclusion
+total(ix,:) = [];
+% 
+% ix=find(~cellfun(@isempty,regexp(total(:,1),'0417'))==1); % Very probably suggest exclusion
+% total(ix,:) = [];
+
+ix=find(~cellfun(@isempty,regexp(total(:,1),'0409'))==1); % Absolutely should be excluded
+total(ix,:) = [];
+
+ix=find(~cellfun(@isempty,regexp(total(:,1),'0415'))==1); % Absolutely should be excluded
+total(ix,:) = [];
+
+
+% ix=find(~cellfun(@isempty,regexp(total(:,1),'0457'))==1);
+% total(ix,:) = [];
+
+
 aa = cell2mat( total(:,8));
 
 if choice == 1   % mu

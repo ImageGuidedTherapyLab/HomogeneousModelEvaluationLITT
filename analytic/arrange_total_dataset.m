@@ -1,6 +1,6 @@
 %function [total,best,total_all] = arrange_total_dataset ( data_filename, var_tag, choice );
 
-function [total,total_all,summary] = arrange_total_dataset ( data_filename, var_tag, choice );
+function [total,total_all,summary] = arrange_total_dataset ( data_filename, var_tag, choice, toss_choice );
 datasummary = dlmread(data_filename,',',1,0);
 datasummary(any(isnan(datasummary), 2), 7) = 1;
 
@@ -23,41 +23,49 @@ elseif choice == 3   % cond
     %load ('GPU_global_cond2.mat');
     load ('GPU_dict_cond.mat');
     
+elseif choice == 5   % cond
+    
+    %load ('GPU_global_cond2.mat');
+    load ('GPU_dict_perf_mu_rand.mat');
+    
 end
 
 cd ( path22 );
 
 % List of excluded datasets   
 total(1,:) = []; % Drop the labels
-ix=find(~cellfun(@isempty,regexp(total(:,1),'0497'))==1); % Absolutely should be excluded
-total(ix,:) = [];
-
-ix=find(~cellfun(@isempty,regexp(total(:,1),'0378'))==1); % Strongly suggest exclusion
-total(ix,:) = [];
-
-ix=find(~cellfun(@isempty,regexp(total(:,1),'0476'))==1); % Strongly suggest exclusion
-total(ix,:) = [];
-
-ix=find(~cellfun(@isempty,regexp(total(:,1),'0436'))==1); % Absolutely should be excluded
-total(ix,:) = [];
-
-ix=find(~cellfun(@isempty,regexp(total(:,1),'0466'))==1); % Very probably suggest exclusion
-total(ix,:) = [];
-
-ix=find(~cellfun(@isempty,regexp(total(:,1),'0468'))==1); % Very probably suggest exclusion
-total(ix,:) = [];
-
-ix=find(~cellfun(@isempty,regexp(total(:,1),'0471'))==1); % Strongly suggest exclusion
-total(ix,:) = [];
-% 
-% ix=find(~cellfun(@isempty,regexp(total(:,1),'0417'))==1); % Very probably suggest exclusion
-% total(ix,:) = [];
-
-ix=find(~cellfun(@isempty,regexp(total(:,1),'0409'))==1); % Absolutely should be excluded
-total(ix,:) = [];
-
-ix=find(~cellfun(@isempty,regexp(total(:,1),'0415'))==1); % Absolutely should be excluded
-total(ix,:) = [];
+ix = 0;
+if toss_choice == 1
+    ix       =find(~cellfun(@isempty,regexp(total(:,1),'0497'))==1); % Absolutely should be excluded
+    %total(ix,:) = [];
+    
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0378'))==1); % Strongly suggest exclusion
+    %total(ix,:) = [];
+    
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0476'))==1); % Strongly suggest exclusion
+    %total(ix,:) = [];
+    
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0436'))==1); % Absolutely should be excluded
+    %total(ix,:) = [];
+    
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0466'))==1); % Very probably suggest exclusion
+    %total(ix,:) = [];
+    
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0468'))==1); % Very probably suggest exclusion
+    %total(ix,:) = [];
+    
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0471'))==1); % Strongly suggest exclusion
+    %total(ix,:) = [];
+    %
+    % ix=find(~cellfun(@isempty,regexp(total(:,1),'0417'))==1); % Very probably suggest exclusion
+    % total(ix,:) = [];
+    
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0409'))==1); % Absolutely should be excluded
+    %total(ix,:) = [];
+    
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0415'))==1); % Absolutely should be excluded
+    total(ix,:) = [];
+end
 
 
 % ix=find(~cellfun(@isempty,regexp(total(:,1),'0457'))==1);

@@ -23,7 +23,8 @@ cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search/libraries
 
 if choice == 1
     
-    load ('all_opt_mu.mat' );
+    %load ('all_opt_mu.mat' );
+    load ('all_opt_mu_small.mat' );
     
 elseif choice == 2
     
@@ -32,6 +33,10 @@ elseif choice == 2
 elseif choice == 3
     
     load ('all_opt_cond.mat' );
+    
+elseif choice == 5
+    
+    load ('rand_opt_perf_mu.mat' );
     
 end
 cd /mnt/FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
@@ -108,46 +113,53 @@ for ii = 2:(num_studies+1)
     % Generate model data
     [model_crop] = organize_model( inputdatavars, all_opt_fig, no_pwr_fig,sim_dim, choice );
     
-    [ total{ii,2}, total{ii,3}, total{ii,4}, total{ii,5}, total{ii,6} ] = metric_calculator ( MRTI_crop, MRTI_isotherm, MRTI_list,n_MRTI,model_crop,inputdatavars,summary );
+    if choice == 5
+        [ total{ii,2}, total{ii,3}, total{ii,4}, total{ii,5}, total{ii,6} ] = metric_calculator_rand ( MRTI_crop, MRTI_isotherm, MRTI_list,n_MRTI,model_crop,inputdatavars,summary );
+        [total] = optimal_metrics_rand(total,ii);
+    else        
+        [ total{ii,2}, total{ii,3}, total{ii,4}, total{ii,5}, total{ii,6} ] = metric_calculator ( MRTI_crop, MRTI_isotherm, MRTI_list,n_MRTI,model_crop,inputdatavars,summary );
+        [total] = optimal_metrics (total,ii);
+    end
     
-    % Record optimal L information
-    total{ii,7} = zeros(3);
-    [total{ii,7}(1,1) , index] = min (total{ii,2}(:,2));  % record optimal L1
-    total{ii,7}(1,2) = total{ii,2}(index,1);   % record value that produces optimal L1
-    total{ii,7}(1,3) = index; % record index that produces optimal L1
-    [total{ii,7}(2,1) , index] = min (total{ii,2}(:,3));  % record optimal L2
-    total{ii,7}(2,2) = total{ii,2}(index,1);   % record value that produces optimal L2
-    total{ii,7}(2,3) = index; % record index that produces optimal L2
-    [total{ii,7}(3,1) , index] = min (total{ii,2}(:,4));  % record optimal L_inf
-    total{ii,7}(3,2) = total{ii,2}(index,1);   % record value that produces optimal L_inf
-    total{ii,7}(3,3) = index; % record index that produces optimal L_inf
-    
-    % Record optimal 57 C isotherm DSC information
-    total{ii,8} = zeros(1,3);
-    [total{ii,8}(1) , index] = max (total{ii,3}(:,7));  % record optimal Dice
-    total{ii,8}(2) = total{ii,2}(index,1);   % record value that produces optimal Dice
-    total{ii,8}(3) = index; % record index that produces optimal Dice
-    
-    % Record optimal 57 C Hausdorff distance information
-    total{ii,9} = zeros(1,3);
-    [total{ii,9}(1) , index] = min (total{ii,4}(:,7)); % record optimal Hausdorff Distance
-    total{ii,9}(2) = total{ii,2}(index,1); % record value that produces optimal Hausdorff distance
-    total{ii,9}(3) = index;
-    
-    % Record optimal temperature MI and 57 C isotherm MI
-    total{ii,10} = zeros(2,3);
-    [total{ii,10}(1,1) , index] = max (total{ii,2}(:,5));  % MI for temperature
-    total{ii,10}(1,2) = total{ii,2}(index,1); % record value that produces optimal MI for temperature
-    total{ii,10}(1,3) = index;
-    [total{ii,10}(2,1) , index] = max (total{ii,5}(:,7));  % MI for 57 C isotherm
-    total{ii,10}(2,2) = total{ii,2}(index,1); % record value that produces optimal MI for 57 C isotherm
-    total{ii,10}(2,3) = index;
-    
-    % Record optimal number of false pixels for 57 C isotherm
-    total{ii,11} = zeros(1,3);
-    [total{ii,11}(1,1) , index] = min (total{ii,6}(:,7,3));  % False pixel number for 57 C isotherm
-    total{ii,11}(1,2) = total{ii,2}(index,1); % record value that produces number of false pixels
-    total{ii,11}(1,3) = index;
+
+%     % Record optimal L information
+%     total{ii,7} = zeros(3);
+%     [total{ii,7}(1,1) , index] = min (total{ii,2}(:,2));  % record optimal L1
+%     total{ii,7}(1,2) = total{ii,2}(index,1);   % record value that produces optimal L1
+%     total{ii,7}(1,3) = index; % record index that produces optimal L1
+%     [total{ii,7}(2,1) , index] = min (total{ii,2}(:,3));  % record optimal L2
+%     total{ii,7}(2,2) = total{ii,2}(index,1);   % record value that produces optimal L2
+%     total{ii,7}(2,3) = index; % record index that produces optimal L2
+%     [total{ii,7}(3,1) , index] = min (total{ii,2}(:,4));  % record optimal L_inf
+%     total{ii,7}(3,2) = total{ii,2}(index,1);   % record value that produces optimal L_inf
+%     total{ii,7}(3,3) = index; % record index that produces optimal L_inf
+%     
+%     % Record optimal 57 C isotherm DSC information
+%     total{ii,8} = zeros(1,3);
+%     [total{ii,8}(1) , index] = max (total{ii,3}(:,7));  % record optimal Dice
+%     total{ii,8}(2) = total{ii,2}(index,1);   % record value that produces optimal Dice
+%     total{ii,8}(3) = index; % record index that produces optimal Dice
+%     
+%     % Record optimal 57 C Hausdorff distance information
+%     total{ii,9} = zeros(1,3);
+%     [total{ii,9}(1) , index] = min (total{ii,4}(:,7)); % record optimal Hausdorff Distance
+%     total{ii,9}(2) = total{ii,2}(index,1); % record value that produces optimal Hausdorff distance
+%     total{ii,9}(3) = index;
+%     
+%     % Record optimal temperature MI and 57 C isotherm MI
+%     total{ii,10} = zeros(2,3);
+%     [total{ii,10}(1,1) , index] = max (total{ii,2}(:,5));  % MI for temperature
+%     total{ii,10}(1,2) = total{ii,2}(index,1); % record value that produces optimal MI for temperature
+%     total{ii,10}(1,3) = index;
+%     [total{ii,10}(2,1) , index] = max (total{ii,5}(:,7));  % MI for 57 C isotherm
+%     total{ii,10}(2,2) = total{ii,2}(index,1); % record value that produces optimal MI for 57 C isotherm
+%     total{ii,10}(2,3) = index;
+%     
+%     % Record optimal number of false pixels for 57 C isotherm
+%     total{ii,11} = zeros(1,3);
+%     [total{ii,11}(1,1) , index] = min (total{ii,6}(:,7,3));  % False pixel number for 57 C isotherm
+%     total{ii,11}(1,2) = total{ii,2}(index,1); % record value that produces number of false pixels
+%     total{ii,11}(1,3) = index;
     
 end
 %[ H0, H1, dice_values ] = Check_ablation ( Study_paths, mu_eff_opt );
@@ -158,19 +170,24 @@ cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search/libraries
 
 if choice == 1
     
-    save ('GPU_dict_mu.mat','total','summary');
+    save ('GPU_dict_mu.mat','total','summary','-v7.3');
     
 elseif choice == 2
     
-    save ('GPU_dict_perf.mat','total','summary');
+    save ('GPU_dict_perf.mat','total','summary','-v7.3');
     
 elseif choice == 3
     
-    save ('GPU_dict_cond.mat','total','summary');
+    save ('GPU_dict_cond.mat','total','summary','-v7.3');
     
 elseif choice == 4
     
-    save ('GPU_dict_perf_mu_global','total','summary');
+    save ('GPU_dict_perf_mu_global','total','summary','-v7.3');
+    
+elseif choice == 5
+    
+    save ('GPU_dict_perf_mu_rand','total','summary','-v7.3');
+    
 end
  
 end

@@ -122,7 +122,7 @@ modFOV_l(2) = sim_dim.spacing.y .*sim_dim.mod_point.y .*sim_dim.mod_point.z_subs
 n_model = size( model_temp,3);
 model_crop = zeros( (inputdatavars.voi(4)-inputdatavars.voi(3)+1), (inputdatavars.voi(2)-inputdatavars.voi(1)+1), n_model);
 for ii = 1:n_model
-    model_crop(:,:,ii) = interp2( modX, modY, model_temp(:,:,ii), MRXq, MRYq);
+    model_crop(:,:,ii) = qinterp2( modX, modY, model_temp(:,:,ii), MRXq, MRYq);
 end
 clear ii
 % model_isotherm = repmat( model_crop, [1 1 1 15]);

@@ -30,7 +30,8 @@ cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search/libraries
 
 if choice == 1
     
-    save ('all_opt_mu.mat','all_opt_fig','no_pwr_fig','sim_dim','summary','-v7.3');
+    %save ('all_opt_mu.mat','all_opt_fig','no_pwr_fig','sim_dim','summary','-v7.3');
+    save ('all_opt_mu_small.mat','all_opt_fig','no_pwr_fig','sim_dim','summary','-v7.3');
     
 elseif choice == 2
     
@@ -46,7 +47,7 @@ elseif choice ==4
     
 elseif choice ==5
     
-    save ('rand_opt_perf_mu.mat', 'all_opt_fig','no_pwr_fig','sim_dim','summary','-v7.3');
+    save ('rand_opt_perf_mu222222.mat', 'all_opt_fig','no_pwr_fig','sim_dim','summary','-v7.3');
 end
 cd /mnt/FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
 end
