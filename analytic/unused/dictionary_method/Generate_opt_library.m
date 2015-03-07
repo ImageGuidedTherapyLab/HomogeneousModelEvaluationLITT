@@ -52,8 +52,20 @@ elseif choice ==3    % cond
     
 elseif choice ==4 % perf and mu
     %w_perf = linspace( 0.5, 16.5, 129);
-    w_perf = [6 9 12];
-    mu_eff =[200 300 400 500 600 700];
+%         w_perf = [6 9 12];
+%         mu_eff =[200 300 400 500 600 700];
+    
+    
+        w_perf = linspace( 0.5, 16.5, 129);
+        mu_eff = linspace( 50, 400, 351);
+%     w_perf = linspace( 0.5, 16.5, 65);
+%     mu_eff = linspace( 49, 401, 89);
+    w_Numruns = length(w_perf);
+    m_Numruns = length(mu_eff);
+    Numruns = w_Numruns*m_Numruns;
+    mu_eff = sort( repmat( mu_eff', w_Numruns,1) );
+    w_perf = repmat( w_perf', m_Numruns,1);
+    
     k_cond = kk;
     
 elseif choice ==5 % perf and mu randomly sampled

@@ -98,11 +98,20 @@ for ii = patient_ix
         [ tmap_model, MRTI_crop, intersection ] = display_obj_fxn_GPU_choice ( inputdatavars, 25, summary.mu_eff , summary.w_perf, var_opt(ii,2), choice );
         
     end
+    inputdatavars.voi = double( inputdatavars.voi);
+    x_diff = abs(inputdatavars.voi(2) - inputdatavars.voi(1));
+    x_lim = 0: inputdatavars.spacing(1): x_diff*inputdatavars.spacing(1);
+    y_diff = abs(inputdatavars.voi(4) -inputdatavars.voi(3));
+    y_lim = 0: inputdatavars.spacing(2): y_diff*inputdatavars.spacing(2);
     
-    figure; imagesc(tmap_model, [30 100]);
-    figure; imagesc(MRTI_crop, [30 100]);
-    figure; imagesc(intersection(:,:,7)); title( Study_paths{ii,2} );
+    x_lim(end)
+    y_lim(end)
+       
+    figure; imagesc(tmap_model, [30 100]); colorbar; set(findobj('type','axes'),'fontsize',14);
+    figure; imagesc(MRTI_crop, [30 100]); colorbar; set(findobj('type','axes'),'fontsize',14);
+    figure; imagesc(intersection(:,:,7)); title( Study_paths{ii,2} ); colorbar; set(findobj('type','axes'),'fontsize',14);
     figure; [AX h1 h2] = plotyy(total{ii,2}(:,1),total{ii,2}(:,3),total{ii,2}(:,1),total{ii,3}(:,7));
+    set(h1, 'LineWidth',5); set(h2,'LineWidth',5); set(findobj('type','axes'),'fontsize',16);
     legend([h1;h2],'L_2','DSC'); title( Study_paths{ii,2});
     var_opt(ii,:)
     keyboard

@@ -23,6 +23,11 @@ if choice == 1            % mu
 elseif choice ==2           % w_perf
     Numruns = length(w_perf);
     mu_eff = [0 mu_eff];
+    if size(w_perf,1) > size(w_perf,2)
+        w_perf = unique(w_perf);
+        w_perf = w_perf';
+        Numruns = length(w_perf);
+    end
     w_perf=[zeros(Numruns,1) w_perf'];
     k_cond=[0 k_cond];
     
@@ -33,12 +38,8 @@ elseif choice ==3           % k_cond
     w_perf=[0 w_perf];
     
 elseif choice ==4           % w_perf + mu
-    w_Numruns = length(w_perf);
-    m_Numruns = length(mu_eff);
-    Numruns = w_Numruns*m_Numruns;
-    mu_eff = sort( repmat( mu_eff', w_Numruns,1) );
+    Numruns = length(w_perf);
     mu_eff = [zeros(Numruns,1) mu_eff];
-    w_perf = repmat( w_perf', m_Numruns,1);
     w_perf = [zeros(Numruns,1) w_perf];
     k_cond=[0 k_cond];
     

@@ -87,7 +87,7 @@ elseif choice == 3
     k_cold = k_cond;
     [no_pwr_fig] = Human_GPU_choice_sym ( power_cold,spacing,scaling,mod_point,source,w_cold,k_cold,g_anisotropy,mu_cold,probe_u,robin_co,c_blood,choice);
     
-elseif choice == 5
+elseif choice == 4||choice==5
     choice_cold=2;
     w_cold = w_perf;
     [no_pwr_fig] = Human_GPU_choice_sym ( power_cold,spacing,scaling,mod_point,source,w_cold,k_cold,g_anisotropy,mu_cold,probe_u,robin_co,c_blood,choice_cold);

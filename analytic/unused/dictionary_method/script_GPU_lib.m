@@ -1,8 +1,9 @@
-choice = 1;
+choice = 4;
+quick_choice=1;
 
 GPU_generate_lib(choice);
 
-metric_generation(choice);
+metric_generation(choice, quick_choice);
 
 %MC_2dimension_GPU (choice);
 

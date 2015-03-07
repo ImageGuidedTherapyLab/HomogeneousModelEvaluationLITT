@@ -98,6 +98,22 @@ if choice == 1
 
     no_pwr = repmat(no_pwr_fig,[1 1 n_length]);
     model_temp = all_opt_fig .* power_log - (power_log-1).*no_pwr;
+    
+elseif choice ==4
+    
+    w_Num = size( no_pwr_fig,3);
+    mu_Num = size( all_opt_fig,3) / w_Num;
+    
+    Temp_sz = size(all_opt_fig);
+    no_pwr = zeros( Temp_sz(1), Temp_sz(2), Temp_sz(3) );
+    
+    for ii = 1:w_Num
+        
+        ix = ii : w_Num : Temp_sz(3);
+        no_pwr(:,:,ix) = repmat( no_pwr_fig(:,:,ii), [1 1 mu_Num]);
+    end
+    clear ii
+    model_temp = all_opt_fig .* power_log - (power_log - 1).*no_pwr;
 
 else
     model_temp = all_opt_fig .* power_log - (power_log-1).*no_pwr_fig;

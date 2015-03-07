@@ -64,8 +64,8 @@ clear kk
 
 figure; h_title = title( 'DSC performance for optimization versus literature'); hold all;
 [h1] = plot (thresholds, [passes_opt pass_naive_opt],'LineWidth',5);
-legend( h1, 'Optimization', ['Literature ', num2str(naive_tag(1)),' m^{-1}' ]) ;
-legend('-DynamicLegend', 'Location','southwest');hold off;
+%legend( h1, 'Optimization', ['Literature ', num2str(naive_tag(1)),' m^{-1}' ]) ;
+%legend('-DynamicLegend', 'Location','southwest');hold off;
 
 kk = 2;
 
@@ -84,23 +84,25 @@ for ii = 1:sizes.var
                 hold all
                 origtitle = get(h_title,'String');
                 set(h_title, 'String', strcat(origtitle, [', DSC >'], num2str(fig_labels.DSC(jj))));
+                set(findobj('type','axes'),'fontsize',13);
                 
                 if run1(ii,jj) == 2
                     
                     if jj == 1
                         plot(thresholds, passes{ii,jj},'LineWidth',5);
                         legend_string = ['DSC > ', num2str(fig_labels.DSC(jj))];
-                        legend( legend_string, 'Location','southwest');
+                        %legend( legend_string, 'Location','southwest');
                         hold all
-                        legend('-DynamicLegend', 'Location','southwest');
+                        %legend('-DynamicLegend', 'Location','southwest');
                         
                         if naive_tag(2) ==1
-                            legend_string = ['Naive ', num2str(naive_tag(1)), ' m^{-1}'];
+                            %legend_string = ['Naive ', num2str(naive_tag(1)), ' m^{-1}'];
                             plot (thresholds, naive_pass{ii,jj}, 'DisplayName',legend_string, 'LineWidth',5);
                         end
                         
                     else
-                        legend_string = strcat( 'DSC >',num2str(fig_labels.DSC(jj)));
+                        %legend_string = strcat( 'DSC >',num2str(fig_labels.DSC(jj)));
+                        set(findobj('type','axes'),'fontsize',13);
                         plot(thresholds, passes{ii,jj},'DisplayName',legend_string,'LineWidth',5);
 
                         %legend('-DynamicLegend', 'Location','southwest');

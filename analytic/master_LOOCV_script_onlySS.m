@@ -1,8 +1,8 @@
 close all
 clear
 cd /mnt/FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
-choice = 1;  % 1 = mu; 2 = perf; 3 = cond;
-toss_choice = 0;
+choice = 5;  % 1 = mu; 2 = perf; 3 = cond;
+toss_choice = 1;
 
 if choice == 1;   % mu
     naive_var = [180 1];
@@ -23,11 +23,9 @@ elseif choice ==3;   % cond
 elseif choice ==5;   % mu + perf random
     naive_var = [0.527 1];
     var_threholds = [];
-    var_tag = [300 1; 0 0];
+    var_tag = [300 0; 0 0];
     %var_threholds = [300, 1; 0 0];
-    
-    
-    
+  
 end
 
 %opttype = 'bestfit50';          % Name the opttype
@@ -53,11 +51,24 @@ if choice == 5
     survival_plot_onlySS_choice (LOOCV.dice.values, aa.LOOCV.dice.naive.val, LOOCV.var.run, opt.dice.all, fig_labels, LOOCV.run1, LOOCV.run2, naive_var, choice);
     cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search/libraries/troubleshoot_global_v_MC
     if toss_choice == 0
-        save ('MC_2para_all.mat','total','LOOCV','opt');
+        
+        if var_tag(1,2)==0
+            save('MC_2para_all.mat', 'total','LOOCV','opt');
+        else
+            save ('MC_2para_all_no_var_thresh.mat','total','LOOCV','opt');
+        end
+        
     elseif toss_choice==1
-        save('MC_2para_21.mat','total','LOOCV','opt');
+        if var_tag(1,2)==0
+            save('MC_2para_21_all.mat','total','LOOCV','opt');
+        else
+            save('MC_2para_21_no_var_thresh.mat','total','LOOCV','opt');
+        end
+
     end
     cd /mnt/FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
+    
+    
 else
     [total,total_all,summary] = arrange_total_dataset ( datafilename, var_tag, choice, toss_choice );
     [opt, LOOCV, fig_labels] = master_LOOCV_onlySS_choice( total, DSC_thresholds, var_thresholds,naive_var(1), opt_tag);

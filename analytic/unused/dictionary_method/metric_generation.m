@@ -1,5 +1,5 @@
 % This script finds the best mu_eff for the different studies.
-function metric_generation (choice);
+function metric_generation (choice,quick_choice);
 %choice = 1; % 1 = mu; 2 = perf; 3 = cond;
 tic
 
@@ -33,6 +33,10 @@ elseif choice == 2
 elseif choice == 3
     
     load ('all_opt_cond.mat' );
+    
+elseif choice == 4
+    
+    load ('all_opt_perf_mu_400_short.mat' );
     
 elseif choice == 5
     
@@ -113,9 +117,9 @@ for ii = 2:(num_studies+1)
     % Generate model data
     [model_crop] = organize_model( inputdatavars, all_opt_fig, no_pwr_fig,sim_dim, choice );
     
-    if choice == 5
-        [ total{ii,2}, total{ii,3}, total{ii,4}, total{ii,5}, total{ii,6} ] = metric_calculator_rand ( MRTI_crop, MRTI_isotherm, MRTI_list,n_MRTI,model_crop,inputdatavars,summary );
-        [total] = optimal_metrics_rand(total,ii);
+    if choice == 5|| choice==4
+        [ total{ii,2}, total{ii,3}, total{ii,4}, total{ii,5}, total{ii,6} ] = metric_calculator_rand ( MRTI_crop, MRTI_isotherm, MRTI_list,n_MRTI,model_crop,inputdatavars,summary,quick_choice );
+        [total] = optimal_metrics_rand(total,ii,quick_choice);
     else        
         [ total{ii,2}, total{ii,3}, total{ii,4}, total{ii,5}, total{ii,6} ] = metric_calculator ( MRTI_crop, MRTI_isotherm, MRTI_list,n_MRTI,model_crop,inputdatavars,summary );
         [total] = optimal_metrics (total,ii);
@@ -182,7 +186,7 @@ elseif choice == 3
     
 elseif choice == 4
     
-    save ('GPU_dict_perf_mu_global','total','summary','-v7.3');
+    save ('GPU_dict_perf_mu_global_400','total','summary','-v7.3');
     
 elseif choice == 5
     
