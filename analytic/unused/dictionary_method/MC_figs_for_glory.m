@@ -54,7 +54,7 @@ if toss_choice == 1
     ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0468'))==1); % Very probably suggest exclusion
     
     ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0471'))==1); % Strongly suggest exclusion
-
+    
     ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0417'))==1); % Very probably suggest exclusion
     
     ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0409'))==1); % Absolutely should be excluded
@@ -79,7 +79,7 @@ elseif choice == 2  % perf
 elseif choice == 3   % cond
     
     index=find( (aa(:,2)>0.4)==1);
-   
+    
     
 elseif choice ==5 || choice ==4
     index=find( (aa(:,2)>-1)==1);
@@ -102,7 +102,7 @@ if choice ==5 ||choice==4
         mu_array = linspace( mu_lim(1),mu_lim(2),mu_pix);
     end
     
-
+    
     %[paraXq, paraYq] = meshgrid (w_lim(1): 0.25 : w_lim(2), mu_lim(1): 50: mu_lim(2) );
     [paraXq, paraYq] = meshgrid ( w_array, mu_array);
     
@@ -128,7 +128,7 @@ if choice ==5 ||choice==4
         
     end
     clear ii jj
-
+    
     opt_mean = mean(obj_fxn,3);
     figure; contourf(Xx(:,:,1),Yy(:,:,1),opt_mean);caxis([0 0.9]); colorbar; title(['Global Mean DSC']);
     xlabel('mu_{eff}   [ m^{-1} ]'); ylabel('perf [ kg/(m^3 s) ]'); set(findobj('type','axes'),'fontsize',15);
@@ -177,7 +177,7 @@ if choice ==5 ||choice==4
         obj_fxn_iter_pass( obj_fxn_iter_pass < 0.7 ) = 0;
         obj_fxn_iter_pass( obj_fxn_iter_pass >=0.7 ) = 1;
         LOOCV_pass = sum( obj_fxn_iter_pass, 3);
- 
+        
         [mean_max(ii), II_mean(ii)] = max( LOOCV_mean(:));
         [mean_ix1(ii), mean_ix2(ii)] = ind2sub( size(LOOCV_mean), II_mean(ii) );
         
@@ -188,36 +188,62 @@ if choice ==5 ||choice==4
         [pass_ix1(ii), pass_ix2(ii)] = ind2sub( size(LOOCV_pass), II_pass(ii) );
         
     end
-    LOOCV_mean_pre = [ mean_max mean_ix1 mean_ix2 II_mean];
-    LOOCV_median_pre = [ median_max median_ix1 median_ix2 II_mean];
-    LOOCV_pass_pre = [ pass_max pass_ix1 pass_ix2 II_mean];
+    LOOCV_mean_pre = [ mean_max mean_ix1 mean_ix2 II_mean];      % max value; mu ix; w ix; column ix;
+    LOOCV_median_pre = [ median_max median_ix1 median_ix2 II_median];
+    LOOCV_pass_pre = [ pass_max pass_ix1 pass_ix2 II_pass];
     
+%     LOOCV_mean_post = zeros (length(index),1);
+%     LOOCV_median_post = LOOCV_mean_post;
+%     LOOCV_pass_post = LOOCV_mean_post;
     LOOCV_mean_post = zeros (length(index),1);
     LOOCV_median_post = LOOCV_mean_post;
     LOOCV_pass_post = LOOCV_mean_post;
+    naive_pass = LOOCV_mean_post;
+    best_eyeball_norm = LOOCV_mean_post;
+    naive_ix = find( total{ii,2}(:,1) == 180 & total{ii,2}(:,2)==6);
+    eyeball_ix =  find( total{ii,2}(:,1) == 212 & total{ii,2}(:,2)==10.25);
     for jj = 1:length(index)
-        ii=index(jj);
+        ii=index(jj);        
+        mean_spot = find( total{ii,2}(:,1) == mu_array(LOOCV_mean_pre(ii,2)) & total{ii,2}(:,2)==w_array(LOOCV_mean_pre(ii,3)));
+        median_spot = find( total{ii,2}(:,1) ==mu_array(LOOCV_median_pre(ii,2)) & total{ii,2}(:,2)==w_array(LOOCV_median_pre(ii,3)));
+        pass_spot = find(total{ii,2}(:,1)==mu_array(LOOCV_pass_pre(ii,2)) & total{ii,2}(:,2)==w_array(LOOCV_pass_pre(ii,3)));
         
-        obj_fxn_iter = obj_fxn;
-        obj_fxn_iter( :,:,ii ) = [];
-        LOOCV_mean = mean(obj_fxn_iter,3);
-        LOOCV_median = median( obj_fxn_iter,3);
+        %         obj_fxn_iter( :,:,ii ) = [];
+        %         LOOCV_mean = mean(obj_fxn_iter,3);
+        %         LOOCV_median = median( obj_fxn_iter,3);
+        %
+        %         obj_fxn_iter_pass = obj_fxn_iter;
+        %         obj_fxn_iter_pass( obj_fxn_iter_pass < 0.7 ) = 0;
+        %         obj_fxn_iter_pass( obj_fxn_iter_pass >=0.7 ) = 1;
+        %         LOOCV_pass = sum( obj_fxn_iter_pass, 3);
         
-        obj_fxn_iter_pass = obj_fxn_iter;
-        obj_fxn_iter_pass( obj_fxn_iter_pass < 0.7 ) = 0;
-        obj_fxn_iter_pass( obj_fxn_iter_pass >=0.7 ) = 1;
-        LOOCV_pass = sum( obj_fxn_iter_pass, 3);
+        %         LOOCV_mean_post(ii) = max( max( LOOCV_mean));
+        %         LOOCV_median_post(ii) = max( max(LOOCV_median));
+        %         LOOCV_pass_post(ii) = max(max(LOOCV_pass));
         
-        LOOCV_mean_post(ii) = max( max( LOOCV_mean));
-        LOOCV_median_post(ii) = max( max(LOOCV_median));
-        LOOCV_pass_post(ii) = max(max(LOOCV_pass));
+%         LOOCV_mean_post(ii) = total{ii,3}(II_mean(ii));
+%         LOOCV_median_post(ii) = total{ii,3}(II_median(ii));
+%         LOOCV_pass_post(ii) = total{ii,3}(II_pass(ii));
+        
+        LOOCV_mean_post(ii) = total{ii,3}(mean_spot);
+        LOOCV_median_post(ii) = total{ii,3}(median_spot);
+        LOOCV_pass_post(ii) = total{ii,3}(pass_spot);
+        naive_pass(ii) = total{ii,3}(naive_ix);
+        best_eyeball_norm(ii)= total{ii,3}(eyeball_ix);
+        
         
     end
-       LOOCV_mean_post_stats = Descriptive_statistics_LOOCV(LOOCV_mean_post);
-       LOOCV_median_post_stats= Descriptive_statistics_LOOCV(LOOCV_median_post);
+%     LOOCV_mean_post_stats = Descriptive_statistics_LOOCV(LOOCV_mean_post);
+%     LOOCV_median_post_stats= Descriptive_statistics_LOOCV(LOOCV_median_post);
+%     LOOCV_pass_post_stats = total{ii,3}(II_pass(ii));
+    LOOCV_mean_post_stats = Descriptive_statistics_LOOCV(LOOCV_mean_post);
+    LOOCV_median_post_stats= Descriptive_statistics_LOOCV(LOOCV_median_post);
+    LOOCV_pass_post_stats = Descriptive_statistics_LOOCV(LOOCV_pass_post);
+    naive_stats = Descriptive_statistics_LOOCV(naive_pass);
+    best_eyeball_stats = Descriptive_statistics_LOOCV(best_eyeball_norm);
 else
-
-
+    
+    
     
     
     
