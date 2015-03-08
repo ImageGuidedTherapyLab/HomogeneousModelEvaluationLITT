@@ -28,7 +28,8 @@ elseif choice == 3   % cond
     
 elseif choice ==4 
     
-    load ('GPU_dict_perf_mu_global_400.mat');
+    %load ('GPU_dict_perf_mu_global_400.mat');
+    load ('GPU_dict_perf_mu_global_400');
     
 elseif choice ==5  % random
      

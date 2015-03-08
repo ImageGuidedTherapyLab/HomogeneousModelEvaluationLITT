@@ -36,7 +36,8 @@ elseif choice == 3
     
 elseif choice == 4
     
-    load ('all_opt_perf_mu_400_short.mat' );
+    %load ('all_opt_perf_mu_400_short.mat' );
+    load ('opt_perf_mu_400_long.mat');
     
 elseif choice == 5
     

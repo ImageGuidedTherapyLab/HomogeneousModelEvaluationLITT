@@ -43,7 +43,8 @@ elseif choice == 3
     
 elseif choice ==4
     
-    save ('all_opt_perf_mu_400_short.mat', 'all_opt_fig','no_pwr_fig','sim_dim','summary','-v7.3');
+    %save ('all_opt_perf_mu_400_short.mat', 'all_opt_fig','no_pwr_fig','sim_dim','summary','-v7.3');
+    save ('opt_perf_mu_400_long.mat', 'all_opt_fig','no_pwr_fig','sim_dim','summary','-v7.3');
     
 elseif choice ==5
     
