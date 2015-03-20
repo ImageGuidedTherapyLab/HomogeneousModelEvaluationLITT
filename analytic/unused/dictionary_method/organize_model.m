@@ -72,6 +72,10 @@ elseif sum( inputdatavars.UID == '0471' ) ==4
 elseif sum( inputdatavars.UID == '0447' ) ==4
     VOI.x = VOI.x + 0;
     VOI.y = VOI.y + 1;
+elseif sum( inputdatavars.UID == '0457' ) ==4
+    VOI.x = VOI.x + 0;
+    VOI.y = VOI.y + 0;
+    power_log = 10.2;
 elseif sum( inputdatavars.UID == '0453' ) ==4
     VOI.x = VOI.x + 0;
     VOI.y = VOI.y + 1;

@@ -18,34 +18,31 @@ cd ( path22 );
 total(1,:) = []; % Drop the labels
 ix = 0;
 if toss_choice == 1
-    ix       =find(~cellfun(@isempty,regexp(total(:,1),'0497'))==1); % Absolutely should be excluded
-    %total(ix,:) = [];
+    ix       =find(~cellfun(@isempty,regexp(total(:,1),'0497'))==1); % Absolutely should be excluded  % good to exclude (median)
     
-    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0378'))==1); % Strongly suggest exclusion
-    %total(ix,:) = [];
+    %ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0378'))==1); %Strongly suggest exclusion %  good to keep (median)
     
-    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0476'))==1); % Strongly suggest exclusion
-    %total(ix,:) = [];
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0476'))==1); % Strongly suggest exclusion  % good to exclude (median)
     
-    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0436'))==1); % Absolutely should be excluded
-    %total(ix,:) = [];
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0435'))==1); % very probably suggest exclusion: susceptibility artifact; new  % good to exclude (median)
     
-    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0466'))==1); % Very probably suggest exclusion
-    %total(ix,:) = [];
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0440'))==1); % very probably suggest exclusion: susceptibility artifact;new  % good to exclude (median)
     
-    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0468'))==1); % Very probably suggest exclusion
-    %total(ix,:) = [];
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0447'))==1); % Very probably suggest exclusion % good to exclude (median)
     
-    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0471'))==1); % Strongly suggest exclusion
-    %total(ix,:) = [];
-    %
-    % ix=find(~cellfun(@isempty,regexp(total(:,1),'0417'))==1); % Very probably suggest exclusion
-    % total(ix,:) = [];
+    %ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0436'))==1); %good to keep (ParaView)  % good to keep (median)
     
-    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0409'))==1); % Absolutely should be excluded
-    %total(ix,:) = [];
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0466'))==1); % Very probably suggest exclusion % good to exclude (median)
     
-    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0415'))==1); % Absolutely should be excluded
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0468'))==1); % Very probably suggest exclusion % good to exclude (median)
+    
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0471'))==1); % Strongly suggest exclusion % good to exclude (median)
+    
+    %ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0417'))==1); %Very probably suggest exclusion % good to keep (median)
+    
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0409'))==1); % Absolutely should be excluded % good to exclude (median)
+    
+    ix(end+1)=find(~cellfun(@isempty,regexp(total(:,1),'0415'))==1); % Absolutely should be excluded % good to exclude (median)
     total(ix,:) = [];
 end
 

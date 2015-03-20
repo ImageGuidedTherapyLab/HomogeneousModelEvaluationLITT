@@ -1,7 +1,7 @@
 close all
 clear
 cd /mnt/FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
-choice = 5;  % 1 = mu; 2 = perf; 3 = cond;
+choice = 4;  % 1 = mu; 2 = perf; 3 = cond;
 toss_choice = 1;
 
 if choice == 1;   % mu
@@ -20,6 +20,12 @@ elseif choice ==3;   % cond
     var_thresholds = [ ];  %  Eg: [ 100 150 200 ]; Intervals: 0 to 100, 100 to 150, 150 to 200, 200
     var_tag = [0 0.7];  % Splits the data at this proscribed point (index 2). Index 1 is 1 = save low side, 2 = save high side, 0 = keep all
     
+elseif choice ==4;   % cond
+    naive_var = [0.527 1];
+    var_threholds = [];
+    var_tag = [300 0; 0 0];
+    %var_threholds = [300, 1; 0 0];
+    
 elseif choice ==5;   % mu + perf random
     naive_var = [0.527 1];
     var_threholds = [];
@@ -36,9 +42,9 @@ DSC_thresholds = sort(DSC_thresholds);
 opt_tag = 1; % DSC is 1; L2 is 2
 
 
-if choice == 5
+if choice == 5||choice ==4
     [total,total_all,summary,toss_ix] = arrange_total_dataset_rand ( datafilename,var_tag, toss_choice );
-    [opt, LOOCV, fig_labels] = master_LOOCV_onlySS_rand( total, DSC_thresholds,naive_var(1), opt_tag,toss_ix);
+    [opt, LOOCV, fig_labels] = master_LOOCV_onlySS_rand( total, DSC_thresholds,naive_var(1), opt_tag,choice);
     cd /mnt/FUS4/data2/sjfahrenholtz/MATLAB/Tests/direct_search/libraries/troubleshoot_global_v_MC
     if toss_choice == 0
         aa = load ('mu_global_all');
@@ -67,6 +73,10 @@ if choice == 5
 
     end
     cd /mnt/FUS4/data2/sjfahrenholtz/gitMATLAB/opt_new_database/PlanningValidation
+    
+% elseif choice ==4
+%     MC_figs_for_glory
+    
     
     
 else

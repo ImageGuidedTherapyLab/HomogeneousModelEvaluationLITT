@@ -1,4 +1,4 @@
-function [opt, LOOCV, fig_labels] = master_LOOCV_onlySS_rand ( total, dice_thresholds, naive_var, opt_tag,toss_ix);
+function [opt, LOOCV, fig_labels] = master_LOOCV_onlySS_rand ( total, dice_thresholds, naive_var, opt_tag,choice);
 tic
 opt.paths = total(:,1);
 
@@ -221,6 +221,11 @@ for ii = 1:length_dice_thresholds
             
             var = var_iter;
             var(ll,:) = [];
+            if choice ==4
+                var = median(var,1);
+                LOOCV.var.run{ii}(ll,:)=var;
+                
+            elseif choice==5
             var = mean(var,1);
             LOOCV.var.run{ii}(ll,:)=var;
             
@@ -229,6 +234,7 @@ for ii = 1:length_dice_thresholds
             
             %[all_opt_fig, no_pwr_fig,sim_dim] = temperature_GPU_LOOCV_rerun ( inputdatavars, 50, max_phys_sz, mu_eff_list, w_perf, k_cond, choice );
             [LOOCV.dice.values{ii}(ll)] = temperature_GPU_LOOCV_rerun ( inputdatavars, 50, max_phys_sz, var(1), var(2), 0.527, 1 );
+            end
             
 %             [~, ix] = min( abs( total_iter{1,2}(:,1) - var));
 %             [~, iix] = min( abs( total_iter{1,2}(:,1) - var));

@@ -28,7 +28,7 @@ cd ../../../MATLAB/Tests/direct_search
 
 if choice == 1
     
-   load ('GPU_global_mu2.mat');
+    load ('GPU_global_mu2.mat');
     
 elseif choice == 2
     
@@ -37,6 +37,10 @@ elseif choice == 2
 elseif choice == 3
     
     load ('GPU_global_cond2.mat');
+    
+elseif choice == 4
+    cd ../../../MATLAB/Tests/direct_search/libraries
+    load ('GPU_dict_perf_mu_global_400');
     
 end
 total(1,:)=[];
@@ -47,19 +51,19 @@ var_opt = cell2mat( total(:,8));
 % opt.paths(toss_index_phantom,:)=[];
 % datasummary(toss_index_phantom,:)=[];
 % num_studies = size(datasummary,1);
-% 
+%
 % indexC = strfind(opt.paths,'0457');
 % toss_index_phantom = find(not(cellfun('isempty',indexC)));
 % opt.paths(toss_index_phantom-num_studies,:)=[];
 % datasummary(toss_index_phantom-num_studies,:)=[];
 % num_studies = size(datasummary,1);
-% 
+%
 % indexC = strfind(opt.paths,'0476');
 % toss_index_phantom = find(not(cellfun('isempty',indexC)));
 % opt.paths(toss_index_phantom-num_studies,:)=[];
 % datasummary(toss_index_phantom-num_studies,:)=[];
 % num_studies = size(datasummary,1);
-% 
+%
 % indexC = strfind(opt.paths,'0436');
 % toss_index_phantom = find(not(cellfun('isempty',indexC)));
 % opt.paths(toss_index_phantom-num_studies,:)=[];
@@ -79,45 +83,103 @@ var_opt = cell2mat( total(:,8));
 % 0450 almost small
 
 % From mu_eff_data, find the matching study's(ies') mu_eff value(s)
-
-
-for ii = patient_ix
-    path_base = strcat ( 'workdir/',Study_paths{ii,1}, '/', Study_paths{ii,2}, '/opt');
-    load( strcat ( path_base, '/optpp_pds.', opttype, '.in.1.mat') );
-    %inputdatavars.spacing
-    if choice == 1  % mu
+if choice ==4
+    for ii = patient_ix
+        path_base = strcat ( 'workdir/',Study_paths{ii,1}, '/', Study_paths{ii,2}, '/opt');
+        load( strcat ( path_base, '/optpp_pds.', opttype, '.in.1.mat') );
         
-        [ tmap_model, MRTI_crop, intersection ] = display_obj_fxn_GPU_choice ( inputdatavars, 25, var_opt(ii,2) , summary.w_perf, summary.k_cond, choice );
+        [ tmap_model, MRTI_crop, intersection ] = display_obj_fxn_GPU_choice ( inputdatavars, 50, var_opt(ii,2) , var_opt(ii,3), summary.k_cond, choice );
         
-    elseif choice == 2 % perf
+        inputdatavars.voi = double( inputdatavars.voi);
+        x_diff = abs(inputdatavars.voi(2) - inputdatavars.voi(1));
+        x_lim = 0: inputdatavars.spacing(1): x_diff*inputdatavars.spacing(1);
+        y_diff = abs(inputdatavars.voi(4) -inputdatavars.voi(3));
+        y_lim = 0: inputdatavars.spacing(2): y_diff*inputdatavars.spacing(2);
         
-        [ tmap_model, MRTI_crop, intersection ] = display_obj_fxn_GPU_choice ( inputdatavars, 25, summary.mu_eff , var_opt(ii,2), summary.k_cond, choice );
+        x_lim(end) % FOV limits
+        y_lim(end)
         
-    elseif choice == 3 % cond
+        figure; imagesc(tmap_model, [30 100]); colorbar; set(findobj('type','axes'),'fontsize',14);
+        figure; imagesc(MRTI_crop, [30 100]); colorbar; set(findobj('type','axes'),'fontsize',14);
+        figure; imagesc(intersection(:,:,7)); title( Study_paths{ii,2} ); colorbar; set(findobj('type','axes'),'fontsize',14);
         
-        [ tmap_model, MRTI_crop, intersection ] = display_obj_fxn_GPU_choice ( inputdatavars, 25, summary.mu_eff , summary.w_perf, var_opt(ii,2), choice );
+        aa = cell2mat( total(:,8));
+        index=find( (aa(:,2)>-1)==1);
+        w_array = unique( summary.w_perf);
+        mu_array = unique( summary.mu);
+        [paraXq, paraYq] = meshgrid ( w_array, mu_array);
+        
+        %     bb=hist2(total{ii,2}(:,1),total{ii,2}(:,2),200);
+        %     figure;imagesc(bb); xlabel('perf');ylabel('mu');
+        grid_sz = size (paraXq);
+        Xx = zeros(grid_sz(1), grid_sz(2), length(index));
+        Yy = Xx;
+        obj_fxn = Xx;
+        
+        [paraXq, paraYq] = meshgrid ( w_array, mu_array);
+        
+        %     bb=hist2(total{ii,2}(:,1),total{ii,2}(:,2),200);
+        %     figure;imagesc(bb); xlabel('perf');ylabel('mu');
+        %         for jj=1:length(index)
+        %             kk =index(jj);
+        dice = squeeze(total{ii,3});
+        
+        %[Xx(:,:,jj), Yy(:,:,jj), obj_fxn(:,:,jj)]=griddata(total{kk,2}(:,1),total{kk,2}(:,2),dice,paraYq,paraXq);
+        [Xx, Yy, obj_fxn]=griddata(total{ii,2}(:,1),total{ii,2}(:,2),dice,paraYq,paraXq);
+        
+        %end
+        clear kk
+        
+        figure; contourf(Xx,Yy,obj_fxn);caxis([0 0.9]); colorbar; title( Study_paths{ii,2} );
+        xlabel('mu_{eff}   [ m^{-1} ]'); ylabel('perf [ kg/(m^3 s) ]'); set(findobj('type','axes'),'fontsize',15);
+        var_opt(ii,:)
+        %[distXq, distYq] = meshgrid (x_lim, y_lim);
+%         figure; contourf(distXq,distYq,intersection(:,:,7), [0 1 2 3]); colorbar; title( Study_paths{ii,2} );
+%         xlabel('Distance   [ m ]'); ylabel('Distance [ m ]'); set(findobj('type','axes'),'fontsize',15);
+        keyboard
+        close all
+    end
+    
+else
+    
+    for ii = patient_ix
+        path_base = strcat ( 'workdir/',Study_paths{ii,1}, '/', Study_paths{ii,2}, '/opt');
+        load( strcat ( path_base, '/optpp_pds.', opttype, '.in.1.mat') );
+        %inputdatavars.spacing
+        if choice == 1  % mu
+            
+            [ tmap_model, MRTI_crop, intersection ] = display_obj_fxn_GPU_choice ( inputdatavars, 25, var_opt(ii,2) , summary.w_perf, summary.k_cond, choice );
+            
+        elseif choice == 2 % perf
+            
+            [ tmap_model, MRTI_crop, intersection ] = display_obj_fxn_GPU_choice ( inputdatavars, 25, summary.mu_eff , var_opt(ii,2), summary.k_cond, choice );
+            
+        elseif choice == 3 % cond
+            
+            [ tmap_model, MRTI_crop, intersection ] = display_obj_fxn_GPU_choice ( inputdatavars, 25, summary.mu_eff , summary.w_perf, var_opt(ii,2), choice );
+            
+        end
+        inputdatavars.voi = double( inputdatavars.voi);
+        x_diff = abs(inputdatavars.voi(2) - inputdatavars.voi(1));
+        x_lim = 0: inputdatavars.spacing(1): x_diff*inputdatavars.spacing(1);
+        y_diff = abs(inputdatavars.voi(4) -inputdatavars.voi(3));
+        y_lim = 0: inputdatavars.spacing(2): y_diff*inputdatavars.spacing(2);
+        
+        x_lim(end)
+        y_lim(end)
+        
+        figure; imagesc(tmap_model, [30 100]); colorbar; set(findobj('type','axes'),'fontsize',14);
+        figure; imagesc(MRTI_crop, [30 100]); colorbar; set(findobj('type','axes'),'fontsize',14);
+        figure; imagesc(intersection(:,:,7)); title( Study_paths{ii,2} ); colorbar; set(findobj('type','axes'),'fontsize',14);
+        figure; [AX h1 h2] = plotyy(total{ii,2}(:,1),total{ii,2}(:,3),total{ii,2}(:,1),total{ii,3}(:,7));
+        set(h1, 'LineWidth',5); set(h2,'LineWidth',5); set(findobj('type','axes'),'fontsize',16);
+        legend([h1;h2],'L_2','DSC'); title( Study_paths{ii,2});
+        var_opt(ii,:)
+        keyboard
+        close all
+        
         
     end
-    inputdatavars.voi = double( inputdatavars.voi);
-    x_diff = abs(inputdatavars.voi(2) - inputdatavars.voi(1));
-    x_lim = 0: inputdatavars.spacing(1): x_diff*inputdatavars.spacing(1);
-    y_diff = abs(inputdatavars.voi(4) -inputdatavars.voi(3));
-    y_lim = 0: inputdatavars.spacing(2): y_diff*inputdatavars.spacing(2);
-    
-    x_lim(end)
-    y_lim(end)
-       
-    figure; imagesc(tmap_model, [30 100]); colorbar; set(findobj('type','axes'),'fontsize',14);
-    figure; imagesc(MRTI_crop, [30 100]); colorbar; set(findobj('type','axes'),'fontsize',14);
-    figure; imagesc(intersection(:,:,7)); title( Study_paths{ii,2} ); colorbar; set(findobj('type','axes'),'fontsize',14);
-    figure; [AX h1 h2] = plotyy(total{ii,2}(:,1),total{ii,2}(:,3),total{ii,2}(:,1),total{ii,3}(:,7));
-    set(h1, 'LineWidth',5); set(h2,'LineWidth',5); set(findobj('type','axes'),'fontsize',16);
-    legend([h1;h2],'L_2','DSC'); title( Study_paths{ii,2});
-    var_opt(ii,:)
-    keyboard
-    close all
-
-    
+    clear ii
 end
-clear ii
 end

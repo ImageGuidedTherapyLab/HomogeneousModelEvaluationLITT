@@ -186,8 +186,9 @@ elseif choice == 3
     save ('GPU_dict_cond.mat','total','summary','-v7.3');
     
 elseif choice == 4
-    
+   % ('GPU_dict_perf_mu_global_400')
     save ('GPU_dict_perf_mu_global_400','total','summary','-v7.3');
+    %save ('GPU_dict_perf_mu_global_400_all_metric','total','summary','-v7.3');
     
 elseif choice == 5
     

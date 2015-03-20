@@ -29,6 +29,9 @@ elseif choice ==3
     n_length = length(k_cond);
     total = zeros(n_length,7);
     total(:,1) = k_cond;
+elseif choice ==4
+    n_length = length(k_cond);
+    total(:,1) = k_cond;
 end
 
 % This for loop identifies the power history's times versus powers for
@@ -134,6 +137,10 @@ elseif sum( inputdatavars.UID == '0471' ) ==4
 elseif sum( inputdatavars.UID == '0447' ) ==4
     VOI.x = VOI.x + 0;
     VOI.y = VOI.y + 1;
+elseif sum( inputdatavars.UID == '0457' ) ==4
+    VOI.x = VOI.x + 0;
+    VOI.y = VOI.y + 0;
+    power_log = 10.2;
 elseif sum( inputdatavars.UID == '0453' ) ==4
     VOI.x = VOI.x + 0;
     VOI.y = VOI.y + 1;
@@ -230,7 +237,11 @@ source.laser = [source.laser z_dim];
 spacing.x = spacing.x/scaling.x;
 spacing.y = spacing.y/scaling.y;
 spacing.z = spacing.z/(scaling.z * dom.z_subslice);
-[tmap_unique] = Human_GPU_choice ( power_log,spacing,scaling,mod_point,source,w_perf,k_cond,g_anisotropy,mu_eff_list,probe_u,robin_co,c_blood,choice);
+if choice ==4
+    [tmap_unique] = Human_GPU_choice_sym ( power_log,spacing,scaling,mod_point,source,w_perf,k_cond,g_anisotropy,mu_eff_list,probe_u,robin_co,c_blood,choice);
+else
+    [tmap_unique] = Human_GPU_choice ( power_log,spacing,scaling,mod_point,source,w_perf,k_cond,g_anisotropy,mu_eff_list,probe_u,robin_co,c_blood,choice);
+end
 
 
 tmap_unique=tmap_unique+37;
