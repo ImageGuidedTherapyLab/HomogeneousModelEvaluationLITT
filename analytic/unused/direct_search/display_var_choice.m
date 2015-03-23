@@ -9,7 +9,7 @@ data_filename = 'datasummaryL2_10sourceNewton50.txt';  % Name the datasummary fi
 
 setenv ( 'PATH22' , pwd);
 path22 = getenv ( 'PATH22' );
-opttype = 'bestfit50' ;
+opttype = 'bestfit51' ;
 
 datasummary = dlmread(data_filename,',',1,0);
 datasummary(any(isnan(datasummary), 2), 7) = 1;
