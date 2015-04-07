@@ -6,15 +6,24 @@ all registration parameters are WRT workdir/meshTemplateFull1.e
 make -f exe.makefile -j 6 &
 
 # decide at run time which run to accumulate stats
-python brainsearch.py --accum_history heating
-python brainsearch.py --accum_history bestfit
-python brainsearch.py --accum_history bestfit1
+python brainsearch.py --accum_history=heating
+python brainsearch.py --accum_history=[opttype]
+
+------------------------- Running LOOCV and naive data ---------------------------
+
+In MATLAB...
+master_naive_script
+[save workspace]
+
+master_LOOCV_script
+[save workspace]
+
 
 ------------------------- Running with MATLAB ------------------------------------
 
 1. Make sure 'brainsearch.py' has MATLAB = True . Make sure DAKMATLAB isn't running and the pipes are absent.  pkill -9 dakmatlab
 2. ./analytic/dakmatlab setup workspace
-3. ./exe.heathing.txt           Or whatever script you want to run
+3. ./exe.heating.txt           Or whatever script you want to run
 
 ----------------------------------------------------------------------------------
 parallel direct search in Dakota
@@ -114,7 +123,7 @@ Steps:
 ###### ./analytic/dakmatlab setup workspace
 
 2. Run a single data set or Bash script for multiple:
-./exe.sanity.txt
+./exe.fit50.txt
 
 3. dakota_sanity_1D.in analysis driver points to brainsearch.py
 
