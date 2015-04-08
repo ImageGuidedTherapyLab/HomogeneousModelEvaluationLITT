@@ -60,6 +60,7 @@ for ii = 1:n_patients
     output = dlmread( strcat( './',result_file));
     L2norm (ii) = output(1);
     dice_values (ii) = output(3);
+    toc
 
 end
 

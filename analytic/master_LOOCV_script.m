@@ -1,6 +1,6 @@
 close all
 clear
-
+tic
 opttype = 'bestfit50';          % Name the opttype
 datafilename = 'datasummaryL2_10sourceNewton50.txt';
 %datafilename = 'datasummaryL2_10sourceNewton50.txt';  % Name the datasummary file
@@ -11,5 +11,5 @@ mu_thresholds = sort(mu_thresholds);
 
 
 [opt, LOOCV, fig_labels] = master_LOOCV ( opttype, datafilename, DSC_thresholds, mu_thresholds);
-
+toc
 survival_plot (LOOCV.dice.values, opt.dice.all, fig_labels, LOOCV.run1, LOOCV.run2);

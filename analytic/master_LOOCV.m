@@ -178,7 +178,7 @@ for ii = 1:length_mu_groups
                     LOOCV.run1(ii,jj) = 2;
                     LOOCV.run2(ii,jj) = 1;
                     LOOCV.dice.stats{ii,jj} = Descriptive_statistics_LOOCV( LOOCV.dice.values{ii,jj});
-                    
+                    toc
                     
                 end
             else
@@ -205,7 +205,7 @@ for ii = 1:length_mu_groups
                 LOOCV.run1(ii,jj) = 2;
                 LOOCV.run2(ii,jj) = 1;
                 LOOCV.dice.stats{ii,jj} = Descriptive_statistics_LOOCV( LOOCV.dice.values{ii,jj});
-                
+                toc
                 
             end
             
@@ -234,5 +234,5 @@ for ii = 1:length_mu_groups
         
     end
 end
-
+toc
 end
