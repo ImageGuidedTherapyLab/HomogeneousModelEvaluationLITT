@@ -1,0 +1,1366 @@
+\documentclass[12pt]{article} 
+\usepackage{amssymb,amsfonts,amsmath}
+\usepackage{color,graphicx}
+\usepackage{siunitx}
+\usepackage{fixltx2e}
+\usepackage[nomarkers,tablesfirst]{endfloat}
+\usepackage[left=0.7in,right=0.7in,top=0.7in,bottom=0.7in]{geometry}
+\newcommand{\eqn}[1]{(\ref{#1})}
+\newcommand{\numberofpatientsLOOCV}{22 }
+\linespread{1.6}
+%http://latex2rtf.sourceforge.net/latex2rtf_1_9_19.html#Conditional-Parsing
+%Starting with LaTeX2RTF 1.9.18, there is a handy method for
+%controlling which content should be processed by LaTeX or by
+%LaTeX2RTF . Control is achieved using the standard \if facility of
+%TeX. If you include the following line in the preamble of your document 
+%
+%     \newif\iflatextortf
+%Then you will create a new \iflatextortf command in LaTeX . TeX
+%sets the value of this to false by default. Now, LaTeX2RTF
+%internally sets \iflatextortf to be true, and to ensure that this
+%is always the case, LaTeX2RTF ignores the command
+%\latextortffalse. This means that you can control how different
+%applications process your document by
+%
+%     \iflatextortf
+%     This code is processed only by latex2rtf
+%     \else
+%     This code is processed only by latex
+%     \fi
+%Note that \iflatextortf will only work within a section; you
+%cannot use this command to conditionally parse code that crosses
+%section boundaries. Also, it will only work on complete table or
+%figure environments. Due to the mechanism used by LaTeX2RTF in
+%processing these environments, at this time the only way to
+%conditionally parse tables and figures is to include two complete
+%versions of the environment in question, nested within an
+%appropriate \iflatextortf structure.
+%
+\newif\iflatextortf
+
+\iflatextortf 
+%do nothing
+\else  %pdflatex
+\usepackage{boxedminipage,float}
+\usepackage{wrapfig,setspace}
+\newcommand{\picdir}{pdffig}
+\fi
+
+\usepackage[pdftex, plainpages=false, colorlinks=true, citecolor=black, filecolor=black, linkcolor=black, urlcolor=black]{hyperref}
+
+
+%=================================================
+\begin{document}
+
+\title{\bf \Large
+A Model Evaluation Study for Treatment Planning of Laser Induced Thermal Therapy
+}
+
+\author{ S.~Fahrenholtz\textsuperscript{1,2},
+         T.~Moon\textsuperscript{3},
+         M.~Franco\textsuperscript{3},
+         D.~Medina\textsuperscript{3}, 
+         S.~Danish\textsuperscript{4}, \\
+         A.~Gowda\textsuperscript{5},
+         A.~Shetty\textsuperscript{5},
+         F.~Maier\textsuperscript{1},
+         J.~D.~Hazle\textsuperscript{1,2},
+         R.~J.~Stafford\textsuperscript{1,2}, \\
+         T.~Warburton\textsuperscript{3},
+         D.~Fuentes\textsuperscript{1,2*}
+       }
+\date{ \small
+\textsuperscript{1}The University of Texas M.D. Anderson Cancer Center,\\
+Department of Imaging Physics, Houston, TX 77030, USA \\
+\textsuperscript{2}The University of Texas at Houston, Graduate School of Biomedical Sciences,\\
+Houston, TX 77030, USA\\
+\textsuperscript{3}CAAM, Rice University, Houston, TX 77005, USA\\ 
+\textsuperscript{4}Robert Wood Johnson, New Brunswick, NJ 08901, USA \\
+\textsuperscript{5}BioTex, Inc., Houston, TX 77054, USA \\
+\textsuperscript{*} Corresponding Author: \texttt{dtfuentes@mdanderson.org}   \\
+%Webpage: \texttt{http://www.caam.rice.edu/~timwar/TimWarburton/Software.html}
+}
+
+
+\maketitle
+
+%\doublespacing
+
+\begin{abstract}
+%Purpose
+A cross validation analysis evaluating computer model predictions for \textit{a priori} 
+planning magnetic resonance-guided laser induced thermal therapy
+(MRgLITT) procedures in treating focal diseased brain tissue is presented.
+Two mathematical models are selected to evaluate the
+trade-off between the time investment in the algorithm, efficiency of the
+numerical implementation, and accuracy required in predicting the final endpoint
+of the therapy.  
+%Methods
+(1) A spectral element discretization of the transient Pennes bioheat transfer
+equation implemented on GPU computing architectures predicts the
+laser induced transient heating in perfused tissue. 
+(2) A computationally inexpensive, closed-form algorithm for predicting the steady state heat transfer
+from a linear superposition of analytic point source heating functions is also
+considered.
+Prediction accuracy is
+retrospectively evaluated in MR thermometry data obtained during an
+MRgLITT procedure in $N$ = \numberofpatientsLOOCV MR thermometry datasets via leave-one-out cross validation (LOOCV).
+Modeling predictions are quantitatively evaluated
+against MR thermal imaging in terms of a Dice similarity coefficient (DSC) between the
+simulation and experimental data.
+%Results
+During LOOCV analysis, the transient model's DSC mean and median is 0.7323 and 0.8001, respectively,
+with 15 of \numberofpatientsLOOCV DSC values exceeding the success criterion of DSC $\geq$ 0.7.
+The steady state model's DSC mean and median is 0.6431 and 0.6770, respectively,
+with 10 of \numberofpatientsLOOCV passing.
+A one-sample, one-sided Wilcoxon signed rank test indicates the transient FEM model's
+median DSC value is $\geq$ 0.7 at a statistically significant level. 
+%The null hypothesis was accepted for the steady state model.
+%Conclusions
+Further, the spectral element discretization of the transient bioheat transfer model
+provides greater potential in accurately calibrating the tissue properties needed
+in treatment prediction.
+%under an Ockham razor philosophy preferential to simplicity,
+%the steady state superposition model with fewer floating
+%point operations would be selected with respect to outcome prediction.
+However, in the appropriate context, both approaches are likely to provide useful
+information in guiding treatment decisions.
+
+
+\paragraph{Keywords} Bioheat Transfer $\cdot$ 
+                     Laser Induced Thermal Therapy $\cdot$ 
+                     MR Temperature Imaging $\cdot$ 
+                     GPU Computing 
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Approximately 211,000 patients present each year in the US with brain
+tumors.  Of these, 38,000 are benign primary tumors, 23,000 malignant
+primary tumors, and 150,000 are metastatic, originating largely from lung,
+breast, and melanoma~\cite{NCIFact13,
+kalkanis2010evidence,gavrilovic2005brain,bafaloukos2004treatment,Owonikoko2014}.
+The average life expectancy for patients with primary and metastatic
+malignancies in the brain, from time of diagnosis until death, is
+approximately 12-16 months. Five year survival is among the lowest of all
+cancers. Current treatment options include conventional surgery,
+stereotactic radiosurgery (SRS), or chemotherapy.  
+Surgical resection may be preferred for patients presenting with a single,
+solitary lesion, or lesions greater than 2.5 cm - 3.0 cm in which the size
+or location of the tumor causes neurological symptoms such as seizures,
+headaches, cognitive or motor deficits, that can be resolved by reducing
+the volume of the disease.
+SRS, such as Gamma Knife\textsuperscript{\textregistered}, is typically performed on patients with multiple
+tumors, tumors under 2.5 cm in diameter, and deep seated tumors~\cite{alexander1995stereotactic}.
+An additional target in brain is
+epileptogenic foci for patients with medically refractory epilepsy,
+where MRgLITT is being considered for the surgical armamentarium for those patients~\cite{curry2012mr,Nowell2014}.
+Unfortunately, patients with malignant recurrences who have reached max radiation dose
+limitations and complications with surgical resection create a group of
+patients with no remaining conventional treatment options;
+meanwhile patients with medically refractory epilepsy have limited interventions available.
+Magnetic Resonance-guided Laser Induced Thermal Therapy (MRgLITT) presents
+an alternative, minimally invasive thermal ablation technique for these
+groups of patients and has been safely and successfully applied to 
+each~\cite{carpentieretal08,carpentier2011laser,
+carpentier2012mr,torres2013stereotactic,jethwa2012magnetic,
+schwarzmaier2002basic,schulze2004laser}. 
+
+Under MR guidance, the laser applicator is carefully navigated through
+critical structures and placed directly into the diseased tissue to induce
+ablative heating and destroy the tissue. 
+Real-time thermometry of the treatment volume during
+laser heating provides a mechanism by which it is possible to deliver
+these therapies in both a safe and effective 
+manner~\cite{rieke2008mr, denis2005magnetic,stafford2010magnetic,
+woodrum2010feasibility} as well as estimate the extent of tissue
+damage~\cite{hyperthermia2003basic,mcdannold2006uterine,mcnichols2004technical}. 
+However, the heating induced by the laser is not constrained exclusively
+to tumor tissue and nearby tissue damage is possible. 
+For these procedures to progress to standard of care, 
+\textit{a priori} determination of the optimal placement of the laser catheter(s) is crucial
+for achieving a more conformal delivery of therapy over the target volume
+with minimal comorbidity of intervening or adjacent tissue. 
+%Currently, neuro-navigation software is used to guide placement. 
+
+This manuscript focuses on the development of a practical methodology for
+evaluating computer model predictions for \textit{a priori} planning the procedure  
+given $N$ datasets from previous procedures.
+Evaluation focuses on the trade-off between (1) algorithmic and numerical
+implementation efficiency (2) against, most importantly, prediction accuracy.
+Retrospective analysis of MR thermometry data acquired during previous procedures is
+essential to train or calibrate the computer model parameters. 
+The machine learning and statistics community have a rich history in
+applying various algorithmic and physics-based data models to reach conclusions from a
+given dataset~\cite{Breiman2001,Hastie2005}. 
+Here we assume that a Pennes bioheat transfer model~\cite{Pennes1948} provides
+representative predictions of the  physical process underlying the heating
+observed within the MR thermometry data.
+This physics-based approach
+provides a theoretically sound and concise methodology to statistically summarize the high
+dimensional thermometry dataset with a low dimensional model parameter subset. 
+
+The computer modeling approach targets a practical clinical setting of the operating room 
+or surgical suite where portable computing hardware, efficient software implementations,
+and efficient algorithm implementations are needed to deliver responsive predictions
+of the treatment outcome.  Two distinct modeling approaches are pursued: 
+(1) A GPU implementation of an unstructured hexahedral spectral element method
+for predicting the bioheat transfer is developed. 
+(2) A computationally inexpensive algorithm for predicting the heat transfer
+from a linear superposition of analytic point source heating functions is also
+presented as a reference implementation.
+
+Previous real-time implementations of the kernel for
+predicting the laser induced bioheat transfer were made feasible via
+implementation on a massively parallel supercomputers~\cite{fuentesetal09,
+Odenetal07,Dilleretal07,Fengetal07,Fuentesetal08}. 
+Despite the increasing presence of large computational clusters within
+large academic hospitals, reliance on such an approach makes clinical
+translation of this research extremely difficult. This technology must
+be practically available to any clinic using an MR-guided thermal therapy
+system whereas integration with an institution's cluster and intranet creates
+significant overhead and potential complications.
+While modern single-chip multi-core CPU's have a peak performance of
+$\mathcal{O}(10-100)$ GFLOPs and are sufficient 
+for inexpensive algorithms such as the linear superposition of analytic functions presented
+in Section~\ref{AnalyticBioheatModel}, 
+current GPUs~\cite{Farber2011a,Muller2013} have a peak
+performance of $\mathcal{O}(1-2)$ TFLOPs (single precision) and the
+portability of these devices are ideal for developing more advanced 
+numerical discretizations of the underlying partial differential equations
+for guiding the therapy. However, a significant
+time investment is needed to express the class of memory bound numerical
+methods used in simulation within an algorithmic framework that can
+simultaneously exploit these floating point capabilities and minimize the
+global memory access latency of these devices.
+% 28 = 1030/ (148/4) single precision.
+% max floating point operations per second is 1030 GFlop
+% data transfer of single precision numbers to the cores = bandwidth x data type size = 148  x (4bytes / float)
+% >>> 1030./ (148./4.)
+% 27.83783783783784
+For example, the $\mathcal{O} (150)$~GB/s memory bandwidth of the Tesla M2070
+used in the manuscript requires $\approx$ 30 floating point operations per
+single precision global memory access to fully utilize the floating point capabilities
+of the GPU. 
+The spectral element method presented in Section~\ref{BioheatComputerModel}
+achieves efficient global memory access through a matrix-free
+implementation of the inherent linear system of equations.
+As opposed to explicitly storing and reading matrix entries
+from global memory, the matrix-free method recalculates the local matrix entries
+needed within the linear system solve.
+This memory access design pattern has demonstrated a 4-10x speedup  over
+the matrix explicit methods~\cite{Muller2013,Knepley2014,Medina2014}.
+
+Combined with the data, the two modeling approaches presented provide an
+environment to critically evaluate model selection for therapy planning of MRgLITT. 
+%``Essentially, all models are wrong, but some are useful'', Box~\cite{box1987empirical},
+Both approaches 
+build intuition in the prediction by
+repetitively training the underlying physics model 
+to statistically match representative datasets. 
+Predictions are critically evaluated in terms of solution efficiency and
+accuracy for prospective treatment planning of MRgLITT procedures. 
+Leave-One-Out Cross Validation (LOOCV) is used to simulate the clinical
+scenario in which $N$ datasets from previous procedures are available to
+calibrate the computer model. LOOCV provides an objective framework to
+critically estimate the accuracy and confidence in predicting the outcome
+of the procedure for the $N+1$ patient~\cite{Stone1974,Geisser1975,Kohavi1995,Browne2000,Arlot2010}.
+
+%===================================================================
+\section{Methods }
+\subsection{Thermometry Data }\label{ThermometryData}
+%===================================================================
+
+MR thermal monitoring from MRI guided stereotactic laser induced thermal
+therapy (LITT) was considered in \textit{N} = \numberofpatientsLOOCV MR thermometry datasets.
+The datasets were vetted for motion artifacts, low signal-to-noise, 
+and catheter induced signal voids that would
+spuriously reduce the modeling accuracy.
+Each patient was treated with The Visualase Thermal Therapy System
+(Visualase, Inc., Houston, TX).  The Visualase\textsuperscript{\textregistered}
+system includes a 15 W
+980 nm diode laser, a cooling pump, and a laser applicator set.
+The laser applicator set is disposable and consists of 
+a 400 \si{\micro\metre} core silica fiber optic with a cylindrical diffusing tip
+housed within a 1.65 \si{\milli\metre} diameter saline-cooled polycarbonate cooling 
+catheter~\cite{torres2013stereotactic,mcnichols2004technical}; see
+Figure~\ref{LaserApplicatorOverview}.
+Applicator cooling lines and laser fiber optics are connected through a
+waveguide between the control room and the bore of the MR magnet. 
+An MR compatible headholder is used to secure the patient's head.
+The trajectory to the targeted tumor lesion was obtained 
+using the Brainlab navigation system (Brainlab, Westchester, IL USA). 
+A battery-powered hand drill was used to place
+a threaded plastic bone anchor within the skull.
+The laser applicator is secured to the threaded plastic bone anchor.
+The Visualase\textsuperscript{\textregistered} system imports images from a 3D MPRAGE sequence
+to verify applicator position within the lesion. 
+The depth is determined by the navigation software and is input retrospectively
+within this study. 
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\begin{figure*}[p!]
+\centering
+\iflatextortf 
+%do nothing
+\else
+\begin{tabular}{ccc}
+\scalebox{0.26}{\includegraphics*{\picdir/OverviewApplicator}}  
+&
+\scalebox{0.18}{\includegraphics*{\picdir/FEMesh}}  
+&
+\scalebox{0.24}{\includegraphics*{\picdir/powerProfile}}  
+\\
+(a) & (b) & (c)  \\
+\end{tabular}
+\fi
+\caption{
+(a) The Visualase\textsuperscript{\textregistered} applicator modeled in
+this application and a diagram of the photon emitting diffusing
+tip and the cooling fluid  are shown. (b) A finite element mesh conforms to the applicator
+and is used as the template for the calculations. (c) A representative
+time-temperature history profile of the thermometry data at two points within the brain tissue,
+ $\sim$1 mm from the applicator, is shown. The corresponding power history is also shown. 
+} \label{LaserApplicatorOverview}
+\end{figure*}
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MR temperature imaging was performed on a 1.5 T MRI
+(GE Healthcare Technologies, Waukesha, WI)
+using a 2D gradient echo sequence~\cite{staffordetal04} 
+(FA = \SI{30}{\degree}, FOV = $24 \times 24$ cm\textsuperscript{2}, matrix size = $256 \times 128$, 
+TR/TE=37.5/20 ms, receive-only head coil,  
+5 sec. per update).
+%No acceleration factor was used.
+The imaging plane was chosen perpendicular to the axial direction of the applicator 
+and allowed monitoring of critical structure regions.
+The Visualase\textsuperscript{\textregistered} workstation communicates with the MR scanner to obtain
+raw DICOM imaging data during the procedure.
+The temperature dependent water proton resonance frequency shift is measured
+by calculating the complex phase-difference observed during heating.
+The water proton resonance frequency chemically shifts to lower
+frequencies with higher temperatures (caused by rupture,
+stretching, bending of hydrogen bonds)~\cite{ishihara1995paf}.
+The total
+temperature change, $\Delta u$, is proportional to the measured
+phase change, $\delta \phi$.
+\[
+\Delta u = \frac{ \delta \phi } { 2 \pi \alpha \cdot \gamma B_0 \cdot \text{TE}}
+\]
+%$\alpha = -0.0097 \left[\frac{ppm}{^oC}\right]$ 
+Here $\alpha$ is the temperature sensitivity coefficient, $\gamma$ is the
+gyromagnetic ratio of water, $B_0$ is the static magnetic field strength, and
+TE is the echo time.  
+A baseline body temperature of \textit{u}\textsubscript{0} = \SI{37.0}{\degreeCelsius} is assumed to obtain
+absolute temperature.
+An Arrhenius rate process model~\cite{pearce1995rate}
+was used to evaluate the thermal dose resulting from the
+time-temperature history of the laser exposure.
+\begin{equation}\label{ArrheniusDamage}
+\text{$\Omega$}(t) = 
+      \int_0^t \! Ae^{\frac{-E_A}{Ru(\tau)}} \, \mathrm{d} \tau
+\end{equation}
+In this Arrhenius thermal dose model, the frequency factor, $A$,
+and the activation energy, $E_A$, are 
+experimentally determined kinetic parameters. The values for $A$ and
+$E_A$ were 3.1E98 and 6.28E5,
+respectively, and have been used in previous
+studies~\cite{carpentieretal08,schwarzmaier1998treatment,mcnichols2004mr}. 
+$R$ is the universal gas constant.  The thermal dose was assumed to
+be lethal at doses $\omega$  $\geq 1$ as seen in previous
+reports~\cite{carpentieretal08,mcnichols2004mr}. 
+
+%\begin{table}[h]
+%\centering
+%\caption{Patient Cohort Summary Statistics (N=\numberofpatientsLOOCV). MR 1.5 T scanner}\label{PatientSummaryStatistics}
+%\begin{tabular}{c|ccc}
+%                       &   Min   &  Mean & Max  \\\hline
+%Age   (yr)             &   14    & 27    & 60   \\
+%Power (W)              &   7     & 10    & 14   \\
+%Damage Volume(mm$^3$)  &   1.1   & 2.2   & 2.0  \\
+%\end{tabular}
+%\end{table}
+
+Prior to treatment delivery, a low power test pulse\textemdash\textit{e.g.}, 4 W for 30 s\textemdash
+is applied to verify position of the diffusion fiber optic within the catheter.  
+The test pulse is
+sufficient to allow thermal visualization but not cause thermal damage. 
+%Criteria for inclusion in our study included...
+Multiple thermal imaging datasets are available per patient;
+only the therapy delivery pulses are considered in this study.
+A representative laser power profile used
+during the therapy is shown in Figure~\ref{LaserApplicatorOverview}. 
+All DICOM header information was imported into an SQLite database 
+to provide efficient queries and 
+organize thermometry data for reproducible analysis and processing. 
+The schema provided by the Slicer~\cite{yeniaras2013design} DICOM
+module was used as template for the table structure.
+The object identifier (OID)
+of the SQL table was used to provide anonymous references to the data.
+The SQL functions,  \verb#group by#, \verb#group_concat#, and \verb#count#,
+were used in quality assurance of the data
+location, number of files, etc.
+Metadata needed for the analysis includes:
+\begin{enumerate}
+\item The applicator orientation and heating region of interest (ROI)
+are manually identified within the imaging datasets for input into the
+computer models discussed in Sections~\ref{BioheatComputerModel} and \ref{AnalyticBioheatModel}.
+\item A text file containing the relevant laser power history for each imaging
+dataset is parsed and input into the simulation. The power history provides
+information on the heating and cooling time intervals during the procedure.
+\end{enumerate}
+
+
+
+%===================================================================
+\subsection{Simulation of Bioheat transfer within Laser Irradiated Tissue}\label{BioheatComputerModel}
+%===================================================================
+
+A time dependent Pennes~\cite{Pennes1948} bioheat transfer equation
+provides a computer model for predicting the temperature field resulting
+from the laser tissue interaction. 
+\begin{equation} \label{BioheatPDE}
+  \partial u_t   
+ -\nabla \cdot  (   \alpha \nabla u  ) 
+ + \frac{\omega c_\textit{blood}}{\rho c_p} (u  - u_a )
+ = \frac{1}{\rho c_p} \; q_{laser}
+     \qquad \text{in } U \backslash U_{tip}
+\end{equation}
+\[
+   q_{laser}(x,t)  = 
+    \int_{U_{tip}}
+ \frac{p(t) \mu_\textit{eff}^2}{\text{Vol}(U_{tip}) }  
+   \frac{ \exp(-\mu_\textit{eff} \| x -{ \xi}\|) }
+      {4\pi \| x-{ \xi}\|} \; d\xi
+   \quad   x \in U \backslash U_{tip}
+\]
+\[
+  \alpha  = \frac{k}{\rho c_p}
+\quad
+  \mu_{eff}  = \sqrt{ 3 {\mu_a} \mu_{tr} }
+\quad
+ \mu_{tr} = \mu_a  + \mu_s (1-g)
+\]
+\[
+n \cdot ( \alpha \nabla u  )  = 0 
+                       \qquad \text{on } \partial U
+\qquad
+n \cdot ( \alpha \nabla u  )  = h (u - u_\textit{cooling}) 
+                       \qquad \text{on } \partial U_\textit{tip}
+\]
+Here the tissue specific heat, $c_p$; tissue density, $\rho$;
+thermal conductivity, $k$; perfusion, $\omega$; blood specific
+heat, $c_{blood}$; 
+and arterial blood temperature, $u_a$,
+are deterministic model parameters 
+obtained from literature~\cite{Handbook05,Welch95,duck1990}; 
+see Table~\ref{modeldata}.
+The laser source, $q_{laser}$, is a deterministic function of the
+applied power, $p(t)$; optical
+scattering, $\mu_s$; optical absorption, $\mu_a$; anisotropy factor, $g$;
+and distance, $\|x-\xi\|$, from the source, $U_{tip}$.
+Active cooling of the water flowing through the applicator is modeled 
+by a Robin or mixed boundary condition in which the temperature flux at
+the applicator interface is proportional to  the convection coefficient,
+$h$, and the temperature difference between the cooling fluid
+$u_\textit{cooling}$ and the tissue. A diagram of the 
+Visualase\textsuperscript{\textregistered} applicator used
+in this application is shown in Figure~\ref{LaserApplicatorOverview}.
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\iflatextortf 
+%do nothing
+\else
+\begin{table*}[p]
+\caption{Constitutive data~\cite{Handbook05,Welch95,duck1990}}\label{modeldata}
+\centering 
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|} \hline 
+\textit{k} [\si[per-mode=fraction]{\watt\per\metre\per\kelvin}]   & $\omega$ [\si[per-mode=fraction]{\kilo\gram\per\metre\per\second}] &  \textit{g} [Unity]  &  $\mu_s$ [\si{\per\centi\metre}] &   $\mu_a$ [\si{\per\centi\metre}] & $\rho$ \si[per-mode=fraction]{\kg\per\metre\cubed} & $c_{blood}$ \si[per-mode=fraction]{\joule\per\kg\per\kelvin} &  $c_{p}$ \si[per-mode=fraction]{\joule\per\kg\per\kelvin} & \textit{h} \si[per-mode=fraction]{\watt\per\kelvin\per\metre\cubed} & $u_{cooling}$ \si{\degreeCelsius}& $u_a$ \si{\degreeCelsius}\\ \hline
+          0.527              &             9.0             & 0.88  &       14000              &       500                  &  1045                        &            3840                      &                  3600  & 100 & 21   & 37    \\ \hline
+\end{tabular}
+\end{table*}
+\fi
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An implicit Euler time discretization is used to reduce the 
+time-dependent bioheat equation, Equation~\eqn{BioheatPDE}, into a sequence of elliptic problems. 
+Hexahedral Lagrange elements (polynomial order = 3) were used in the finite
+element discretization of the spatial domain.
+These elements use a tensor-product of Gauss-Lobatto-Legendre (GLL) interpolation
+nodes and are commonly referred to as spectral elements.  
+A matrix-free preconditioned conjugate gradient algorithm is used to solve the
+linear system of equations inherent to the discretization.  
+An overlapping additive Schwarz preconditioner is used since the local
+block problem on each element is well suited for the block-coupled
+parallelism of the wide SIMD cores on the GPU.  
+The matrix-free approach minimizes the storage
+requirements and data movement of the finite element elliptic solvers.  The
+preconditioned conjugate gradient algorithm does not explicitly demand the system
+matrix to be stored but only requires the evaluation of matrix-vector products,
+and the structure of the tensor-product hexahedral elements allow this action
+to be computed with $\mathcal{O}$($N^4$) operations per degree-\textit{N} finite
+element.  
+%The actual performance depends on the degree of the finite
+%element with higher degree elements.  
+Avoiding assembly and storage of the stiffness matrix on the GPU
+allows the solver to handle discretizations with a large number of elements to
+compensate for the limited memory on the GPU.  This algorithmic approach is
+shown to have high computational efficiency on the non-uniform memory
+architecture of modern GPUs~\cite{Medina2014}.
+
+All computations were performed on the template hexahedral mesh
+shown in Figure~\ref{LaserApplicatorOverview} (b).
+For each simulation, the template was registered to the observed
+laser location for each patient.
+The mesh consists of disjoint regions for the applicator and tissue.
+A quadrilateral mesh was extruded axially along the applicator to create
+the base of the hexahedral finite element mesh. The mesh for the tissue
+conforms to the surface of the application and extends sufficiently far
+to ensure that the boundary does not influence the heating.
+The discretization consists of $N_{dof}=$844,032 total GLL nodes. 
+The degrees of freedom across the volume of the applicator were removed;
+the effect of the room-temperature cooling fluid which protects the laser fiber
+during heating were considered through the boundary conditions at the surface
+nodes. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Analytic Steady State Solution}\label{AnalyticBioheatModel}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+A steady state version of the Pennes bioheat equation, Equation~\eqn{BioheatPDE},
+was also considered as a surrogate model for the therapy planning, in order to
+investigate the accuracy of a simpler, trained model.
+Constant coefficients are assumed. A 1D spherically symmetric radial decomposition 
+of the solution,
+$u(r)~-~u_a~=~\frac{\mathcal{R}(r)}{r}$, simplifies the analysis of the differential operator in
+spherical coordinates.
+\[
+    \frac{\omega c_\textit{blood}}{\rho c_p}  \frac{ \mathcal{R}(r)}{r} 
+   -
+    \frac{\alpha }{r}   \frac{d^2 \mathcal{R}}{dr^2}
+   = 
+    \frac{\mu_\textit{eff}^2 \;  P}{ \; \rho c_p}   
+    \frac{ \exp \left(-\mu_\textit{eff} \; r \right) }{ 4 \; \pi \; r}
+\]
+\[
+   u(r_1) = u_0
+  \qquad
+  \left. \frac{d u}{dr} \right|_{r_2}  = 0
+  \qquad
+   r_1 < r_2
+\]
+%FIXME { \color{red} May also consider Robin BC 
+%\[
+%  \left. k  \frac{d u}{dr} \right|_{r_1}  = h (u - u_\infty) 
+%\]
+%} 
+From classical theory~\cite{boyce1992elementary}, 
+the general solution is the linear combination of the homogeneous solution, $u_h$, and
+a particular solution, 
+$ u_p = \frac{1}{r} \left( A \exp (-\mu_\textit{eff} \; r) + B \; r \;  \exp
+(-\mu_\textit{eff} \; r) \right) $.
+In this case, the particular solution was obtained from the method of undetermined
+coefficients for $A,B \in \mathbb{R}$. 
+\begin{equation}\label{OneDSolution}
+u = 
+  \underbrace{
+    C_1 \frac{\exp\left( \sqrt{\frac{\omega c_\textit{blood}}{k}} \; r \right)}{r}  
+  + 
+    C_2 \frac{\exp\left(-\sqrt{\frac{\omega c_\textit{blood}}{k}} \; r \right)}{r}  
+    }_{u_h}
+  + 
+  \underbrace{
+    \frac{\mu_\textit{eff}^2 \; P \; \exp \left(-\mu_\textit{eff} \; r \right) }
+         { 4 \; \pi \; r \; \left(\omega c_\textit{blood}-k \; \mu_\textit{eff}^2 \right)} 
+    }_{u_p}
+  + 
+    u_a
+\end{equation}
+The boundary conditions are used to determine the coefficients of the homogeneous solution.
+Applicator cooling is specified by the boundary condition at $r = r_1$.
+The domain is assumed large enough that no heat flux is observed at the far boundary $r = r_2$.
+\[
+\begin{bmatrix}
+    \frac{\exp\left( \sqrt{\frac{\omega c_\textit{blood}}{k}} \; r_1 \right)}{r_1}  
+  & 
+    \frac{\exp\left(-\sqrt{\frac{\omega c_\textit{blood}}{k}} \; r_1 \right)}{r_1}  
+  \\
+  \left.
+   \frac{d}{dr}
+    \frac{\exp\left( \sqrt{\frac{\omega c_\textit{blood}}{k}} \; r \right)}{r}  
+  \right|_{r_2}
+  & 
+  \left.
+   \frac{d}{dr}
+    \frac{\exp\left(-\sqrt{\frac{\omega c_\textit{blood}}{k}} \; r \right)}{r}  
+  \right|_{r_2}
+\end{bmatrix}
+\begin{bmatrix}
+  C_1 \\
+  C_2 \\
+\end{bmatrix}
+= 
+\begin{bmatrix}
+      u_0 - u_p(r_1) - u_a    \\
+  - \left. \frac{d u_p}{dr} 
+  \right|_{r_2}\\
+\end{bmatrix}
+\]
+%The 1D solution provides an estimate of the heating from a single point source
+%with applicator boundary at $r_1$. The Symbolic Toolbox of MATLAB was used to determine
+%and verify all coefficients and \verb#ccode# was used to write out the kernel.
+%Similar analytical solutions are provided in \cite{Giordano2010,Vyas1992,Deng2002}.
+The 1D solution provides an estimate of the heating from a single point source
+with applicator boundary at $r_1$. Mathematica 7 (Wolfram, Champaign, IL) was used
+to determine and verify all coefficients. Then, \verb#ccode# was used to write out the kernel.
+Similar analytical solutions are provided in \cite{Giordano2010,Vyas1992,Deng2002}.
+%FIXME \text{ \color{red} (Do we get the same result ?) } 
+Heating caused by the cylindrical geometry of the diffusing tip was modeled as
+evenly distributed point sources, $M = 10$, along the axial dimension of the
+applicator at positions $r_{0_i}$. 
+\begin{equation}\label{GreenSuperPosition}
+  u = \sum_{i=1}^M u_h( r-r_{0_i}) + u_p( r-r_{0_i})
+\end{equation}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model Calibration}\label{ModelCalibration}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For each thermometry dataset discussed in Section~\ref{ThermometryData},
+an inverse problem was solved to calibrate both computer models considered 
+to the observed heating.
+Previous work~\cite{fahrenholtz2013generalised} 
+showed that the optical parameters provide the highest sensitivity in the temperature
+predictions over the range of physically meaningful model parameters.
+Consequently, optical parameters are considered in the optimization.
+The analytical form of the standard diffusion approximation for
+the laser source term concisely represents the heating as a function
+of the single optical parameter, $\mu_\textit{eff}$. {\color{red}At the end of
+optimization for one MRTI dataset, the dataset has a corresponding
+optimal $\mu_\textit{eff}$ that is constant in space and time.}
+
+
+The out-of-plane translation component, $z$, of the mesh template 
+shown in Figure~\ref{LaserApplicatorOverview} was also optimized.
+The physics of the MR thermometry data acquisition averages
+the temperature over the slice thickness and the translation update
+is implemented to tune the registration of the computational domain to the MR thermometry data.
+The remaining input parameters are assumed fixed.
+
+% \[
+%  f_1(\mu_\text{eff},z)
+%    =  
+%                  \sum_{k=1}^{N_\text{step}} \| u(t_k) - u^\text{MRTI}(t_k) \|^2
+% \qquad
+% \qquad
+%  f_2(\mu_\text{eff},z)
+%    = 1-DSC(\mu_\text{eff},z)
+%  \qquad
+%    DSC(\mu_\text{eff},z)
+%    = 2 \frac{A \cap B}{A+B}
+% \]
+
+The DAKOTA (Sandia National Laboratories)~\cite{eldred2007dakota} library was
+used to optimize $\mu_\textit{eff}$  for the transient and steady
+state  models. 
+The $L_2$ error over space and
+time was used as the objective function.
+\[
+   (\mu_\textit{calib},z_\textit{calib})  = \text{arg}\min_{(\mu_\textit{eff},z)}  
+                 \sum_{k=1}^{N_\textit{step}} \| u(t_k) - u^\textit{MRTI}(t_k) \|^2
+\]
+Thermometry data is denoted $u^\textit{MRTI}$.
+All time steps were considered
+for the transient analysis of the computer model presented
+in Section~\ref{BioheatComputerModel}.
+For the steady state model presented in Section~\ref{AnalyticBioheatModel},
+the objective function was the $L_2$ norm between the model and the MRTI's maximum heating time point.
+%The Dice similarity coefficient (DSC) was used as a measure of model prediction accuracy against
+%damage observed in MR thermometry data. 
+%For the transient model, regions of DSC overlap were considered as  
+%Arrhenius dose, $\Omega$, $\geq$ 1.
+%For the steady state model, DSC overlap was considered as regions where
+%the MRTI max heating and model's temperature exceeded 57 $\degree$C.
+%For some datasets, optimizing only the $L_2$ norm led to a DSC = 0, even if
+%DSC $\geq$ 0 was possible. Therefore, a penalty term
+%was added to the objective function that ensured the optimizer would
+%converge to a $\mu_\text{eff}$ that had a DSC $\geq$ 0 if possible. 
+A quasi-Newton optimization method, \verb#opp_q_newton#, was implemented as the
+optimization algorithm for both models. 
+% The method allows search directions of negative curvature.
+% A BFGS preconditioner and  Eisenstat-walker convergence criteria was used for
+% the inexact Newton solve.
+Gradients of the objective functions were computed using numerical
+finite differences. The calibration was solved as a bound constrained
+optimization problem. A physically feasible parameter bound on the optimization of
+the optical parameters, $\mu_\textit{eff} \in [0.8,400]$ m$^{-1}$, was obtained from
+literature~\cite{Welch95}. During calibration, the initial value for $\mu_\textit{eff}$
+was 180 m$^{-1}$. The initial value was calculated via the $\mu_\textit{eff}$ identity
+from Equation~\eqn{BioheatPDE} and the $\mu_\textit{a}$, $\mu_\textit{s}$, and $g$ values
+from Table~\ref{modeldata}.  The slice thickness of the MR thermometry data was used to bound the
+optimization of the template out of plane translation.  
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Leave-One-Out Cross Validation } \label{LOOCV_section}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Leave-One-Out Cross Validation (LOOCV) is a method for estimating a
+trained, \textit{i.e.} calibrated, model's accuracy in prediction ~\cite{Stone1974,Geisser1975,Kohavi1995,Browne2000,Arlot2010}.
+Within this context, developing a `predictive model' refers to the process by which we
+can confidently assign a probability to a treatment outcome, such as full tumor
+destruction or damage to surrounding healthy tissue. 
+Similar to the human cognitive process, the predictive computer model is built
+from prior experience using MR temperature imaging data used to monitor the
+procedure. The datasets are used to calibrate the computer model parameters as
+discussed in Section~\ref{ModelCalibration}. The LOOCV algorithm is executed as: 
+\begin{itemize}
+\item for each thermometry dataset $i = 1, ..., N$
+\begin{itemize}
+\item  The average value for the optical coefficient, $\bar{\mu}_\textit{eff}^i$, 
+is learned from the calibration results, $\mu_\textit{calib}^j$,
+on the remaining $j \neq i$ datasets.
+\[
+   \bar{\mu}_\textit{eff}^i = \frac{1}{N-1} \sum_{j \neq i} \mu_\textit{calib}^j
+\]
+\item 
+Tissue damage on the 
+$i$-th dataset is predicted by using the average, $\bar{\mu}_\textit{eff}^i$, 
+values from the $j \neq i$ cohort. 
+The Dice similarity coefficient (DSC) provides an estimate of the agreement
+with Arrhenius damage measured from thermometry data.
+\[
+   DSC(\bar{\mu}_\textit{eff}^i)   
+    = 2 \frac{A \cap B}{A+B}
+   \qquad \qquad 
+   \bar{\mu}_\textit{eff}^i \neq \mu_\textit{calib}^j
+\]
+%The , $f_2$, was used to measure distance between the time-independent model,
+%Section~\ref{AnalyticBioheatModel} and the 57$^o$C isotherm at the maximum
+%heating seen in the MR thermometry. 
+The DSC measures the area of overlap between
+the area enclosed by the Arrhenius damage model for the thermometry data, $A$, and the
+computer model prediction, $B$. 
+The Arrhenius damage, Equation~\eqn{ArrheniusDamage}, is computed
+from the simulated temperature field of the transient analysis. The isotherms
+are used as the damage model for the steady state analysis.
+Previous work in canine
+brain demonstrated that the 57 \si{\degreeCelsius} isotherm produce damage regions similar
+to the Arrhenius model for the ablation regime considered
+in this study~\cite{yung2010quantitative}.
+\end{itemize}
+\end{itemize}
+
+The trained model's predictive ability is
+evaluated by analyzing the distribution of DSC values from the $N$ iterations of
+LOOCV. 
+A one-sample, one-sided Wilcoxon signed rank test examines if the trained
+model prediction's median exceeds DSC $\geq$ 0.7. 
+One-sample calculations were computed using a threshold DSC value, $0.7$, as 
+the null hypothesis, $H_0$.
+\[
+   H_0: DSC  = 0.7  \qquad   H_1: DSC > 0.7
+\]
+The value chosen is a commonly accepted value in image processing
+literature~\cite{yung2010quantitative,Dice1945measures,zou2004three};  
+$DSC=1$ implies complete agreement between the measure and predicted damage model,
+$i.e.$ the predicted and measured damages volumes completely overlap.
+A two-sample, paired Wilcoxon signed rank test was used to compare if the two models'
+prediction medians are statistically different from one another.
+All statistical tests and descriptive statistics were evaluated on
+GraphPad Prism 6.01 (GraphPad Software, La Jolla, CA).
+
+\begin{figure}[p!] 
+\begin{tabular}{ccccc} 
+
+\scalebox{0.16}{\includegraphics*{\picdir/dakota/0488/magnbestfit0059.jpg}} & \scalebox{0.257}{\includegraphics*{\picdir/model_vs_MRTI_SS/hot_0488_label.png}}  & \scalebox{0.32}{\includegraphics*{\picdir/model_vs_MRTI_SS/FEM_MRTI.png}} & \scalebox{0.295}{\includegraphics*{\picdir/model_vs_MRTI_SS/GF_MRTI.png}} & \scalebox{0.28}{\includegraphics*{\picdir/model_vs_MRTI_SS/dmg_legend.png}}
+\\
+(a) & (b) & (c) & (d) & (e) \\
+\end{tabular}
+\\
+\caption{Representative thermometry data and calibrated model damage predictions.
+(a) The magnitude of the complex valued thermometry data provides a visualization
+of the anatomy and is provided as a reference. The applicator trajectory
+is observed as a signal void in the image. The ROI displayed has a 
+3.75 $\times$ 3.28 \si{\cm\squared} field of view and is shown in (b)-(d).
+(b) MR thermometry at maximum heating is shown.
+(c) FEM model predicted Arrhenius damage is compared to
+Arrhenius damage based on MRTI.
+(d) A comparison of the steady state damage model is shown.
+The steady state damage model 
+is the region enclosed by the \SI{57}{\degreeCelsius} isotherm. 
+The color map indicates the geometrical overlap used in DSC calculations;
+the legend is at right (e).
+Respective DSC values for the FEM model (c) and steady state
+model (d) are DSC = 0.8385 and DSC = 0.7442.
+}  
+\label{RepresentativeData}
+\end{figure}
+
+
+
+\begin{figure*}[p!]
+\begin{tabular}{ccccc} 
+\centering
+\iflatextortf 
+%do nothing
+\else
+%\begin{tabular}{cc}
+%\scalebox{0.42}{\includegraphics*{\picdir/datasummarybestfit}}  
+%&
+\scalebox{0.55}{\includegraphics*{\picdir/hist_pics/FEM_Hist.png}} &  \scalebox{0.55}{\includegraphics*{\picdir/hist_pics/SteadyStateHist22.png}}  
+\\
+(a) & (b) \\
+\fi
+\end{tabular}
+\caption{ 
+Presented here are histograms of calibration analysis from the transient FEM model (a) and steady state model (b),
+shown left and right; respectively. The optical parameters, $\mu_\textit{eff}$,
+recovered from each thermometry dataset considered is shown.
+For each calibration, the bound constrained optimization was
+restricted to a range obtained from literature, $\mu_\textit{eff} \in [0.8,400]$ m$^{-1}$. Leave-one-out cross validation was performed
+using these \numberofpatientsLOOCV $\mu_\textit{eff}$ values.
+The nominal value in brain tissue obtained from~\cite{Welch95} is 
+$\mu_\textit{eff}$ = 180 m$^{-1}$.
+} \label{QuantitativeComparison}
+\end{figure*}
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\iflatextortf 
+%do nothing
+\else
+\begin{table*}[p]
+\caption{Here are the descriptive statistics for $\mu_\textit{eff}$ during optimization
+and DSC performance during optimization and LOOCV (\textit{N} = \numberofpatientsLOOCV).
+The transient solve of the Pennes bioheat equation
+using the Arrhenius damage, Equation~\eqn{ArrheniusDamage}, is denoted FEM.
+Steady state analysis using the \SI{57}{\degreeCelsius} isotherm damage model is denoted GF.
+Note that all DSC, skewness, and kurtosis quantities are unitless.
+``\%-ile" refers to percentiles. \textit{E.g.}, 25\%-ile means the dataset's DSC performance exceeds
+25\% of the population DSC values in ranked order.
+}\label{DescriptiveStatistics}
+\centering 
+\begin{tabular}{c|cc|cc|cc} \hline 
+Descriptive Statistic & FEM           & GF $\mu_\textit{eff}$ (m$^{-1}$) & FEM         & GF DSC opt. & FEM            & GF DSC LOOCV \\ \hline
+      Minimum         &    67.26      & 138.4                            &   0.4865    &     0.3421   &      0        &    0.3312    \\ %\hline
+      25\%-ile        &    115.5      & 167.2                            &   0.7356    &     0.5789   &      0.6709   &    0.5617    \\ %\hline
+      Median          &    121.6      & 189.6                            &   0.8142    &     0.6925   &      0.8001   &    0.6770    \\ %\hline
+      75\%-ile        &    146.1      & 212.4                            &   0.8652    &     0.7259   &      0.8429   &    0.7257    \\ %\hline
+      Maximum         &    154.6      & 269.4                            &   0.8972    &     0.8476   &      0.8859   &    0.8143    \\ \hline
+      Mean            &    125.6      & 194.7                            &   0.7824    &     0.6493   &      0.7323   &    0.6431    \\ %\hline
+  Standard Deviation  &    21.78      & 38.42                            &   0.1091    &     0.1274   &      0.1930   &    0.1289    \\ \hline
+      Skewness        &    -0.7906    & 0.5714                           &   -1.432    &     -1.190   &      -2.830   &    -1.150    \\ %\hline
+      Kurtosis        &    1.026      & -0.2562                          &   1.609     &     1.142    &      9.919    &    0.6817    \\ %\hline
+\end{tabular}
+\end{table*}
+\fi
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Results}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Representative thermometry images and calibrated computer model predictions are
+shown in Figure~\ref{RepresentativeData}.  The measured and predicted thermal dose
+is displayed. The Arrhenius damage model is shown for the transient model
+predictions, Equation~\eqn{BioheatPDE}, and the thermometry data. The \SI{57}{degreeCelsius}
+isotherm damage model is shown for the steady state analysis, Equation~\eqn{GreenSuperPosition}. 
+Significant variability is seen in the heating due to local patient tissue heterogeneities,
+tumor location, and nearby heat sinks in the brain such as large blood vessels
+and cerebral spinal fluid (CSF). This is reflected by the non-ellipsoidal shape
+of the isotherms and corresponding damage volume in the Arrhenius
+estimates of the damage.  However, the calibrated thermal damage predictions show acceptable
+agreement, \textit{i.e.} DCE $\geq$ .7~\cite{zou2004three}, between the measured and predicted
+tissue damage in multiple patients. 
+
+The calibration process applied to each thermometry dataset provides a
+histogram of $\mu_\textit{eff}$ values in which the optimal agreement between
+the model's prediction and the MR thermometry is observed for each model. 
+The histogram of the $\mu_\textit{eff}$
+values for both the transient and steady state model calibrations is shown in
+Figure~\ref{QuantitativeComparison}. Literature values of the expected optical
+properties is provided as a reference. 
+Extrema of the feasible set are obtained
+from the range of values observed in literature.
+Descriptive statistics of the optimized $\mu_\textit{eff}$ values,
+DSC during optimization, and DSC during LOOCV for 
+both models is provided in Table~\ref{DescriptiveStatistics};
+meanwhile, percentiles corresponding to interesting DSC thresholds
+are presented in Table~\ref{DSC_and_percentiles}.
+
+
+The overall DSC performance from both models during LOOCV analysis is
+provided in Figure~\ref{ModelSelection}.
+The performance is summarized by the
+number of datasets that pass a given DSC threshold; the plot is
+analogous to the Kaplan-Meier survival curve.
+During LOOCV, the transient model had 15 of 22 datasets pass
+the DSC $\geq$ 0.7 success criterion, while the steady state model
+passed 10 of 22.
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\iflatextortf 
+%do nothing
+\else
+\begin{table*}[p]
+\caption{Here are the percentiles that correspond to several interesting DSC thresholds.
+The ``opt." and ``LOOCV" columns refer to the same groups of datasets described in Table~\ref{DescriptiveStatistics},
+as well as the datasets plotted in Figure~\ref{ModelSelection}.
+The smaller the percentile value, the better the model's performance.
+`0' indicates all values pass at the given threshold; `100' indicates no values pass.
+}\label{DSC_and_percentiles}
+\centering 
+\begin{tabular}{c|cc|cc} \hline 
+DSC threshold (Unity) &  FEM (\%-ile)& GF DSC opt. (\%-ile)  &  FEM (\%-ile) & GF DSC LOOCV (\%-ile) \\ \hline
+      0.4             &    0         &     8.357             &      5.776    &    7.176              \\ %\hline
+      0.5             &    2.996     &     13.34             &      6.652    &    14.06              \\ %\hline
+      0.6             &    11.36     &     27.34             &      12.97    &    27.52              \\ \hline
+      0.7             &    15.25     &     57.64             &      30.35    &    58.61              \\ %\hline
+      0.75            &    30.53     &     83.22             &      41.36    &    85.11              \\ %\hline
+      0.8             &    44.36     &     95.12             &      49.97    &    96.14              \\ %\hline
+      0.85            &    67.19     &     100               &      82.06    &    100                \\ %\hline
+\end{tabular}
+\end{table*}
+\fi
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+\begin{figure*}[p]
+\begin{tabular}{ccccc}
+\centering
+\iflatextortf 
+%do nothing
+\else
+\scalebox{0.5}{\includegraphics*{\picdir/Survival_plots/opt_survival.png}} &  \scalebox{0.485}{\includegraphics*{\picdir/Survival_plots/LOOCV_survival.png}}  
+\fi
+\\
+(a) & (b) \\
+\end{tabular}
+\caption{
+Here, the overall predictive performance, measured by DSC,
+is displayed for both models. (a) Left is the performance during
+optimization, and the right is during LOOCV (b).
+The horizontal axis displays increasing
+DSC thresholds; the vertical axis displays the number of datasets
+that pass the DSC threshold. Greater area under the curve (AUC)
+indicates better prediction. In the FEM LOOCV plot, there
+is one dataset that has a DSC = 0 and therefore does not appear
+on the plot.
+}
+\label{ModelSelection}
+\end{figure*}
+
+The two-sample, paired Wilcoxon signed rank test rejected the null hypothesis
+with a \textit{p}-value of 0.0059.
+\textit{I.e.}, the difference of the transient and steady state models' medians of DSC
+during LOOCV was statistically significant.
+The one-sample, one-sided Wilcoxon signed rank test for the transient model
+rejected the null hypothesis with a \textit{p}-value of 0.029.
+\textit{I.e.}, the transient model's median of DSC during LOOCV was $\geq$
+0.7 at statistically significant level.
+The one-sample, one-sided Wilcoxon signed rank test for the steady state model
+accepted the null hypothesis with a \textit{p}-value of 0.0732.
+\textit{I.e.}, the steady state model's median of DSC during LOOCV was
+not $\geq$ 0.7 at a statistically significant level.
+
+{\color{red}For the two models, the time to run LOOCV
+was recorded. The FEM model took ZYX for LOOCV, or asdfasdf on average per dataset.
+The steady state took 247 seconds for LOOCV, or 11.2 seconds on average per dataset. }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discussion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+{\color{red}We are presenting this manuscript to introduce the possibility
+of a new paradigm of treatment planning via a train-and-predict scheme.
+This method is becoming possible because of a growing number of retrospective patient
+datasets. Relatively simple models were chosen for this demonstration
+to expedite the model training, \textit{i.e.}, optimization. The success
+or failure of this paradigm is expected to be related to several factors.
+First, there must be a sufficient quantity of retrospective datasets
+for the training to converge. Second, the cohort of retrospective
+datasets used in training must have sufficient similarity within the group
+and to the prediction scenarios. Third, the model used must be able 
+to describe clinically relevant ablations. In this investigation,
+none of these three factors are satisfied. Nonetheless,
+we propose that model training may expedite clinically useful,
+patient-specific prediction by reducing the model complexity necessary
+and/or the need for patient-specific or population-based parameter
+measurements. }
+
+
+{\color{red}Given the number of available datasets, the LOOCV analysis
+provides the best available recapitulation of the clinical scenario}
+for treatment planning. Prior knowledge and experience is embodied
+within the thermometry data from the previous $N$ ablations.
+Information from the previous ablations is extracted by calibrating
+a computer model to the available data. 
+In this case, we calibrated our optical parameter to the thermometry data.
+
+
+
+If the LOOCV analysis only includes datasets that can be optimized to
+have DSC $\geq$ 0.7, both models perform very well. This is because
+the calibrated $\mu_\textit{eff}$ values have a much tighter distribution;
+\textit{i.e.} datasets with an optimal DSC $\geq$ 0.7 had similar $\mu_\textit{eff}$ values.
+Given this investigation is framed as a prediction on the $N$ + 1 patient,
+cherry-picking the successful optimizations is inappropriate. Indeed, optimization results
+with DSC $<$ 0.7 are included in the LOOCV analysis as seen in the descriptive statistics,
+Table~\ref{DescriptiveStatistics}. However,
+it is worth realizing that successful optimizations have similar
+$\mu_\textit{eff}$ values and perhaps information beyond the
+thermometry data would allow the calibration to grouped into similar cohorts.
+\textit{E.g.}, additional meta information on the primary disease type, tumor location, and treatment history
+would provide
+useful information in the analysis that may demonstrate clustering during the calibration
+and would further classify the tissue type.
+
+The two models presented provides a canonical model selection comparison of the
+trade-off between the time investment in the algorithm, efficiency of the
+numerical implementation, and accuracy required for predicting the final endpoint
+of the application. The two-sided, two-sample paired Wilcoxon signed rank test
+indicates the predictive results' medians are significantly different and
+only the transient model's median DSC performance was significantly
+$\geq$ 0.7. 
+The finite element discretization of the governing equations requires significant
+expertise of the GPU computing architecture as well as detailed algorithmic
+understanding of both the finite element technology and matrix-vector multiply
+within the iterative linear system solver to maximize floating point operation
+throughput and minimizes memory transactions latencies.
+Meanwhile, the steady state superposition analysis, Equation~\eqn{GreenSuperPosition},
+provides treatment predictions with fewer floating point operations and would be selected under an Occam
+razor~\cite{jaynes2003probability} philosophy highly preferential to simplicity.
+While all kernels
+for the present spectral element methods and preconditioned conjugate gradient
+method were hand coded in this manuscript, library implementations of the
+matrix-free iterative solver approach are also
+appearing~\cite{Knepley2013,Knepley2014}. 
+
+%{\color{red}The focus of this manuscript is to compare two models' accuracy
+%in predicting the maximum ablation size. However, for any given predictive model,
+%a natural question to address is how much accuracy is necessary to clinically useful?
+%A second question to answer is 
+%The 
+
+The finite element discretization of the governing equations, however, 
+provides significant opportunity for further
+physics-based improvements including 
+higher order model spherical harmonic expansions in the laser fluence 
+model~\cite{carp2004radiative}. 
+As seen in Figure~\ref{QuantitativeComparison}, the models used
+introduce a bias in the model parameter
+recovery that differs from published literature values.
+{\color{red}The bias may arise from inaccuracies in the modeling assumptions, perhaps
+most significant being the use of optical tissue properties that are
+invariant in space and time. The literature has clear examples
+where temperature/damage dependent and spatially/temporally dependent
+parameters are critical to the
+prediction~\cite{Mohammed05,Schutt2008}.
+The choice to use a single constant parameter for every
+optimized MRTI dataset is driven by
+several considerations. The focus of this investigation
+is to demonstrate the use of training in the two models.
+The inclusion of spatially varied, damage dependent, and
+multiple parameters would require considerably more
+complicated computational methods and resources; this
+should be persued in the future. Higher order physics
+models of the fluence are be expected to provide the highest accuracy in
+recovering the optical parameters during the calibration process and for
+characterizing the tissue properties. }
+
+The finite element discretization of the governing equations
+also provides a rigorous physics-based methodology to 
+incorporate tissue heterogeneities into the treatment prediction.
+Calibrations of the spatially heterogeneous 
+optical parameter field has been shown to provide highly accurate 
+predictions~\cite{fuentes2013inverse}.
+Adjoint-based methods of computing the gradient of the objective 
+function are necessary to efficiently optimize in the higher dimensional parameter space.
+Tissue heterogeneities could similarly be incorporated
+into the steady state superposition analysis, Equation~\eqn{GreenSuperPosition}, in a patient-specific
+`\textit{ad hoc}' manner. However, this would violate the underlying homogeneous
+tissue parameter assumptions which provided the mathematical
+structure for the concise analytical solution.
+A Gaussian process~\cite{rasmussen2006gaussian,Constantinescu2013} 
+framework may be appropriate
+in which the model parameters recovered may be interpreted as hyperparameters
+for the covariance kernels.
+Similar to physics-based model calibration, optimization of the
+hyperparameters in the Gaussian process kernels offers a complementary
+trade-off between data fitting and smoothing. Further, Gaussian processes allow
+for prior information to be used and provide a full probabilistic prediction
+and an estimate of the uncertainty. 
+
+Model calibration and training was limited to thermometry data in these efforts. 
+The predictive capabilities are expected to improve with more information
+provided by pre-treatment MR imaging such as dynamic contrast enhanced imaging
+or perfusion imaging to help guide the selection of the model parameters,
+especially if these preoperative images can inform the optical parameters.
+Incorporating tissue heterogeneities into the model predictions would also
+require segmentations of the neuro-anatomy as a template for the regional heterogeneity.
+Each direction would benefit from the forethought of including these data
+acquisitions into the therapy protocol. 
+For example, current brain segmentation techniques~\cite{Menze2014} require high resolution
+FLAIR, T2, and T1 imaging with and without contrast.
+The SQL database used in organizing all data was vital to the reproducibility
+of the analysis in these efforts; this additional information must be
+incorporated.
+Tools for communicating with the neuro-navigation software to locate the fiber
+would also provide further information to improve the analysis throughput
+and reproducibility.
+Passive tracking of the applicator location using fiducials placed on the fiber
+would additionally provide the registration information needed to align the
+computational domain of the mathematical model. 
+
+
+\paragraph{Conclusion}
+Currently, the neurosurgeon reviews anatomical MR images to plan his/her
+trajectory to reach the tumor with neuro-navigation software, but does not
+have the capability to visualize outcomes of the laser ablation using
+various trajectories beforehand. 
+Fully developed and commercially implemented predictive computer models 
+will extend this functionality to include \textit{a priori} visualization of the
+potential outcomes for complex treatment scenarios (multiple
+applicators/trajectories) in which the laser ablation is performed near a
+critical structure within a heterogeneous tissue environment. 
+This work presents a step in this direction and demonstrates
+the feasibility in establishing a confidence in these predictions.
+Consideration of other available metadata to improve prediction accuracy
+is a topic of on-going research.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Acknowledgments}
+
+The research in this paper was supported in part through the O'Donnell Foundation,
+NSF AIR-1312048, NIH 1R21EB010196-01, TL1TR000369, DoD W81XWH-14-1-0024,
+ and CA79282 as well as the Cancer Center Support
+Grant CA016672.
+Research was jointly conducted at the MD Anderson Center for Advanced
+Biomedical Imaging in-part with equipment support from General Electric
+Healthcare.
+The authors would like to thank Roger McNichols, PhD 
+for his assistance in clinical laser ablation as well as the
+DAKOTA~\cite{eldred2007dakota},
+ITK~\cite{ITKSoftwareGuideSecondEdition}, 
+Paraview~\cite{Paraview}, and
+CUBIT~\cite{cubit} communities for providing enabling software for
+scientific computation and visualization.  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Declaration of Interest}
+
+At the time of this work, Visualase, Inc. and BioTex, Inc. provided
+the surgical device technology and services. Drs. Shetty and Gowda
+were employed by those companies. Since that time, Medtronic, Inc.
+has acquired Visualase, Inc., and employs Dr. Shetty. BioTex, Inc.
+employs Dr. Gowda. Dr. Danish has received educational honoraria
+from Medtronic, Inc.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% BibTeX users please use one of
+%\bibliographystyle{vancouver}
+%\bibliographystyle{plain}  % Here the bibliography                 
+\bibliographystyle{unsrt}  % chronological order
+\clearpage
+\bibliography{gpuPlanningAug13}
+
+%\appendix
+%\section{Cooling Model}
+%The quantitative value of the convective cooling coefficient at the
+%applicator interface $U_\text{tip}$ was derived using 
+%non-dimensionalization arguments \cite{fasano2010mathematical}.
+%\marginpar{\color{red}\tiny Moon, how do we derive the convective 
+
+%coefficient $h$?}
+
+\end{document} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Big data analysis tools were needed.  Visualization of model comparisons to the
+experimental data is automated observe potential inaccuracies. 
+
+Continual iterative refinement of the input simulation setup parameters such as
+the orientation, power history, and ROI are ongoing due to manual input errors.
+
+The user interface allows the monitoring  damage
+threshold temperatures within specific target anatomy. 
+Triggered threshold temperature automatically deactivates the
+laser and provides a safety mechanism for overly aggressive 
+treament plans.
+
+The data selection process was carefully chosen as to not bias the results.
+However, in the case where a relatively simple model is a poor emulation of the
+complex physics the model unjustifiably biases the conclusions.
+In this case uncontrolled heating from tissue heterogeniety, out of plane
+positioning, susceptibility, etc did not fit the modeling assumptions
+and are excluded.
+
+future work heterogeneous tissue properties and calibration.
+imaging biomarkers of the important tissue heterogenieties.
+
+The LOOCV methodology may also be extend to training and predicting
+the thermometry data within a real-time data assimilation paradigm~\cite{fuentesetal12a}.
+
+10 of the 100 top computers are using MIC~\cite{intelmic} processing chips~\cite{Medina2014}.
+Further work will also include extending presented methodologies
+to utilize the MIC for computing the therapy outcome.
+
+Further, upon applicator placement,
+updates to the treatment prediction (<30sec per prediction) are needed to
+critically re-assess actual therapeutic outcomes possible against the
+planned procedure to guide final delivery. 
+
+A planning tool will enable the neurosurgeon to visualize various
+trajectories with respect to patient-specific imaging and simulate complex
+treatment scenarios. This would strengthen the confidence in aggressive
+treatment plans and provide the ability to (1) get maximum coverage of the
+tumor; (2) avoid heat near motor and visual critical structures – nerves,
+vessels or functional areas; and (3) evaluate spread of heat
+pre-placement, near heat sinks like the ventricles and large blood
+vessels. The Visualase procedure entails a neurosurgeon stereotactically
+inserting a pencil-lead thin laser catheter into the brain tumor, and then
+heating the targeted tissue with laser energy until the tumor is dead.
+
+Surgical technique All LITT procedures were performed using the intraoperative
+3.0T MR scanner (IMRIS, Manitoba, Canada).  Acquisition of a fiducial-based
+volumetric MRI was performed on all patients and fiducialbased A drill hole
+through the skull and dura was created using a 3.2-mm drill bit on a
+batterypowered hand drill.  A threaded plastic bone anchor was then screwed
+into the twist-drill hole in the trajectory of the lesion. 
+
+At the end of treatment, contrastenhanced T1-weighted VIBE sequence was
+acquired for ablation volume verification. Upon completion, scalp closure
+typically required only a single suture layer.  
+
+A second or third overlapping thermal ablation zone
+was sometimes created by withdrawing the fiberoptic applicator inside the
+cooling catheter and repeating the ablation. 
+
+Success is critically dependent on the
+ability to destroy tumor tissue only, sparing important critical
+structures.  If the actual
+treatment-time placement differs from the planned trajectory, the proposed
+planning software would allow the surgeon to reassess the ablation, with
+respect to the new location, and decide if it still covers the target or
+needs repositioning. This knowledge further enables the clinician to
+refine expectations about achievable ablation and avoids accidental
+over-treatment. This knowledge would also allow the surgeon to determine
+if the ablation will cover the targeted lesion without affecting critical
+structures and if tails of the tumor will be left untreated with the
+current applicator placement. 
+
+Computational tools are needed for planning the procedure to assist in
+delivering maximum coverage of the tumor, avoid heat near motor and visual
+critical structures - nerves, vessels or functional areas, and evaluate
+spread of heat pre-placement, near heat sinks like the ventricles and
+large blood vessels~\cite{fuentesetal11a,fahrenholtz2013generalised}. 
+
+
+Predictive prospective computer simulation
+integrated with 3D visualization and assessment of diagnostic and
+interventional MR imaging information can provide useful information on
+probe placement (number and location) in order to best assure the ability
+to complete surgical laser ablation procedures.
+
+Embedding these results within
+uncertainty quantification methods may guarantee the
+real-time predictability of computer simulations of the bioheat transfer
+\cite{fahrenholtz2012f,fahrenholtz2013generalised}. 
+
+Inaccuracies are currently arising from modeling assumptions that do not
+match
+physical reality. For the data shown in
+Figure~\ref{RepresentativeData}.
+modeling assumes homogeneous parameters. We are currently exploring
+reproducible
+image processing methods to identify heterogeneous tissue parameters that
+are thermally
+and optically distinct. This additional information is expected to improve
+prediction accuracy.
+Functionality to handle tissue parameters currently exists within
+brainNek.
+
+In addition to planning, computational methods are being investigated at
+several time scales of MR Guided Laser Induced Thermal Therapy (MRgLITT)
+procedures for assisting in additionally monitoring and controlling the
+therapy outcome.
+Computational techniques have been recognized as a potentially useful tool
+to improve the quality of the thermal therapy planning for several
+delivery modalities, including
+laser,~\cite{chen2009optimizing,Fuentes2010,schwarzmaier2002basic,DeGreef2011,MicrowavePlanning,Prakash2012}.
+Moreover, incorporating
+real-time model based predictions into the temperature imaging
+used for monitoring~\cite{potocki1993concurrent,todd2010model,
+fuentesetal12a,roujol2011robust} 
+provide a means to robustly estimate 
+lost information due to data corrupting  
+motion, low signal-to-noise-ratio (SNR), excessive heating, and 
+catheter induced signal voids.
+These enhanced real-time monitoring approaches 
+may further assist in more safely and accurately 
+controlling therapy delivery for increased efficacy 
+of the procedure~\cite{mougenot2009three,Fuentesetal08}.  
+Thermal therapy can also be applied in a manner complimentary with
+conventional approaches and can be used to treat additional focal lesions
+outside the range of conventional therapy, recurrence or be used
+synergistically with local drug delivery
+\cite{schwarzmaier2006mr,paiva2005intratumor}. 
+
+A matrix-free preconditioned conjugate gradient solver was implemented to
+minimize the storage requirements and data movement of the finite element
+solver. Avoiding assembly and storage of the stiffness matrix on GPU
+computing architectures allows the solver to handle discretizations with a
+large number of elements and compensate for the limited memory on the GPU.
+
+Potential phase change measurement error due to temperature and spatially
+dependent temperature gradient induced changes in magnetic
+susceptibility~\cite{peters2000heat,salomir2003fast} are not considered in this
+measurement model.  However, as presented in the discussion, this approximation
+is expected to have an minimal impact on the results of this work due to the
+error metric used, Equation~\eqn{weightedL2Norm}.  
+
+
+gNek Implementation of the bioheat transfer solver: The Nek simulation
+tool was developed by Paul Fischer at Argonne National Laboratory to solve
+the thermo-fluidic incompressible Navier-Stokes equations in
+three-dimensional domains and has demonstrated excellent scalability on
+clusters with conventional CPU compute cores of O($10^6$).  
+
+Relevant to this project, gNek solves the screened Coulomb potential problem
+discretized with high-order hexahedral finite elements.  
+
+The coarse grid solver is handled on the CPUs as they are otherwise not
+occupied by computation.  The initial implementation of gNek achieves up to 400
+GFLOPS on NVIDIA GTX 590 GPU.  
+
+Kovasznay flow [33] and the time-dependent solution by Ethier et al [34] were
+used to test steady-state and time-dependent solutions, both being common
+test-cases when simulating Navier-Stokes equations
+
+Registration|(0.1275, 0.119, 0, 90, -4, 0)|Quality|1|VOI|[120, 150, 110, 145, 0, 0]|Power|[['Use'], ['Default'], 5.0, [19, 60], [0, 18]]|SNRROI|[60, 70, 60, 70, 0, 0]|NumberImagesCount|300|NumberSliceLoc|2|ManualStudyInfo|Unknown|Series Description|THERAML SAG OBLIQUE T13D SPGR||Manufacturer|GE MEDICAL SYSTEMS|Image Type|['ORIGINAL', 'PRIMARY', 'OTHER']|LogFilePower| if( time< 110.000000  ) return 0.000000;      else if( time< 126.000000  ) return 0.000000;   else if( time< 151.000000  ) return 3.000000;   else if( time< 175.000000  ) return 0.000000;   else if( time< 199.000000  ) return 3.000000;   else if( time< 320.000000  ) return 0.000000;   else if( time< 329.000000  ) return 0.000000;   else if( time< 355.000000  ) return 10.050000;   else return 0.0;|Echo Number(s)|1|Study Date|20100907|Echo Time|10|Repetition Time|22.5|Magnetic Field Strength|1.5|Pixel Bandwidth|78.125|Spacing Between Slices|3|Slice Thickness|3|Number of Averages|1|Flip Angle|30|Percent Phase Field of View|100|Acquisition Matrix|[0, 256, 128, 0]|Columns|256
