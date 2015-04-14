@@ -253,7 +253,7 @@ As opposed to explicitly storing and reading matrix entries
 from global memory, the matrix-free method recalculates the local matrix entries
 needed within the linear system solve.
 This memory access design pattern has demonstrated a 4-10x speedup  over
-the matrix explicit methods~\cite{Muller2013,Knepley2014,Medina2014}.
+the matrix explicit methods~\cite{Muller2013,Knepley_2_2013,Medina2014}.
 
 Combined with the data, the two modeling approaches presented provide an
 environment to critically evaluate model selection for therapy planning of MRgLITT. 
@@ -309,13 +309,13 @@ within this study.
 %do nothing
 \else
 \begin{tabular}{ccc}
-\scalebox{0.26}{\includegraphics*{\picdir/OverviewApplicator}}  
-&
+\scalebox{0.4}{\includegraphics*{\picdir/OverviewApplicator}} \\ 
+(a)\\
 \scalebox{0.18}{\includegraphics*{\picdir/FEMesh}}  
 &
 \scalebox{0.24}{\includegraphics*{\picdir/powerProfile}}  
 \\
-(a) & (b) & (c)  \\
+(b) & (c)  \\
 \end{tabular}
 \fi
 \caption{
@@ -367,7 +367,7 @@ time-temperature history of the laser exposure.
 In this Arrhenius thermal dose model, the frequency factor, $A$,
 and the activation energy, $E_A$, are 
 experimentally determined kinetic parameters. The values for $A$ and
-$E_A$ were 3.1E98 and 6.28E5,
+$E_A$ were 3.1E98 {\color{red}s\textsuperscript{-1}} and 6.28E5 {\color{red}(J/mol)},
 respectively, and have been used in previous
 studies~\cite{carpentieretal08,schwarzmaier1998treatment,mcnichols2004mr}. 
 $R$ is the universal gas constant.  The thermal dose was assumed to
@@ -820,7 +820,8 @@ model (d) are DSC = 0.8385 and DSC = 0.7442.
 \end{tabular}
 \caption{ 
 Presented here are histograms of calibration analysis from the transient FEM model (a) and steady state model (b),
-shown left and right; respectively. The optical parameters, $\mu_\textit{eff}$,
+shown left and right; respectively. {\color{red}Both histograms have a bin width of \SI{13.0}{\per\metre}.}
+The optical parameters, $\mu_\textit{eff}$,
 recovered from each thermometry dataset considered is shown.
 For each calibration, the bound constrained optimization was
 restricted to a range obtained from literature, $\mu_\textit{eff} \in [0.8,400]$ m$^{-1}$. Leave-one-out cross validation was performed
