@@ -2,6 +2,10 @@
 \usepackage{amssymb,amsfonts,amsmath}
 \usepackage{color,graphicx}
 \usepackage{siunitx}
+\sisetup{
+per-mode=fraction,
+fraction-function=\tfrac
+}
 \usepackage{fixltx2e}
 \usepackage[nomarkers,tablesfirst]{endfloat}
 \usepackage[left=0.7in,right=0.7in,top=0.7in,bottom=0.7in]{geometry}
@@ -478,10 +482,17 @@ in this application is shown in Figure~\ref{LaserApplicatorOverview}.
 \begin{table*}[p]
 \caption{Constitutive data~\cite{Handbook05,Welch95,duck1990}}\label{modeldata}
 \centering 
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|} \hline 
-\textit{k} [\si[per-mode=fraction]{\watt\per\metre\per\kelvin}]   & $\omega$ [\si[per-mode=fraction]{\kilo\gram\per\metre\per\second}] &  \textit{g} [Unity]  &  $\mu_s$ [\si{\per\centi\metre}] &   $\mu_a$ [\si{\per\centi\metre}] & $\rho$ \si[per-mode=fraction]{\kg\per\metre\cubed} & $c_{blood}$ \si[per-mode=fraction]{\joule\per\kg\per\kelvin} &  $c_{p}$ \si[per-mode=fraction]{\joule\per\kg\per\kelvin} & \textit{h} \si[per-mode=fraction]{\watt\per\kelvin\per\metre\cubed} & $u_{cooling}$ \si{\degreeCelsius}& $u_a$ \si{\degreeCelsius}\\ \hline
-          0.527              &             9.0             & 0.88  &       14000              &       500                  &  1045                        &            3840                      &                  3600  & 100 & 21   & 37    \\ \hline
+
+\begin{tabular}{|c|c|c|c|c|c|} \hline 
+\textit{k} [$\frac{\si{\watt}}{\si{\metre\kelvin}}$]   & $\omega$ [$\frac{\si{\kilo\gram}}{\si{\metre\cubed\second}}$] &  \textit{g} [Unity]  &  $\mu_s$ [\si{\per\centi\metre}] &   $\mu_a$ [\si{\per\centi\metre}] & $\rho$ [$\frac{\si{\kilo\gram}}{\si{\metre\cubed}}$] \\ \hline
+          0.527              &             9.0             & 0.88  &       14000              &       500             &  1045    \\ \hline
+$c_{blood}$ [$\frac{\si{\joule}}{\si{\kilo\gram\kelvin}}$] &  $c_{p}$ [$\frac{\si{\joule}}{\si{\kilo\gram\kelvin}}$]& \textit{h} [$\frac{\si{\watt}}{\si{\kelvin\metre\cubed}}$] & $u_{cooling}$ [\si{\degreeCelsius}]& $u_a$ [\si{\degreeCelsius}] \\ \hline
+     3840                      &                  3600  & 100 & 21   & 37 \\ \hline
 \end{tabular}
+%\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|} \hline 
+%\textit{k} [$\frac{\si{\watt}}{\si{\metre\kelvin}}$]   & $\omega$ [$\frac{\si{\kilo\gram}}{\si{\metre\cubed\second}}$] &  \textit{g} [Unity]  &  $\mu_s$ [\si{\per\centi\metre}] &   $\mu_a$ [\si{\per\centi\metre}] & $\rho$ [$\frac{\si{\kilo\gram}}{\si{\metre\cubed}}$] & $c_{blood}$ [$\frac{\si{\joule}}{\si{\kilo\gram\kelvin}}$] &  $c_{p}$ [$\frac{\si{\joule}}{\si{\kilo\gram\kelvin}}$]& \textit{h} [$\frac{\si{\watt}}{\si{\kelvin\metre\cubed}}$] & $u_{cooling}$ [\si{\degreeCelsius}]& $u_a$ [\si{\degreeCelsius}]\\ \hline
+%          0.527              &             9.0             & 0.88  &       14000              &       500                  &  1045                        &            3840                      &                  3600  & 100 & 21   & 37    \\ \hline
+%\end{tabular}
 \end{table*}
 \fi
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
