@@ -14,18 +14,98 @@ Reviewer 1:\\
 Comments to the Author\\
 This is a well-written paper on an evaluation study of
 two mathematical models. However, there are several issues with the current version as follow:\\
-\\
-1	The authors stated, in the abstract, that the objective
+
+\begin{enumerate}
+\item
+The authors stated, in the abstract, that the objective
 was to evaluate the trade-off between the
 time investment in the algorithm, efficiency of the numerical
 implementation, and accuracy required in
 predicting the final endpoint of the therapy. However,
 the results and discussion were focus on the validation
 of the models. It was not obvious what is the trade-off
-between the models? What is accuracy required in
-predicting the final endpoint of the therapy?
+between the models? 
 
-{\color{red}Thank you for returning our focus on the important
+{\color{red}
+The authors agree. The focus of the manuscript was
+the accuracy required in
+predicting the final endpoint of the therapy. 
+Remarks in the abstract on the trade-off between the
+time investment in the algorithm, efficiency of the numerical
+implementation, and accuracy required in
+predicting the final endpoint of the therapy diffuse the focus
+of the paper; these remarks have been (1) removed from the abstract and (2)
+re-organized as results and  discussion points with model size and
+computation time as you suggestion below.  Thank you for this suggestion.
+}
+
+
+\item What is accuracy required in predicting the final endpoint of the therapy?
+ 
+{\color{red}
+
+Regarding the topic of what accuracy is required to consider a model useful
+for prediction, it is a multifaceted concept. Firstly, we consider a model
+prediction as useful in a particular case if the models ablation region and
+the ablation as indicated via MR temperature imaging has a Dice similarity
+coefficient (DSC) greater than 0.7. Ultimately the quantitative value of
+DSC=.7 is based on prior information and experiences in image processing
+literature~\cite{yung2010quantitative,Dice1945measures,zou2004three};  
+in which DSC$>$.7 is considered `good agreement'. This point is highlighted
+in the discussion section where the DSC is introduced.
+ Secondly, the models overall accuracy in
+a cohort is measured by the ratio of useful predictions versus inaccurate
+predictions (\textit{i.e.}, number of DSC $\geq$ 0.7 versus DSC $<$ 0.7).
+This overall accuracy is desired to be as high as possible, but it is beyond the
+scope of our present investigation to name a success rate that would
+indicate the model would be useful in clinical practice. This manuscript
+focuses on reporting the accuracy achieved for our current computational
+methods. Future work will consider the accuracy needed to impact treatment 
+on a very carefully selected patient population.
+
+}
+\item
+It is not clear how this method will improve pretreatment planning?
+
+{\color{red}
+Long term project goals are to develop a data driven computer model
+that can prospectively predict the thermal dose outcome with high
+accuracy. These efforts present results towards these goals
+in the form of a retrospective analysis
+with sufficiently large number datasets to evaluate prediction
+statistics within a hypothesis testing framework. 
+Our LOOCV analysis attempts to mimic our targeted prospective scenario
+in that the model is trained on all previous (N-1) datasets and
+the trained model prediction accuracy is evaluated on the
+independent remaining dataset.
+The success or failure of this paradigm is
+to be related to several factors. 1) The model used must be able to
+describe clinically relevant ablations. 2) There must be a sufficient
+quantity of retrospective datasets for the
+training to converge. 3) The cohort of retrospective datasets must have sufficient similarity within the
+group and to the prediction scenario. \textit{E.g.}, a model trained on datasets from liver ablations is unlikely to
+be predictive for brain. However, a training cohort of brain
+metastases may or may not have enough homogeneity for a trained model
+to be predictive. These points are added at the beginning of
+the Discussion section.
+}
+\item
+The introduction is too long. It is not clear how the second part that
+describes the hardware relates to the paper.  There is no information
+on the model size and the actual computations time.
+It is not clear which hardware was used with which particular model. 
+
+{\color{red}
+The hardware discussion was intended to
+motivate the discussion on the tradeoff between algorithm efficiency and
+accuracy on state of the art computing architectures. 
+Similar to the previous comment, this diffuses the modeling accuracy focus of the 
+manuscript and has been reorganized to a discussion point.
+
+The time required for computation is described in your
+1\textsuperscript{st} critique and the Results and Discussion include that information now.
+
+Thank you for returning our focus on the important
 trade-off between accuracy and required time.
 The accuracy of the models is reported, but the time of implementation
 is not as you stated. The models implemented in the manuscript are 1) a homogenous,
@@ -45,54 +125,15 @@ state models LOOCV takes 246.6 seconds or 11.2 seconds on average per dataset. T
 could be used before and during surgery. The Results
 and Discussion have been amended to describe this
 information; the new text is red.
+}
+\end{enumerate}
 
-Regarding the topic of what accuracy is required to consider a model useful for prediction, it is a
-multifaceted concept. Firstly, we consider a model prediction as useful in a particular case if the models ablation region and the ablation as indicated
-via MR temperature imaging has a Dice similarity coefficient (DSC) greater than 0.7. Secondly, the models overall accuracy in a cohort is measured by the
-ratio of useful predictions versus inaccurate predictions (\textit{i.e.}, number of DSC $\geq$ 0.7 versus DSC
-$<$ 0.7). Clearly, this overall accuracy is desired to be high, but it is beyond the scope of our present investigation to name a success rate that would indicate the model would be useful in clinical practice.
-}\\
-\\
-2	It is not clear how this method will improve pretreatment planning?
-
-{\color{red}
-With MR temperature images from an unprecedented number of retrospective MRgLITT treatments, the authors
-decided a new thermal treatment planning method was becoming available and worth investigating. With a relatively large number datasets, a model can be
-optimized for each dataset to train the model for predicting future datasets. The success or failure of this paradigm is thought to be related to several
-factors. 1) The model used must be able to describe clinically relevant ablations. 2) There must be a sufficient quantity of retrospective datasets for the
-training to converge. 3) The cohort of retrospective datasets must have sufficient similarity within the
-group and to the prediction scenario. \textit{E.g.}, a model trained on datasets from liver ablations is unlikely to
-be predictive for brain. However, a training cohort of brain metastases may or may not have enough homogeneity
-for a trained model to be predictive. There is new text in red and is in the beginning of the Discussion
-section.
-}\\
-\\
-3	The introduction is too long. It is not clear how the second part that describes the hardware relates to the paper. 
-
-{\color{red}
-{\color{green}[DF, what do you want to do about this?]}
-}\\
-\\
-4	There is no information on the model size and the actual computations time.
-
-{\color{red}
-The time required for computation is described in your
-1\textsuperscript{st} critique and the Results and Discussion include that information now.
-}\\
-\\
-5	It is not clear which hardware was used with which particular model. 
-{\color{red}
-The methods are now revised to include the hardware information.\\
-\\
-{\color{green}[DF, can you add this?]}
-}\\
-\\
-\\
-\\
 Reviewer 2:\\
 Comments and suggestions to improve the manuscript:\\
 \\
--Please expand on any heating induced changes in model parameters. Was blood perfusion held constant for the
+\begin{itemize}
+\item
+Please expand on any heating induced changes in model parameters. Was blood perfusion held constant for the
 entire treatment duration? Blood perfusion is well
 known to change during ablative exposures (as the
 authors note, this is sometimes exploited to confirm post-ablation heating with contrast-enhanced imaging).  Have the authors explored any techniques for
@@ -116,7 +157,8 @@ training) to be truly physical. In this investigation, the modeling is driven by
 complexity/physical fidelity. 
 }\\
 \\
-- Did the authors investigate the impact of temperature dependent optical properties? During the model
+\item
+Did the authors investigate the impact of temperature dependent optical properties? During the model
 calibration procedure, it appears a single optical attenuation coefficient was determined for all spatial
 location/time points. Since optical absorption properties likely change during the course of heating,
 one approach may be to perform the model calibration over only the first ~30-60 seconds, to estimate the
@@ -150,26 +192,30 @@ Our rationale for the use of constant parameters is explained in the answer to t
 Finally, the last sentence in this critique seems to have been cut short. Please reiterate it, as necessity dictates.
 }\\
 \\
-- Please state the test performed to confirm the discretization (mesh size, time steps) did not impact the solution.
+\item
+Please state the test performed to confirm the discretization (mesh size, time steps) did not impact the solution.
 
 {\color{red}
 {\color{green}[DF, what did Rice CAAM do for this?]}
 }\\
 \\
-- Figure 1, consider blowing up the sketch of applicator (bottom half of fig 1a) so details can be distinguished more easily.
+\item
+ Figure 1, consider blowing up the sketch of applicator (bottom half of fig 1a) so details can be distinguished more easily.
 
 {\color{red}
 The figure has been modified accordingly at
 {\color{green}[page and line number]}. 
 }\\
 \\
--p6, L24 -- State units of frequency factor and activation energy
+\item
+p6, L24 -- State units of frequency factor and activation energy
 
 {\color{red}
 The units have been added.
 }\\
 \\
-- p6, L30 -- can the low-power pulse (used to confirm applicator positioning) be used to estimate optical
+\item
+p6, L30 -- can the low-power pulse (used to confirm applicator positioning) be used to estimate optical
 attenuation in a patient-specific manner? Did you consider evaluating this dataset and comparing to the
 average value obtained from the calibration process for the other datasets?
 
@@ -188,16 +234,19 @@ surgical planning. We expect that the delay in the surgery incurred by patient-s
 preclude it being useful for some time. 
 }\\
 \\
-- Please modify references so they appear in IJH style.
+\item
+Please modify references so they appear in IJH style.
 
 {\color{red}
 The references are updated to match the \textit{IJH} style.
 }\\
 \\
-- Figure 3, suggesting use same bin width for both histograms so the results for the two models can be
+\item
+Figure 3, suggesting use same bin width for both histograms so the results for the two models can be
 more readily compared.
 
 {\color{red}
 The figure has been amended.
 }
+\end{itemize}
 \end{document}

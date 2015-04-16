@@ -2,10 +2,10 @@
 \usepackage{amssymb,amsfonts,amsmath}
 \usepackage{color,graphicx}
 \usepackage{siunitx}
-\sisetup{
-per-mode=fraction,
-fraction-function=\tfrac
-}
+%\sisetup{
+%per-mode=fraction,
+%fraction-function=\tfrac
+%}
 \usepackage{fixltx2e}
 \usepackage[nomarkers,tablesfirst]{endfloat}
 \usepackage[left=0.7in,right=0.7in,top=0.7in,bottom=0.7in]{geometry}
@@ -92,43 +92,57 @@ Houston, TX 77030, USA\\
 
 \begin{abstract}
 %Purpose
-A cross validation analysis evaluating computer model predictions for \textit{a priori} 
-planning magnetic resonance-guided laser induced thermal therapy
-(MRgLITT) procedures in treating focal diseased brain tissue is presented.
-Two mathematical models are selected to evaluate the
-trade-off between the time investment in the algorithm, efficiency of the
-numerical implementation, and accuracy required in predicting the final endpoint
-of the therapy.  
+{\color{red}
+A cross validation analysis evaluating computer model prediction accuracy
+for \textit{a priori} planning magnetic resonance-guided laser induced
+thermal therapy (MRgLITT) procedures in treating focal diseased brain
+tissue is presented.
+Two mathematical models are considered.
+%Two mathematical models are selected to evaluate the
+%trade-off between the time investment in the algorithm, efficiency of the
+%numerical implementation, and accuracy required in predicting the final endpoint
+%of the therapy.  
+}
 %Methods
-(1) A spectral element discretization of the transient Pennes bioheat transfer
-equation implemented on GPU computing architectures predicts the
-laser induced transient heating in perfused tissue. 
-(2) A computationally inexpensive, closed-form algorithm for predicting the steady state heat transfer
-from a linear superposition of analytic point source heating functions is also
+(1) A spectral element discretization of the transient Pennes bioheat
+transfer equation is implemented to 
+%implemented on GPU computing architectures 
+predict the laser induced heating in perfused tissue. 
+(2) A 
+%computationally inexpensive, 
+closed-form algorithm for predicting the steady state heat transfer from a
+linear superposition of analytic point source heating functions is also
 considered.
+{\color{red}
 Prediction accuracy is
-retrospectively evaluated in MR thermometry data obtained during an
-MRgLITT procedure in $N$ = \numberofpatientsLOOCV MR thermometry datasets via leave-one-out cross validation (LOOCV).
+retrospectively evaluated 
+via leave-one-out cross validation (LOOCV).  
 Modeling predictions are quantitatively evaluated
-against MR thermal imaging in terms of a Dice similarity coefficient (DSC) between the
-simulation and experimental data.
+in terms of a Dice similarity coefficient (DSC) between the
+simulated thermal dose and
+thermal dose information contained within
+$N$ = \numberofpatientsLOOCV 
+MR thermometry datasets.
+%obtained during MRgLITT procedures. 
+}
 %Results
 During LOOCV analysis, the transient model's DSC mean and median is 0.7323 and 0.8001, respectively,
 with 15 of \numberofpatientsLOOCV DSC values exceeding the success criterion of DSC $\geq$ 0.7.
 The steady state model's DSC mean and median is 0.6431 and 0.6770, respectively,
 with 10 of \numberofpatientsLOOCV passing.
-A one-sample, one-sided Wilcoxon signed rank test indicates the transient FEM model's
-median DSC value is $\geq$ 0.7 at a statistically significant level. 
+A one-sample, one-sided Wilcoxon signed rank test indicates that the
+transient FEM model achieves the prediction success critera, 
+DSC $\geq$ 0.7, at a statistically significant level. 
 %The null hypothesis was accepted for the steady state model.
 %Conclusions
-Further, the spectral element discretization of the transient bioheat transfer model
-provides greater potential in accurately calibrating the tissue properties needed
-in treatment prediction.
+%Further, the spectral element discretization of the transient bioheat transfer model
+%provides greater potential in accurately calibrating the tissue properties needed
+%in treatment prediction.
 %under an Ockham razor philosophy preferential to simplicity,
 %the steady state superposition model with fewer floating
 %point operations would be selected with respect to outcome prediction.
-However, in the appropriate context, both approaches are likely to provide useful
-information in guiding treatment decisions.
+%However, in the appropriate context, both approaches are likely to provide useful
+%information in guiding treatment decisions.
 
 
 \paragraph{Keywords} Bioheat Transfer $\cdot$ 
@@ -218,46 +232,6 @@ for predicting the bioheat transfer is developed.
 from a linear superposition of analytic point source heating functions is also
 presented as a reference implementation.
 
-Previous real-time implementations of the kernel for
-predicting the laser induced bioheat transfer were made feasible via
-implementation on a massively parallel supercomputers~\cite{fuentesetal09,
-Odenetal07,Dilleretal07,Fengetal07,Fuentesetal08}. 
-Despite the increasing presence of large computational clusters within
-large academic hospitals, reliance on such an approach makes clinical
-translation of this research extremely difficult. This technology must
-be practically available to any clinic using an MR-guided thermal therapy
-system whereas integration with an institution's cluster and intranet creates
-significant overhead and potential complications.
-While modern single-chip multi-core CPU's have a peak performance of
-$\mathcal{O}(10-100)$ GFLOPs and are sufficient 
-for inexpensive algorithms such as the linear superposition of analytic functions presented
-in Section~\ref{AnalyticBioheatModel}, 
-current GPUs~\cite{Farber2011a,Muller2013} have a peak
-performance of $\mathcal{O}(1-2)$ TFLOPs (single precision) and the
-portability of these devices are ideal for developing more advanced 
-numerical discretizations of the underlying partial differential equations
-for guiding the therapy. However, a significant
-time investment is needed to express the class of memory bound numerical
-methods used in simulation within an algorithmic framework that can
-simultaneously exploit these floating point capabilities and minimize the
-global memory access latency of these devices.
-% 28 = 1030/ (148/4) single precision.
-% max floating point operations per second is 1030 GFlop
-% data transfer of single precision numbers to the cores = bandwidth x data type size = 148  x (4bytes / float)
-% >>> 1030./ (148./4.)
-% 27.83783783783784
-For example, the $\mathcal{O} (150)$~GB/s memory bandwidth of the Tesla M2070
-used in the manuscript requires $\approx$ 30 floating point operations per
-single precision global memory access to fully utilize the floating point capabilities
-of the GPU. 
-The spectral element method presented in Section~\ref{BioheatComputerModel}
-achieves efficient global memory access through a matrix-free
-implementation of the inherent linear system of equations.
-As opposed to explicitly storing and reading matrix entries
-from global memory, the matrix-free method recalculates the local matrix entries
-needed within the linear system solve.
-This memory access design pattern has demonstrated a 4-10x speedup  over
-the matrix explicit methods~\cite{Muller2013,Knepley_2_2013,Medina2014}.
 
 Combined with the data, the two modeling approaches presented provide an
 environment to critically evaluate model selection for therapy planning of MRgLITT. 
@@ -777,10 +751,12 @@ the null hypothesis, $H_0$.
 \[
    H_0: DSC  = 0.7  \qquad   H_1: DSC > 0.7
 \]
+{\color{red}
 The value chosen is a commonly accepted value in image processing
 literature~\cite{yung2010quantitative,Dice1945measures,zou2004three};  
 $DSC=1$ implies complete agreement between the measure and predicted damage model,
 $i.e.$ the predicted and measured damages volumes completely overlap.
+}
 A two-sample, paired Wilcoxon signed rank test was used to compare if the two models'
 prediction medians are statistically different from one another.
 All statistical tests and descriptive statistics were evaluated on
@@ -990,6 +966,48 @@ The steady state took 247 seconds for LOOCV, or 11.2 seconds on average per data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Discussion}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+{\color{blue}
+Previous real-time implementations of the kernel for
+predicting the laser induced bioheat transfer were made feasible via
+implementation on a massively parallel supercomputers~\cite{fuentesetal09,
+Odenetal07,Dilleretal07,Fengetal07,Fuentesetal08}. 
+Despite the increasing presence of large computational clusters within
+large academic hospitals, reliance on such an approach makes clinical
+translation of this research extremely difficult. This technology must
+be practically available to any clinic using an MR-guided thermal therapy
+system whereas integration with an institution's cluster and intranet creates
+significant overhead and potential complications.
+While modern single-chip multi-core CPU's have a peak performance of
+$\mathcal{O}(10-100)$ GFLOPs and are sufficient 
+for inexpensive algorithms such as the linear superposition of analytic functions presented
+in Section~\ref{AnalyticBioheatModel}, 
+current GPUs~\cite{Farber2011a,Muller2013} have a peak
+performance of $\mathcal{O}(1-2)$ TFLOPs (single precision) and the
+portability of these devices are ideal for developing more advanced 
+numerical discretizations of the underlying partial differential equations
+for guiding the therapy. However, a significant
+time investment is needed to express the class of memory bound numerical
+methods used in simulation within an algorithmic framework that can
+simultaneously exploit these floating point capabilities and minimize the
+global memory access latency of these devices.
+% 28 = 1030/ (148/4) single precision.
+% max floating point operations per second is 1030 GFlop
+% data transfer of single precision numbers to the cores = bandwidth x data type size = 148  x (4bytes / float)
+% >>> 1030./ (148./4.)
+% 27.83783783783784
+For example, the $\mathcal{O} (150)$~GB/s memory bandwidth of the Tesla M2070
+used in the manuscript requires $\approx$ 30 floating point operations per
+single precision global memory access to fully utilize the floating point capabilities
+of the GPU. 
+The spectral element method presented in Section~\ref{BioheatComputerModel}
+achieves efficient global memory access through a matrix-free
+implementation of the inherent linear system of equations.
+As opposed to explicitly storing and reading matrix entries
+from global memory, the matrix-free method recalculates the local matrix entries
+needed within the linear system solve.
+This memory access design pattern has demonstrated a 4-10x speedup  over
+the matrix explicit methods~\cite{Muller2013,Knepley_2_2013,Medina2014}.
+}
 
 {\color{red}We are presenting this manuscript to introduce the possibility
 of a new paradigm of treatment planning via a train-and-predict scheme.
