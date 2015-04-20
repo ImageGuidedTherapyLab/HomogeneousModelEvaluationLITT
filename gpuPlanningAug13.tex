@@ -208,8 +208,9 @@ with minimal comorbidity of intervening or adjacent tissue.
 This manuscript focuses on the development of a practical methodology for
 evaluating computer model predictions for \textit{a priori} planning the procedure  
 given $N$ datasets from previous procedures.
-Evaluation focuses on the trade-off between (1) algorithmic and numerical
-implementation efficiency (2) against, most importantly, prediction accuracy.
+%Evaluation focuses on the trade-off between (1) algorithmic and numerical
+%implementation efficiency (2) against, most importantly, prediction accuracy.
+{\color{red} Evaluation focuses on prediction accuracy.}
 Retrospective analysis of MR thermometry data acquired during previous procedures is
 essential to train or calibrate the computer model parameters. 
 The machine learning and statistics community have a rich history in
@@ -511,6 +512,12 @@ The degrees of freedom across the volume of the applicator were removed;
 the effect of the room-temperature cooling fluid which protects the laser fiber
 during heating were considered through the boundary conditions at the surface
 nodes. 
+{\color{red}
+A mesh resolution of approximately the pixel size near the applicator was used
+to ensure convergence of the discretized solution~\cite{fuentesetal11a}. 
+Multiple time resolutions were also evaluated to ensure convergence of the
+time stepping scheme.
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Analytic Steady State Solution}\label{AnalyticBioheatModel}
@@ -966,7 +973,17 @@ The steady state took 247 seconds for LOOCV, or 11.2 seconds on average per data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Discussion}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-{\color{blue}
+{\color{red}
+Our investigation is presented such that the present surgical
+technique would be mostly unmodified. 
+
+Higher order methods in which constitutive nonlinearites and differenst
+subsets of training sets such as the patient specifi
+test pulse that are optimal for planning
+is considered future work. This requires overfitting studies, harmonization
+of meta data and studies on how much training data is needed to achieve
+the desired accuracy.
+
 Previous real-time implementations of the kernel for
 predicting the laser induced bioheat transfer were made feasible via
 implementation on a massively parallel supercomputers~\cite{fuentesetal09,
@@ -1007,9 +1024,18 @@ from global memory, the matrix-free method recalculates the local matrix entries
 needed within the linear system solve.
 This memory access design pattern has demonstrated a 4-10x speedup  over
 the matrix explicit methods~\cite{Muller2013,Knepley_2_2013,Medina2014}.
-}
 
-{\color{red}We are presenting this manuscript to introduce the possibility
+The forward solve is considered the fundamental computational
+operation of this study.
+Total runtimes are  proportional to the total number of foward solve
+iterations in the optimation and LOOCV analysis. 
+As an estimate of practical run times,
+numbers are reported on the CPU (INTEL xxx)  and GPU (NVIDIA XXX) 
+hardware available to this study.
+The average foward solve runtime observed on these architectures
+was 246.6 and 11.2 for the transient and steady state model; respectively. 
+
+We are presenting this manuscript to introduce the possibility
 of a new paradigm of treatment planning via a train-and-predict scheme.
 This method is becoming possible because of a growing number of retrospective patient
 datasets. Relatively simple models were chosen for this demonstration

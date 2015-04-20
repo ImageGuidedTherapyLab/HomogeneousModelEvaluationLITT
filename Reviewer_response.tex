@@ -4,10 +4,17 @@
 \usepackage{color,graphicx}
 \usepackage{siunitx}
 \usepackage{fixltx2e}
+\newcommand{\picdir}{pdffig}
 \usepackage[nomarkers,figuresonly]{endfloat}
 \usepackage[left=0.7in,right=0.7in,top=0.7in,bottom=0.7in]{geometry}
 \newcommand{\numberofpatientsLOOCV}{22 }
 \begin{document}
+{\color{red}
+We thank the reviewers for their insightful remarks and time in review of
+this manuscript. A point-by-point response is provided below.
+Updates are highlighted in red throughout the manuscript. 
+}
+
 Answer to reviewers\\
 \\
 Reviewer 1:\\
@@ -102,35 +109,47 @@ accuracy on state of the art computing architectures.
 Similar to the previous comment, this diffuses the modeling accuracy focus of the 
 manuscript and has been reorganized to a discussion point.
 
-The time required for computation is described in your
-1\textsuperscript{st} critique and the Results and Discussion include that information now.
+Runtimes of the models have also been added as discussion points.
+The models implemented in the manuscript are 1) a homogenous,
+time-dependent FEM model and 2) a homogeneous steady state model.
+Intuitively, the FEM model is expected to be more accurate than the steady state model.
+There are numerous ways to normalize a comparison between these two
+approaches. We chose to report the run-time of a single forward solve. I.E.
+given model parameters predict the temperature. This operation is the
+lowest common denominator and is the workhorse for the optimization and the
+LOOCV analysis. Within this context, the runtime of the optimization and the
+LOOCV analysis is the runtime of the single forward solve times the number
+of optimization iterations needed or the LOOCV patients considered.
+These numbers are intended to qualitatively provide
+intuition for the practical run times of these models. 
+Steady state model
+results are presented from CPU based matlab runs and transient model results are
+presented on the GPU cards available to our group. 
+Each of these points
+is added to the discussion.
+Attempts to further optimize and normalize to memory bandwidth or total
+flop count are considered outside the scope. 
 
-Thank you for returning our focus on the important
-trade-off between accuracy and required time.
-The accuracy of the models is reported, but the time of implementation
-is not as you stated. The models implemented in the manuscript are 1) a homogenous,
-time-dependent FEM model and 2) a homogeneous steady state model. The
-FEM model is more accurate than the steady state model but takes considerably longer time
-to run. It is difficult to succinctly express the difference in
-computation times for at least two
-reasons. During optimization for a given patient,
-the FEM model and steady state model may have a different
-number of optimization realizations. Secondly, the FEM model is transient and has multiple time steps within
-one realization whereas the steady state model naturally has a single time step. Therefore, we
-consider the simplest means to summarize computation time is to report the timing of optimization and LOOCV.
-Optimization of the same dataset may involve differing number of realizations for the two models; LOOCV only
-has one forward prediction for each dataset. In optimization, the FEM model takes {\color{green}[Some estimate of time]}; during LOOCV, it took
-{\color{green}[Some estimate of time]}. The steady
-state models LOOCV takes 246.6 seconds or 11.2 seconds on average per dataset. This indicates that both models
-could be used before and during surgery. The Results
-and Discussion have been amended to describe this
-information; the new text is red.
+%but takes considerably longer time
+%to run. It is difficult to succinctly express the difference in
+%computation times for at least two
+%reasons. During optimization for a given patient,
+%the FEM model and steady state model may have a different
+%number of optimization realizations. Secondly, the FEM model is transient and has multiple time steps within
+%one realization whereas the steady state model naturally has a single time step. Therefore, we
+%consider the simplest means to summarize computation time is to report the timing of optimization and LOOCV.
+%Optimization of the same dataset may involve differing number of realizations for the two models; LOOCV only
+%has one forward prediction for each dataset. In optimization, the FEM model takes {\color{green}[Some estimate of time]}; during LOOCV, it took
+%{\color{green}[Some estimate of time]}. The steady
+%state models LOOCV takes 246.6 seconds or 11.2 seconds on average per dataset. This indicates that both models
+%could be used before and during surgery. The Results
+%and Discussion have been amended to describe this
+%information; the new text is red.
 }
 \end{enumerate}
 
 Reviewer 2:\\
 Comments and suggestions to improve the manuscript:\\
-\\
 \begin{itemize}
 \item
 Please expand on any heating induced changes in model parameters. Was blood perfusion held constant for the
@@ -141,22 +160,25 @@ incorporating temperature/thermal damage dependencies for blood perfusion? Sugge
 perfusion level based on time-temperature history (see, for example, Schutt, Med Phys, 2008).
 
 {\color{red}
-The model parameters do not change with heating. We obviously must make this fact abundantly clear in the
-manuscript and directly address the reasons why it is appropriate. Thank you for bringing to our attention
-the lack of clarity regarding the use of model parameters. Accordingly, the manuscript has been
-modified in the following places:
-{\color{green}[list areas that were modified]}.
-
-As the hyperthermia/ablation literature states in concert, tissue properties are dependent on temperature
-and thermal damage state and these dependencies are important to consider in order to accurately predict
-outcomes. However, this time-dependent phenomenon is mitigated in our investigation via shorter ablation
+Thank you for this suggestion. Model parameters change with temperature was
+not considered in this study. 
+Adding additional temperature dependet
+properties would add one more degree of freedom to 'fit' the data. 
+We were concerned with overfitting in this regard.
+As the hyperthermia/ablation literature states in concert, tissue properties
+are dependent on temperature and thermal damage state and these dependencies
+are important to consider in order to accurately predict
+outcomes. 
+However, this time-dependent phenomenon is mitigated in our investigation via shorter ablation
 times relative to other thermal modalities. \textit{E.g.}, laser ablations typically last 1.5 minutes to 2 minutes
 whereas the RFA procedures modeled in Schutt, 2008, were 12 and 15 minutes in duration. Furthermore, and
 perhaps more importantly, we do not consider the parameters from model optimization (or model
 training) to be truly physical. In this investigation, the modeling is driven by model training, not model
 complexity/physical fidelity. 
-}\\
-\\
+Accordingly, the manuscript has been
+modified in the following places:
+{\color{green}[list areas that were modified]}.
+}
 \item
 Did the authors investigate the impact of temperature dependent optical properties? During the model
 calibration procedure, it appears a single optical attenuation coefficient was determined for all spatial
@@ -167,53 +189,120 @@ previously published reports of the relationship between optical attenuation and
 considering approach where
 
 {\color{red}
-You are correct that the model calibration arrives at a constant effective optical attenuation coefficient,
-eff, for one training dataset. Also, we certainly agree that patient-specific optimization via test pulse
-or initial 30 seconds of ablation is an excellent idea for providing a calibrated parameter value. In this
-manuscript we did not include patient-specific optimization because we did not think it would be
-clinically practical. The optimization used in calibration requires [such and such] for the FEM model
-and [such and such] for the steady state model. That optimization process could only begin after the low
-power pulse the neurosurgeon uses for position confirmation. If the neurosurgeon is satisfied with the
-localization, ablation would normally follow immediately. If a patient-specific optimization was
-used, the clinician would have to wait for the optimization and then check the predicted ablation
-zone.
+You are correct that the model calibration arrives at a constant effective
+optical attenuation coefficient, eff, for one training dataset. Also, we
+certainly agree that patient-specific optimization via test pulse
+or initial 30 seconds of ablation is an excellent idea for providing a
+calibrated parameter value.
+However, we only considered first order
+predictions in this manuscript. 
+Our investigation is presented such that the present surgical
+technique would be mostly unmodified. 
+ The surgical planning would be
+performed beforehand. 
+Using parameter values calibrated by a prior cohort allows the
+surgical planning to be performed within a tolerably short period of time.
+%During this planning, one prediction would take only
+%[such and such] for the FEM model and [such and such] for the steady state model. 
+Even in the case that the laser fiber was placed differently than the
+designed surgical plan, an updated prediction could be quickly generated. 
 
-Instead, our investigation is presented such that the present surgical technique would be mostly unmodified.
-The surgical planning would be performed beforehand. During this planning, one prediction would take only
-[such and such] for the FEM model and [such and such] for the steady state model. Even in the case that the
-laser fiber was placed differently than the designed surgical plan, an updated prediction could be quick
-generated. In summary, using parameter values calibrated by a prior cohort allows the surgically
-planning to be performed within a tolerably short period of time. Furthermore, even in the future case
-that computation was fast enough for patient-specific optimization, the surgeon would likely want a pre
-surgical `best guess' to inform the surgical plan. This `best guess' is what is presented in this manuscript.
-\\ \\
-Our rationale for the use of constant parameters is explained in the answer to the previous critique you raised.
-\\ \\
-Finally, the last sentence in this critique seems to have been cut short. Please reiterate it, as necessity dictates.
-}\\
-\\
+
+Indeed, as you mention,
+higher order methods can be considered. 
+Conceivably, the additional parameters could compensate for errors.
+However, similar to above, the higher order model would also
+introduce additional parameters to the optimization.
+The resulting analysis on the threshold as which 'over-fitting' would occur
+is considered future work.
+Furthermore, even in the future case that computation was fast enough for
+patient-specific optimization, the surgeon would likely want a pre surgical
+`best guess' to inform the surgical plan. This `best guess' is what is
+presented in this manuscript.
+
+%The optimization used in calibration requires [such and such] for the FEM model
+%and [such and such] for the steady state model. 
+%That optimization process could only begin after the low power pulse the
+%neurosurgeon uses for position confirmation. If the neurosurgeon is
+%satisfied with the localization, ablation would normally follow immediately.
+%If a patient-specific optimization was used, the clinician would have to
+%wait for the optimization and then check the predicted ablation zone.
+
+%Our rationale for the use of constant parameters is explained in the answer
+%to the previous critique you raised.  Finally, the last sentence in this
+%critique seems to have been cut short.  Please reiterate it, as necessity dictates.
+}
 \item
 Please state the test performed to confirm the discretization (mesh size, time steps) did not impact the solution.
 
+
 {\color{red}
-{\color{green}[DF, what did Rice CAAM do for this?]}
-}\\
-\\
+Thank you for pointing this out. Discretization schemes were chosen based on
+previous studies in canine data~\cite{fuentesetal11a}. 
+Quality assurance of the computed result was evaluated using multiple mesh
+resolutions to ensure convergence and time dependent manufactured solution
+regression tests.  This point has been added to the methods.
+
+%% To ensure convergence, five FEM mesh resolutions were considered for each
+%% ROI (min/median/max number of elements = 896/3693/11978, min/median/max
+%% number of nodes = 1349/4674/13874). Within the ROI, the mesh size element
+%% diameter ranged between 0.5 mm and 2 mm. As a reference, 1 mm is in the
+%% order of the pixel size.
+
+%% \paragraph{Goal Oriented Modeling}
+%% Goal oriented quantity of interest based error estimates indicate that the
+%% mesh
+%% resolutions near the resolution of the MR imaging 1mm\textsuperscript{3}
+%% accurately represent the solution to the implemented mathematical models,
+%% Figure~\ref{QOIEstimates}.  Additionally, the same techniques allow us to
+%% gauge the sensitivity
+%% of relevant quantities of interest to discretization error; for example, we
+%% compared sensitivity of the kill zone and coagulation regions to
+%% discretization
+%% error in both space and time.
+%% The current speed of the GPU solvers is $<$30sec run time for the full
+%% 3-5min simulation time
+%% and is well within the clinical constraints of the solver.
+%% Model reduction techniques are not needed at this time for further
+%% efficiency.
+%% 
+%% \begin{figure}[h]
+%% \centering
+%% %\begin{tabular}{ccccc}
+%% %\scalebox{0.11}{\includegraphics*{\picdir/coarseError.png}} &
+%% %\scalebox{0.11}{\includegraphics*{\picdir/qoiCoag.png}} &
+%% \scalebox{0.11}{\includegraphics*{\picdir/qoiKillzone.png}}
+%% %\scalebox{0.11}{\includegraphics*{\picdir/refinedError.png}} &
+%% %\scalebox{0.11}{\includegraphics*{\picdir/refinedErrorRescaled.png}}
+%% %\end{tabular}
+%% \caption{Goal Oriented Error Estimation.  Goal oriented error estimation
+%% techniques have been applied to evaluate discretization error in the laser
+%% heating predictions. Two mesh resolutions were construction with differing
+%% polynomial order. The average error within the domain of the expected kill
+%% zone shows the numerical methods being use is providing adequate accuracy
+%% for this application.
+%% } \label{QOIEstimates}
+%% \end{figure}
+%% 
+
+}
+
+
 \item
  Figure 1, consider blowing up the sketch of applicator (bottom half of fig 1a) so details can be distinguished more easily.
 
 {\color{red}
 The figure has been modified accordingly at
 {\color{green}[page and line number]}. 
-}\\
-\\
+}
+
 \item
 p6, L24 -- State units of frequency factor and activation energy
 
 {\color{red}
 The units have been added.
-}\\
-\\
+}
+
 \item
 p6, L30 -- can the low-power pulse (used to confirm applicator positioning) be used to estimate optical
 attenuation in a patient-specific manner? Did you consider evaluating this dataset and comparing to the
@@ -222,25 +311,30 @@ average value obtained from the calibration process for the other datasets?
 {\color{red}
 We consider it a very good idea to use the low-power pulse as a patient-specific optimization dataset. Also,
 your suggestion of comparing the optimized parameter values from the test pulses to the ablative pulses is
-very astute. For now, patient-specific optimization is not close to being clinically feasible using the
-methods of this manuscript.
+very astute. For now, 
+our investigation is presented such that the present surgical
+technique would be mostly unmodified. Higher order techniques in which
+different subsets of the data are considered in the optimization are of
+great interest but are considered future work. 
+This suggestion has also been added to the discussion as future work.
 
-Patient-specific optimization is mostly impeded by the fact that it stops the surgical workflow. In order to
-acquire the low-power dataset, the neurosurgeon must first place the laser applicator. Then the test pulse
-occurs and is imaged. That dataset is then pushed from the scanner to the computational architecture. There,
-temperature maps must be generated. Only then can optimization begin, followed by a forward prediction
-using the optimal optical parameter value. That forward prediction would then be used by the neurosurgeon for
-surgical planning. We expect that the delay in the surgery incurred by patient-specific optimization would
-preclude it being useful for some time. 
-}\\
-\\
+%Patient-specific optimization is mostly impeded by the fact that it stops
+%the surgical workflow. In order to acquire the low-power dataset, the
+%neurosurgeon must first place the laser applicator. Then the test pulse
+%occurs and is imaged. That dataset is then pushed from the scanner to the
+%computational architecture. There, temperature maps must be generated. Only
+%then can optimization begin, followed by a forward prediction using the
+%optimal optical parameter value. That forward prediction would then be used
+%by the neurosurgeon for surgical planning. We expect that the delay in the
+%surgery incurred by patient-specific optimization would preclude it being
+%useful for some time. 
+}
 \item
 Please modify references so they appear in IJH style.
 
 {\color{red}
 The references are updated to match the \textit{IJH} style.
 }\\
-\\
 \item
 Figure 3, suggesting use same bin width for both histograms so the results for the two models can be
 more readily compared.
@@ -249,4 +343,33 @@ more readily compared.
 The figure has been amended.
 }
 \end{itemize}
+
+\begin{thebibliography}{4}
+
+\bibitem{yung2010quantitative}
+Joshua~P Yung, Anil Shetty, Andrew Elliott, Jeffrey~S Weinberg, Roger~J
+  McNichols, Ashok Gowda, John~D Hazle, and R~Jason Stafford.
+\newblock Quantitative comparison of thermal dose models in normal canine
+  brain.
+\newblock {\em Medical physics}, 37(10):5313--5321, 2010.
+
+\bibitem{Dice1945measures}
+L.R. Dice.
+\newblock {Measures of the amount of ecologic association between species}.
+\newblock {\em Ecology}, 26(3):297--302, 1945.
+
+\bibitem{zou2004three}
+K.H. Zou, W.M. Wells~III, R.~Kikinis, and S.K. Warfield.
+\newblock Three validation metrics for automated probabilistic image
+  segmentation of brain tumours.
+\newblock {\em Statistics in medicine}, 23(8):1259--1282, 2004.
+
+\bibitem{fuentesetal11a}
+D.~Fuentes, C.~Walker, A.~Elliott, A.~Shetty, J.~Hazle, and R.~J. Stafford.
+\newblock {MR temperature imaging validation of a bioheat transfer model for
+  LITT}.
+\newblock {\em {International Journal of Hyperthermia}}, 27(5):453--464, 2011.
+\newblock Cover Page.
+
+\end{thebibliography}
 \end{document}
