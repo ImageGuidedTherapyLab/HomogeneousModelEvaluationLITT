@@ -223,19 +223,21 @@ This physics-based approach
 provides a theoretically sound and concise methodology to statistically summarize the high
 dimensional thermometry dataset with a low dimensional model parameter subset. 
 
-The computer modeling approach targets a practical clinical setting of the operating room 
-or surgical suite where portable computing hardware, efficient software implementations,
-and efficient algorithm implementations are needed to deliver responsive predictions
-of the treatment outcome.  Two distinct modeling approaches are pursued: 
+%The computer modeling approach targets a practical clinical setting of the operating room 
+%or surgical suite where portable computing hardware, efficient software implementations,
+%and efficient algorithm implementations are needed to deliver responsive predictions
+%of the treatment outcome.  
+Two distinct modeling approaches are pursued: 
 (1) A GPU implementation of an unstructured hexahedral spectral element method
 for predicting the bioheat transfer is developed. 
 (2) A computationally inexpensive algorithm for predicting the heat transfer
 from a linear superposition of analytic point source heating functions is also
 presented as a reference implementation.
-
-
+{\color{red}
 Combined with the data, the two modeling approaches presented provide an
-environment to critically evaluate model selection for therapy planning of MRgLITT. 
+environment to critically evaluate model accuracy and  selection for therapy
+planning of MRgLITT. 
+}
 %``Essentially, all models are wrong, but some are useful'', Box~\cite{box1987empirical},
 Both approaches 
 build intuition in the prediction by
@@ -513,7 +515,7 @@ the effect of the room-temperature cooling fluid which protects the laser fiber
 during heating were considered through the boundary conditions at the surface
 nodes. 
 {\color{red}
-A mesh resolution of approximately the pixel size near the applicator was used
+A mesh resolution of approximately the 1mm pixel size near the applicator was used
 to ensure convergence of the discretized solution~\cite{fuentesetal11a}. 
 Multiple time resolutions were also evaluated to ensure convergence of the
 time stepping scheme.
@@ -965,102 +967,43 @@ accepted the null hypothesis with a \textit{p}-value of 0.0732.
 \textit{I.e.}, the steady state model's median of DSC during LOOCV was
 not $\geq$ 0.7 at a statistically significant level.
 
-{\color{red}For the two models, the time to run LOOCV
-was recorded. The FEM model took ZYX for LOOCV, or asdfasdf on average per dataset.
-The steady state took 247 seconds for LOOCV, or 11.2 seconds on average per dataset. }
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Discussion}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-{\color{red}
-Our investigation is presented such that the present surgical
-technique would be mostly unmodified. 
 
-Higher order methods in which constitutive nonlinearites and differenst
-subsets of training sets such as the patient specifi
-test pulse that are optimal for planning
-is considered future work. This requires overfitting studies, harmonization
-of meta data and studies on how much training data is needed to achieve
-the desired accuracy.
-
-Previous real-time implementations of the kernel for
-predicting the laser induced bioheat transfer were made feasible via
-implementation on a massively parallel supercomputers~\cite{fuentesetal09,
-Odenetal07,Dilleretal07,Fengetal07,Fuentesetal08}. 
-Despite the increasing presence of large computational clusters within
-large academic hospitals, reliance on such an approach makes clinical
-translation of this research extremely difficult. This technology must
-be practically available to any clinic using an MR-guided thermal therapy
-system whereas integration with an institution's cluster and intranet creates
-significant overhead and potential complications.
-While modern single-chip multi-core CPU's have a peak performance of
-$\mathcal{O}(10-100)$ GFLOPs and are sufficient 
-for inexpensive algorithms such as the linear superposition of analytic functions presented
-in Section~\ref{AnalyticBioheatModel}, 
-current GPUs~\cite{Farber2011a,Muller2013} have a peak
-performance of $\mathcal{O}(1-2)$ TFLOPs (single precision) and the
-portability of these devices are ideal for developing more advanced 
-numerical discretizations of the underlying partial differential equations
-for guiding the therapy. However, a significant
-time investment is needed to express the class of memory bound numerical
-methods used in simulation within an algorithmic framework that can
-simultaneously exploit these floating point capabilities and minimize the
-global memory access latency of these devices.
-% 28 = 1030/ (148/4) single precision.
-% max floating point operations per second is 1030 GFlop
-% data transfer of single precision numbers to the cores = bandwidth x data type size = 148  x (4bytes / float)
-% >>> 1030./ (148./4.)
-% 27.83783783783784
-For example, the $\mathcal{O} (150)$~GB/s memory bandwidth of the Tesla M2070
-used in the manuscript requires $\approx$ 30 floating point operations per
-single precision global memory access to fully utilize the floating point capabilities
-of the GPU. 
-The spectral element method presented in Section~\ref{BioheatComputerModel}
-achieves efficient global memory access through a matrix-free
-implementation of the inherent linear system of equations.
-As opposed to explicitly storing and reading matrix entries
-from global memory, the matrix-free method recalculates the local matrix entries
-needed within the linear system solve.
-This memory access design pattern has demonstrated a 4-10x speedup  over
-the matrix explicit methods~\cite{Muller2013,Knepley_2_2013,Medina2014}.
-
-The forward solve is considered the fundamental computational
-operation of this study.
-Total runtimes are  proportional to the total number of foward solve
-iterations in the optimation and LOOCV analysis. 
-As an estimate of practical run times,
-numbers are reported on the CPU (INTEL xxx)  and GPU (NVIDIA XXX) 
-hardware available to this study.
-The average foward solve runtime observed on these architectures
-was 246.6 and 11.2 for the transient and steady state model; respectively. 
-
-We are presenting this manuscript to introduce the possibility
-of a new paradigm of treatment planning via a train-and-predict scheme.
-This method is becoming possible because of a growing number of retrospective patient
-datasets. Relatively simple models were chosen for this demonstration
-to expedite the model training, \textit{i.e.}, optimization. The success
-or failure of this paradigm is expected to be related to several factors.
-First, there must be a sufficient quantity of retrospective datasets
-for the training to converge. Second, the cohort of retrospective
-datasets used in training must have sufficient similarity within the group
-and to the prediction scenarios. Third, the model used must be able 
-to describe clinically relevant ablations. In this investigation,
-none of these three factors are satisfied. Nonetheless,
-we propose that model training may expedite clinically useful,
-patient-specific prediction by reducing the model complexity necessary
-and/or the need for patient-specific or population-based parameter
-measurements. }
-
-
-{\color{red}Given the number of available datasets, the LOOCV analysis
-provides the best available recapitulation of the clinical scenario}
+Given the number of available datasets, the LOOCV analysis
+provides a methodology to recapitulate the clinical scenario
 for treatment planning. Prior knowledge and experience is embodied
 within the thermometry data from the previous $N$ ablations.
 Information from the previous ablations is extracted by calibrating
 a computer model to the available data. 
 In this case, we calibrated our optical parameter to the thermometry data.
+{\color{red}
+%We are presenting this manuscript to introduce the possibility of a new
+%paradigm of treatment planning via a train-and-predict scheme.  This method
+%is becoming possible because of a growing number of retrospective patient
+%datasets. 
+%% Relatively simple models were chosen for this demonstration
+%% to expedite the model training, \textit{i.e.}, optimization. 
+Modeling goals are to ultimately utilize the calibrated model in optimizing
+the thermal dose delivery.
+The success
+or failure of this paradigm is related to several factors.
+First, there must be a sufficient quantity of retrospective datasets
+for the training to converge. Second, the cohort of retrospective
+datasets used in training must have sufficient similarity within the group
+and to the prediction scenarios. Third, the model must be able 
+to describe clinically relevant ablations. 
+%In this investigation, none of these three factors are satisfied. 
+%Nonetheless,
+%we propose that model training may expedite clinically useful,
+%patient-specific prediction by reducing the model complexity necessary
+%and/or the need for patient-specific or population-based parameter
+%measurements. 
 
+}
 
 
 If the LOOCV analysis only includes datasets that can be optimized to
@@ -1086,11 +1029,35 @@ of the application. The two-sided, two-sample paired Wilcoxon signed rank test
 indicates the predictive results' medians are significantly different and
 only the transient model's median DSC performance was significantly
 $\geq$ 0.7. 
+{\color{red}
+As a quantitative reference,
+the forward solve mapping between model parameters, Table~\ref{modeldata}, 
+and temperature field is considered the fundamental computational
+operation of this study.
+Total runtimes in the analysis are  proportional to the total number of foward solve
+iterations in the optimation and LOOCV analysis. 
+The run times for the forward solves in this study 
+averaged 187.e3s and 11.2s for the transient model GPU implementation 
+and steady state CPU implementation; respectively. 
+These numbers are intended to provide intuition for the observed
+practical run times on a local CPU 
+% (Intel Xeon, 6 core, 2.4 GHz)  
+(Intel Xeon, 6 core, 2.4 GHz, double precision peak 57 Gflops )  
+workstation with attach GPU accelerators
+%(NVIDIA Tesla M2070)
+(NVIDIA Tesla M2070 double precision peak 515 Gflops) 
+available to this study.
+}
 The finite element discretization of the governing equations requires significant
 expertise of the GPU computing architecture as well as detailed algorithmic
 understanding of both the finite element technology and matrix-vector multiply
 within the iterative linear system solver to maximize floating point operation
 throughput and minimizes memory transactions latencies.
+As opposed to explicitly storing and reading matrix entries
+from global memory, the matrix-free method recalculates the local matrix entries
+needed within the linear system solve.
+This memory access design pattern has demonstrated a 4-10x speedup  over
+the matrix explicit methods~\cite{Muller2013,Knepley_2_2013,Medina2014}.
 Meanwhile, the steady state superposition analysis, Equation~\eqn{GreenSuperPosition},
 provides treatment predictions with fewer floating point operations and would be selected under an Occam
 razor~\cite{jaynes2003probability} philosophy highly preferential to simplicity.
@@ -1100,6 +1067,45 @@ method were hand coded in this manuscript, library implementations of the
 matrix-free iterative solver approach are also
 appearing~\cite{Knepley2013,Knepley2014}. 
 
+%% {\color{red}
+%% 
+%% Previous real-time implementations of the kernel for
+%% predicting the laser induced bioheat transfer were made feasible via
+%% implementation on a massively parallel supercomputers~\cite{fuentesetal09,
+%% Odenetal07,Dilleretal07,Fengetal07,Fuentesetal08}. 
+%% Despite the increasing presence of large computational clusters within
+%% large academic hospitals, reliance on such an approach makes clinical
+%% translation of this research extremely difficult. This technology must
+%% be practically available to any clinic using an MR-guided thermal therapy
+%% system whereas integration with an institution's cluster and intranet creates
+%% significant overhead and potential complications.
+%% While modern single-chip multi-core CPU's have a peak performance of
+%% $\mathcal{O}(10-100)$ GFLOPs and are sufficient 
+%% for inexpensive algorithms such as the linear superposition of analytic functions presented
+%% in Section~\ref{AnalyticBioheatModel}, 
+%% current GPUs~\cite{Farber2011a,Muller2013} have a peak
+%% performance of $\mathcal{O}(1-2)$ TFLOPs (single precision) and the
+%% portability of these devices are ideal for developing more advanced 
+%% numerical discretizations of the underlying partial differential equations
+%% for guiding the therapy. However, a significant
+%% time investment is needed to express the class of memory bound numerical
+%% methods used in simulation within an algorithmic framework that can
+%% simultaneously exploit these floating point capabilities and minimize the
+%% global memory access latency of these devices.
+%% % 28 = 1030/ (148/4) single precision.
+%% % max floating point operations per second is 1030 GFlop
+%% % data transfer of single precision numbers to the cores = bandwidth x data type size = 148  x (4bytes / float)
+%% % >>> 1030./ (148./4.)
+%% % 27.83783783783784
+%% For example, the $\mathcal{O} (150)$~GB/s memory bandwidth of the Tesla M2070
+%% used in the manuscript requires $\approx$ 30 floating point operations per
+%% single precision global memory access to fully utilize the floating point capabilities
+%% of the GPU. 
+%% The spectral element method presented in Section~\ref{BioheatComputerModel}
+%% achieves efficient global memory access through a matrix-free
+%% implementation of the inherent linear system of equations.
+%% 
+%% }
 %{\color{red}The focus of this manuscript is to compare two models' accuracy
 %in predicting the maximum ablation size. However, for any given predictive model,
 %a natural question to address is how much accuracy is necessary to clinically useful?
@@ -1119,18 +1125,25 @@ most significant being the use of optical tissue properties that are
 invariant in space and time. The literature has clear examples
 where temperature/damage dependent and spatially/temporally dependent
 parameters are critical to the
-prediction~\cite{Mohammed05,Schutt2008}.
-The choice to use a single constant parameter for every
-optimized MRTI dataset is driven by
-several considerations. The focus of this investigation
-is to demonstrate the use of training in the two models.
-The inclusion of spatially varied, damage dependent, and
-multiple parameters would require considerably more
-complicated computational methods and resources; this
-should be persued in the future. Higher order physics
+prediction~\cite{Mohammed05,Schutt2008}. The use of thermometry data during
+only the test pulse is also expected to influence the recovered optical
+properties.
+The choice to use a single constant parameter for full time history of each
+MRTI dataset is motivated by
+the practical model training focus of this investigation.
+Higher order physics
 models of the fluence are be expected to provide the highest accuracy in
 recovering the optical parameters during the calibration process and for
-characterizing the tissue properties. }
+characterizing the tissue properties.
+
+
+%Higher order methods in which constitutive nonlinearites and different
+%subsets of training sets such as the patient specifi
+%test pulse that are optimal for planning
+%is considered future work. This requires overfitting studies, harmonization
+%of meta data and studies on how much training data is needed to achieve
+%the desired accuracy.
+ }
 
 The finite element discretization of the governing equations
 also provides a rigorous physics-based methodology to 
@@ -1138,6 +1151,8 @@ incorporate tissue heterogeneities into the treatment prediction.
 Calibrations of the spatially heterogeneous 
 optical parameter field has been shown to provide highly accurate 
 predictions~\cite{fuentes2013inverse}.
+{\color{red} The inclusion of spatially varied, damage dependent, and
+multiple parameters should be pursued in future efforts.}
 Adjoint-based methods of computing the gradient of the objective 
 function are necessary to efficiently optimize in the higher dimensional parameter space.
 Tissue heterogeneities could similarly be incorporated
@@ -1183,7 +1198,8 @@ trajectory to reach the tumor with neuro-navigation software, but does not
 have the capability to visualize outcomes of the laser ablation using
 various trajectories beforehand. 
 Fully developed and commercially implemented predictive computer models 
-will extend this functionality to include \textit{a priori} visualization of the
+will extend this functionality to include \textit{a priori} visualization 
+{\color{red} and optimization} of the
 potential outcomes for complex treatment scenarios (multiple
 applicators/trajectories) in which the laser ablation is performed near a
 critical structure within a heterogeneous tissue environment. 
