@@ -56,11 +56,11 @@ for prediction, it is a multifaceted concept. Firstly, we consider a model
 prediction as useful in a particular case if the models ablation region and
 the ablation as indicated via MR temperature imaging has a Dice similarity
 coefficient (DSC) greater than 0.7. Ultimately the quantitative value of
-DSC=.7 is based on prior information and experiences in image processing
-literature~\cite{yung2010quantitative,Dice1945measures,zou2004three};  
-in which DSC$>$.7 is considered `good agreement'. This point is highlighted
+DSC = 0.7 is based on prior information and experiences in image processing
+literature~\cite{yung2010quantitative,Dice1945measures,zou2004three},  
+in which DSC $>$ 0.7 is considered `good agreement'. This point is highlighted
 in the discussion section where the DSC is introduced.
- Secondly, the models overall accuracy in
+Secondly, each model's overall accuracy in
 a cohort is measured by the ratio of useful predictions versus inaccurate
 predictions (\textit{i.e.}, number of DSC $\geq$ 0.7 versus DSC $<$ 0.7).
 This overall accuracy is desired to be as high as possible, but it is beyond the
@@ -75,7 +75,7 @@ on a very carefully selected patient population.
 It is not clear how this method will improve pretreatment planning?
 
 {\color{red}
-Long term project goals are to develop a data driven computer model
+Long term project goals are to develop a data-driven computer model
 that can prospectively predict the thermal dose outcome with high
 accuracy. The ability to accurately predict the therapy outcome will enable
 opportunities to optimize the delivery and maximized tumor kill while
@@ -84,7 +84,7 @@ in the form of a retrospective analysis
 with sufficiently large number datasets to evaluate prediction
 statistics within a hypothesis testing framework. 
 Our LOOCV analysis attempts to mimic our targeted prospective scenario
-in that the model is trained on all previous (N-1) datasets and
+in that the model is trained on all previous (\textit{N}-1) datasets and
 the trained model prediction accuracy is evaluated on the
 independent remaining dataset.
 The success or failure of this paradigm is
@@ -117,8 +117,8 @@ The models implemented in the manuscript are 1) a homogenous,
 time-dependent FEM model and 2) a homogeneous steady state model.
 Intuitively, the FEM model is expected to be more accurate than the steady state model.
 There are numerous ways to normalize a comparison between these two
-approaches. We chose to report the run-time of a single forward solve. I.E.
-given model parameters predict the temperature. This operation is the
+approaches. We chose to report the run-time of a single forward solve.
+\textit{I.e.}, given model parameters, predict the temperature. This operation is the
 lowest common denominator and is the workhorse for the optimization and the
 LOOCV analysis. Within this context, the runtime of the optimization and the
 LOOCV analysis is the runtime of the single forward solve times the number
@@ -126,7 +126,7 @@ of optimization iterations needed or the LOOCV patients considered.
 These numbers are intended to qualitatively provide
 intuition for the practical run times of these models. 
 Steady state model
-results are presented from CPU based matlab runs and transient model results are
+results are presented from CPU-based MATLAB runs and transient model results are
 presented on the GPU cards available to our group. 
 Each of these points
 is added to the discussion.
@@ -163,10 +163,10 @@ incorporating temperature/thermal damage dependencies for blood perfusion? Sugge
 perfusion level based on time-temperature history (see, for example, Schutt, Med Phys, 2008).
 
 {\color{red}
-Thank you for this suggestion. Model parameters change with temperature was
+Thank you for this suggestion. Model parameters that change with temperature was
 not considered in this study. 
-Adding additional temperature dependet
-properties would add one more degree of freedom to 'fit' the data. 
+Adding additional temperature dependent
+properties would add one more degree of freedom to `fit' the data. 
 We were concerned with overfitting in this regard.
 As the hyperthermia/ablation literature states in concert, tissue properties
 are dependent on temperature and thermal damage state and these dependencies
@@ -175,9 +175,9 @@ outcomes.
 However, this time-dependent phenomenon is mitigated in our investigation via shorter ablation
 times relative to other thermal modalities. \textit{E.g.}, laser ablations typically last 1.5 minutes to 2 minutes
 whereas the RFA procedures modeled in Schutt, 2008, were 12 and 15 minutes in duration. Furthermore, and
-perhaps more importantly, we do not consider the parameters from model optimization (or model
-training) to be truly physical. In this investigation, the modeling is driven by model training, not model
-complexity/physical fidelity. 
+perhaps more importantly, we do not consider the parameters from model optimization
+(or `model training') to be truly physical. In this investigation,
+the modeling is driven by model training, not model complexity/physical fidelity. 
 Discussion points for temperature dependent constitutive properties have
 been updated.
 }
@@ -192,7 +192,7 @@ considering approach where
 
 {\color{red}
 You are correct that the model calibration arrives at a constant effective
-optical attenuation coefficient, eff, for one training dataset. Also, we
+optical attenuation coefficient, $\mu_{eff}$, for one training dataset. Also, we
 certainly agree that patient-specific optimization via test pulse
 or initial 30 seconds of ablation is an excellent idea for providing a
 calibrated parameter value.
@@ -200,7 +200,7 @@ However, we only considered first order
 predictions in this manuscript. 
 Our investigation is presented such that the present surgical
 technique would be mostly unmodified. 
- The surgical planning would be
+\textit{I.e.}, the surgical planning would be
 performed beforehand. 
 Using parameter values calibrated by a prior cohort allows the
 surgical planning to be performed within a tolerably short period of time.
@@ -215,7 +215,7 @@ higher order methods can be considered.
 Conceivably, the additional parameters could compensate for errors.
 However, similar to above, the higher order model would also
 introduce additional parameters to the optimization.
-The resulting analysis on the threshold as which 'over-fitting' would occur
+The resulting analysis on the threshold as which `over-fitting' would occur
 is considered future work.
 Furthermore, even in the future case that computation was fast enough for
 patient-specific optimization, the surgeon would likely want a pre surgical
@@ -350,7 +350,7 @@ Joshua~P Yung, Anil Shetty, Andrew Elliott, Jeffrey~S Weinberg, Roger~J
   McNichols, Ashok Gowda, John~D Hazle, and R~Jason Stafford.
 \newblock Quantitative comparison of thermal dose models in normal canine
   brain.
-\newblock {\em Medical physics}, 37(10):5313--5321, 2010.
+\newblock {\em Medical Physics}, 37(10):5313--5321, 2010.
 
 \bibitem{Dice1945measures}
 L.R. Dice.
@@ -361,7 +361,7 @@ L.R. Dice.
 K.H. Zou, W.M. Wells~III, R.~Kikinis, and S.K. Warfield.
 \newblock Three validation metrics for automated probabilistic image
   segmentation of brain tumours.
-\newblock {\em Statistics in medicine}, 23(8):1259--1282, 2004.
+\newblock {\em Statistics in Medicine}, 23(8):1259--1282, 2004.
 
 \bibitem{fuentesetal11a}
 D.~Fuentes, C.~Walker, A.~Elliott, A.~Shetty, J.~Hazle, and R.~J. Stafford.
