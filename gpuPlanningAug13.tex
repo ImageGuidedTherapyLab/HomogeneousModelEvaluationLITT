@@ -177,11 +177,11 @@ tumors, tumors under 2.5 cm in diameter, and deep seated tumors~\cite{alexander1
 An additional target in brain is
 epileptogenic foci for patients with medically refractory epilepsy,
 where MRgLITT is being considered for the surgical armamentarium for those patients~\cite{curry2012mr,Nowell2014}.
-Unfortunately, patients with malignant recurrences who have reached max radiation dose
+Unfortunately, patients with malignant recurrences who have reached max{\color{red}imum} radiation dose
 limitations and complications with surgical resection create a group of
 patients with no remaining conventional treatment options;
 meanwhile patients with medically refractory epilepsy have limited interventions available.
-Magnetic Resonance-guided Laser Induced Thermal Therapy (MRgLITT) presents
+Magnetic resonance-guided laser induced thermal therapy (MRgLITT) presents
 an alternative, minimally invasive thermal ablation technique for these
 groups of patients and has been safely and successfully applied to 
 each~\cite{carpentieretal08,carpentier2011laser,
@@ -202,7 +202,9 @@ to tumor tissue and nearby tissue damage is possible.
 For these procedures to progress to standard of care, 
 \textit{a priori} determination of the optimal placement of the laser catheter(s) is crucial
 for achieving a more conformal delivery of therapy over the target volume
-with minimal comorbidity of intervening or adjacent tissue. 
+with minimal comorbidity of intervening or adjacent tissue.
+{\color{red}Surgical workflows in which the operating room and MRI suite are separate~\cite{Curry2012,Tovar-Spinoza2013}
+exaggerate the advantages of a predictive model.}
 %Currently, neuro-navigation software is used to guide placement. 
 
 This manuscript focuses on the development of a practical methodology for
@@ -245,7 +247,7 @@ repetitively training the underlying physics model
 to statistically match representative datasets. 
 Predictions are critically evaluated in terms of solution efficiency and
 accuracy for prospective treatment planning of MRgLITT procedures. 
-Leave-One-Out Cross Validation (LOOCV) is used to simulate the clinical
+Leave-one-out cross validation (LOOCV) is used to simulate the clinical
 scenario in which $N$ datasets from previous procedures are available to
 calibrate the computer model. LOOCV provides an objective framework to
 critically estimate the accuracy and confidence in predicting the outcome
@@ -259,7 +261,7 @@ of the procedure for the $N+1$ patient~\cite{Stone1974,Geisser1975,Kohavi1995,Br
 MR thermal monitoring from MRI guided stereotactic laser induced thermal
 therapy (LITT) was considered in \textit{N} = \numberofpatientsLOOCV MR thermometry datasets.
 The datasets were vetted for motion artifacts, low signal-to-noise, 
-and catheter induced signal voids that would
+and catheter induced signal voids that
 spuriously reduce the modeling accuracy.
 Each patient was treated with The Visualase Thermal Therapy System
 (Visualase, Inc., Houston, TX).  The Visualase\textsuperscript{\textregistered}
@@ -315,7 +317,7 @@ MR temperature imaging was performed on a 1.5 T MRI
 using a 2D gradient echo sequence~\cite{staffordetal04} 
 (FA = \SI{30}{\degree}, FOV = $24 \times 24$ cm\textsuperscript{2}, matrix size = $256 \times 128$, 
 TR/TE=37.5/20 ms, receive-only head coil,  
-5 sec. per update).
+5 sec{\color{red}onds} per update).
 %No acceleration factor was used.
 The imaging plane was chosen perpendicular to the axial direction of the applicator 
 and allowed monitoring of critical structure regions.
@@ -372,7 +374,7 @@ The test pulse is
 sufficient to allow thermal visualization but not cause thermal damage. 
 %Criteria for inclusion in our study included...
 Multiple thermal imaging datasets are available per patient;
-only the therapy delivery pulses are considered in this study.
+only the {\color{red}therapeutic} pulses are considered in this study.
 A representative laser power profile used
 during the therapy is shown in Figure~\ref{LaserApplicatorOverview}. 
 All DICOM header information was imported into an SQLite database 
@@ -515,7 +517,7 @@ the effect of the room-temperature cooling fluid which protects the laser fiber
 during heating were considered through the boundary conditions at the surface
 nodes. 
 {\color{red}
-A mesh resolution of approximately the 1mm pixel size near the applicator was used
+A mesh resolution approximating the 1 mm pixel size near the applicator was used
 to ensure convergence of the discretized solution~\cite{fuentesetal11a}. 
 Multiple time resolutions were also evaluated to ensure convergence of the
 time stepping scheme.
@@ -764,7 +766,7 @@ the null hypothesis, $H_0$.
 The value chosen is a commonly accepted value in image processing
 literature~\cite{yung2010quantitative,Dice1945measures,zou2004three};  
 $DSC=1$ implies complete agreement between the measure and predicted damage model,
-$i.e.$ the predicted and measured damages volumes completely overlap.
+$i.e.$, the predicted and measured damages volumes completely overlap.
 }
 A two-sample, paired Wilcoxon signed rank test was used to compare if the two models'
 prediction medians are statistically different from one another.
@@ -979,7 +981,7 @@ for treatment planning. Prior knowledge and experience is embodied
 within the thermometry data from the previous $N$ ablations.
 Information from the previous ablations is extracted by calibrating
 a computer model to the available data. 
-In this case, we calibrated our optical parameter to the thermometry data.
+In this case, we calibrate our optical parameter to the thermometry data.
 {\color{red}
 %We are presenting this manuscript to introduce the possibility of a new
 %paradigm of treatment planning via a train-and-predict scheme.  This method
@@ -1037,12 +1039,12 @@ operation of this study.
 Total runtimes in the analysis are  proportional to the total number of foward solve
 iterations in the optimation and LOOCV analysis. 
 The run times for the forward solves in this study 
-averaged 187.e3s and 11.2s for the transient model GPU implementation 
+averaged 187E3 s and 11.2 s for the transient model GPU implementation 
 and steady state CPU implementation; respectively. 
 These numbers are intended to provide intuition for the observed
 practical run times on a local CPU 
 % (Intel Xeon, 6 core, 2.4 GHz)  
-(Intel Xeon, 6 core, 2.4 GHz, double precision peak 57 Gflops )  
+(Intel Xeon, 6 core, 2.4 GHz, double precision peak 57 Gflops)  
 workstation with attach GPU accelerators
 %(NVIDIA Tesla M2070)
 (NVIDIA Tesla M2070 double precision peak 515 Gflops) 
@@ -1117,13 +1119,13 @@ provides significant opportunity for further
 physics-based improvements including 
 higher order model spherical harmonic expansions in the laser fluence 
 model~\cite{carp2004radiative}. 
-As seen in Figure~\ref{QuantitativeComparison}, the models used
+As seen in Figure~\ref{QuantitativeComparison}, the {\color{red}chosen} models
 introduce a bias in the model parameter
 recovery that differs from published literature values.
 {\color{red}The bias may arise from inaccuracies in the modeling assumptions, perhaps
 most significant being the use of optical tissue properties that are
 invariant in space and time. The literature has clear examples
-where temperature/damage dependent and spatially/temporally dependent
+where temperature/damage dependent and spatio-temporal dependent
 parameters are critical to the
 prediction~\cite{Mohammed05,Schutt2008}. The use of thermometry data during
 only the test pulse is also expected to influence the recovered optical
