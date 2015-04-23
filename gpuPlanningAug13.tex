@@ -213,7 +213,7 @@ evaluating computer model predictions for \textit{a priori} planning the procedu
 given $N$ datasets from previous procedures.
 %Evaluation focuses on the trade-off between (1) algorithmic and numerical
 %implementation efficiency (2) against, most importantly, prediction accuracy.
-{\color{red} Evaluation focuses on prediction accuracy.}
+{\color{red} Evaluation focuses on prediction accuracy for guiding applicator placement.}
 Retrospective analysis of MR thermometry data acquired during previous procedures is
 essential to train or calibrate the computer model parameters. 
 The machine learning and statistics community have a rich history in
@@ -518,8 +518,9 @@ the effect of the room-temperature cooling fluid which protects the laser fiber
 during heating were considered through the boundary conditions at the surface
 nodes. 
 {\color{red}
-A mesh resolution approximating the 1 mm pixel size near the applicator was used
-to ensure convergence of the discretized solution~\cite{fuentesetal11a}. 
+Similar to previous studies~\cite{fuentesetal11a}, multiple mesh resolutions
+were considered to ensure convergence of the discretized solution;
+a mesh resolution approximating the 1 mm pixel size near the applicator was used.
 Multiple time resolutions were also evaluated to ensure convergence of the
 time stepping scheme.
 }
@@ -1153,7 +1154,7 @@ also provides a rigorous physics-based methodology to
 incorporate tissue heterogeneities into the treatment prediction.
 Calibrations of the spatially heterogeneous 
 optical parameter field has been shown to provide highly accurate 
-predictions~\cite{fuentes2013inverse}.
+predictions~\cite{fuentes2013inverse,Dilleretal07,Fengetal08}.
 {\color{red} The inclusion of spatially varied, damage dependent, and
 multiple parameters should be pursued in future efforts.}
 Adjoint-based methods of computing the gradient of the objective 
