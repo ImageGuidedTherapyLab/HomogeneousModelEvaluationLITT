@@ -1,0 +1,1322 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 7.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[     48406,       1313]
+NotebookOptionsPosition[     46576,       1252]
+NotebookOutlinePosition[     46957,       1268]
+CellTagsIndexPosition[     46914,       1265]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Analytic steady state problem", "Title",
+ CellChangeTimes->{{3.6143400922755604`*^9, 3.6143401703233643`*^9}, {
+  3.614340215853917*^9, 3.614340226758007*^9}, {3.614340293409672*^9, 
+  3.6143402951608467`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     FractionBox[
+      RowBox[{"\[Omega]", " ", "cblood"}], 
+      RowBox[{"\[Rho]", " ", "cp"}]], 
+     RowBox[{"(", 
+      RowBox[{"u", " ", "-", " ", "ua"}], ")"}]}], " ", "-", " ", 
+    RowBox[{"Div", "[", 
+     RowBox[{"\[Alpha]", " ", 
+      RowBox[{"Grad", "[", "u", "]"}]}], "]"}]}], "=", 
+   RowBox[{
+    FractionBox["1", 
+     RowBox[{"\[Rho]", " ", "cp"}]], "qlaser"}]}], 
+  "\[IndentingNewLine]"}]], "Input",
+ CellChangeTimes->{{3.6143402961269436`*^9, 3.6143403473010607`*^9}, {
+   3.6143404140267324`*^9, 3.6143404192392535`*^9}, {3.6143404702253513`*^9, 
+   3.614340508325161*^9}, {3.615290099099227*^9, 3.6152901024195595`*^9}, {
+   3.615290159943311*^9, 3.615290218763192*^9}, 3.6152902503383493`*^9}],
+
+Cell[CellGroupData[{
+
+Cell["Solution before boundary conditions", "Section",
+ CellChangeTimes->{{3.6143407481761436`*^9, 3.61434075053738*^9}, {
+  3.6143408372360487`*^9, 3.6143408605883837`*^9}, {3.614341322236544*^9, 
+  3.614341346277948*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"u", "=", 
+   RowBox[{
+    FractionBox[
+     RowBox[{"C1", " ", 
+      SuperscriptBox["\[ExponentialE]", 
+       RowBox[{"r", " ", 
+        SqrtBox[
+         FractionBox[
+          RowBox[{"cblood", " ", "\[Omega]"}], "k"]]}]]}], "r"], "+", 
+    FractionBox[
+     RowBox[{"C2", " ", 
+      SuperscriptBox["\[ExponentialE]", 
+       RowBox[{"r", " ", 
+        RowBox[{"(", 
+         RowBox[{"-", 
+          SqrtBox[
+           FractionBox[
+            RowBox[{"cblood", " ", "\[Omega]"}], "k"]]}], ")"}]}]]}], "r"], 
+    "+", 
+    FractionBox[
+     RowBox[{
+      SuperscriptBox["mueff", "2"], " ", "P", " ", 
+      SuperscriptBox["\[ExponentialE]", 
+       RowBox[{
+        RowBox[{"-", "mueff"}], " ", "r"}]]}], 
+     RowBox[{"4", " ", "\[Pi]", " ", "r", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"cblood", " ", "\[Omega]"}], "-", 
+        RowBox[{"k", " ", 
+         SuperscriptBox["mueff", "2"]}]}], ")"}]}]], "+", "ua"}]}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.6143408628756127`*^9, 3.61434112807113*^9}, 
+   3.6152902570980253`*^9}],
+
+Cell[" ", "Text",
+ Editable->False,
+ Selectable->False,
+ CellFrame->{{0, 0}, {0, 0.5}},
+ ShowCellBracket->False,
+ CellMargins->{{0, 0}, {1, 1}},
+ CellElementSpacings->{"CellMinHeight"->1},
+ CellFrameMargins->0,
+ CellFrameColor->RGBColor[0, 0, 1],
+ CellSize->{Inherited, 3}],
+
+Cell[" ", "Text",
+ Editable->False,
+ Selectable->False,
+ CellFrame->{{0, 0}, {0, 3}},
+ ShowCellBracket->False,
+ CellMargins->{{0, 0}, {1, 1}},
+ CellElementSpacings->{"CellMinHeight"->1},
+ CellFrameMargins->0,
+ CellFrameColor->RGBColor[0, 0, 1],
+ CellSize->{Inherited, 5}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Application of boundary conditions: laser cooling and semi-infinite tissue \
+assumption\
+\>", "Section",
+ CellChangeTimes->{{3.614341290100331*^9, 3.6143412918755083`*^9}, {
+  3.614341349782298*^9, 3.614341367646085*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ClearAll", "[", "\"\<Global`*\>\"", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"up", "[", "rVar_", "]"}], " ", ":=", " ", 
+   FractionBox[
+    RowBox[{
+     SuperscriptBox["mueff", "2"], " ", "Powr", " ", 
+     RowBox[{"Exp", "[", 
+      RowBox[{
+       RowBox[{"-", "mueff"}], " ", "rVar"}], "]"}]}], 
+    RowBox[{"4", " ", "\[Pi]", " ", "rVar", " ", "CC"}]]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"uh", "=", 
+   RowBox[{
+    RowBox[{"CC1", 
+     FractionBox[
+      RowBox[{"Exp", "[", 
+       RowBox[{"BB", " ", "rVar"}], "]"}], "rVar"]}], "+", 
+    RowBox[{"CC2", 
+     FractionBox[
+      RowBox[{"Exp", "[", 
+       RowBox[{
+        RowBox[{"-", "BB"}], " ", "rVar"}], "]"}], "rVar"]}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"f1", "[", "rVar_", "]"}], ":=", 
+   FractionBox[
+    RowBox[{"Exp", "[", "\[VeryThinSpace]", 
+     RowBox[{"BB", " ", "rVar"}], "]"}], "rVar"]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"f2", "[", "rVar_", "]"}], ":=", 
+   FractionBox[
+    RowBox[{"Exp", "[", 
+     RowBox[{
+      RowBox[{"-", "BB"}], " ", "rVar"}], "]"}], "rVar"]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"f3", "[", "rVar_", "]"}], ":=", 
+   RowBox[{"-", 
+    RowBox[{
+     RowBox[{"up", "'"}], "[", "rVar", "]"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"solveSys", "=", 
+   RowBox[{"Solve", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{
+       RowBox[{"(", GridBox[{
+          {
+           RowBox[{"f1", "[", "r1", "]"}], 
+           RowBox[{"f2", "[", "r1", "]"}]},
+          {
+           RowBox[{
+            RowBox[{"f1", "'"}], "[", "r2", "]"}], 
+           RowBox[{
+            RowBox[{"f2", "'"}], "[", "r2", "]"}]}
+         }], ")"}], ".", 
+       RowBox[{"(", GridBox[{
+          {"CCoef1"},
+          {"CCoef2"}
+         }], ")"}]}], "==", 
+      RowBox[{"(", GridBox[{
+         {
+          RowBox[{"u0", "-", 
+           RowBox[{"up", "[", "r1", "]"}], "-", "ua"}]},
+         {
+          RowBox[{"f3", "[", "r2", "]"}]}
+        }], ")"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{"CCoef1", ",", "CCoef2"}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"u", "=", 
+   RowBox[{"uh", "+", 
+    RowBox[{"up", "[", "rVar", "]"}], "+", "ua"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"CC1", "=", 
+   RowBox[{"solveSys", "[", 
+    RowBox[{"[", 
+     RowBox[{"All", ",", "1", ",", "2"}], "]"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"CC2", "=", 
+   RowBox[{"solveSys", "[", 
+    RowBox[{"[", 
+     RowBox[{"All", ",", "2", ",", "2"}], "]"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", "u", "\[IndentingNewLine]", 
+ RowBox[{"temperature1", " ", "=", 
+  RowBox[{"FullSimplify", "[", "u", "]"}]}]}], "Input",
+ CellChangeTimes->{{3.6152025380957627`*^9, 3.6152025386808214`*^9}, {
+   3.6152026316611185`*^9, 3.615202637196672*^9}, 3.615202677297682*^9, {
+   3.615289165014828*^9, 3.615289200217348*^9}, {3.615289235575884*^9, 
+   3.615289239010227*^9}, {3.6152892914404697`*^9, 3.615289292896615*^9}, {
+   3.6152893311624413`*^9, 3.6152893361939445`*^9}, 3.6152894475020742`*^9, 
+   3.6152910222845364`*^9, {3.615291330470352*^9, 3.615291350023307*^9}, {
+   3.6152914695932627`*^9, 3.6152916075430565`*^9}, {3.615291699359237*^9, 
+   3.615291739503251*^9}, {3.615291803146615*^9, 3.615291806374938*^9}, {
+   3.61529248946624*^9, 3.6152925535656495`*^9}, {3.615292592723565*^9, 
+   3.6152927261549063`*^9}, 3.6152930800422916`*^9, 3.615293241327419*^9, {
+   3.615293430277312*^9, 3.615293445948879*^9}, {3.6152936271439962`*^9, 
+   3.6152936834126225`*^9}, {3.615293747332014*^9, 3.6152937474170227`*^9}, {
+   3.6155457705561833`*^9, 3.6155457715722847`*^9}, {3.615547852758383*^9, 
+   3.615547887909898*^9}, {3.6155481775028543`*^9, 3.6155482008631897`*^9}, {
+   3.6155483859887004`*^9, 3.6155483954696484`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   FractionBox[
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       RowBox[{"-", "mueff"}], " ", "rVar"}]], " ", 
+     SuperscriptBox["mueff", "2"], " ", "Powr"}], 
+    RowBox[{"4", " ", "CC", " ", "\[Pi]", " ", "rVar"}]], "+", "ua", "+", 
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{
+      SuperscriptBox["\[ExponentialE]", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"-", "mueff"}], " ", "r1"}], "-", 
+        RowBox[{"mueff", " ", "r2"}], "+", 
+        RowBox[{"BB", " ", "rVar"}]}]], " ", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{
+           RowBox[{"mueff", " ", "r1"}], "+", 
+           RowBox[{"BB", " ", "r2"}]}]], " ", 
+         SuperscriptBox["mueff", "2"], " ", "Powr"}], "-", 
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{
+           RowBox[{"BB", " ", "r1"}], "+", 
+           RowBox[{"mueff", " ", "r2"}]}]], " ", 
+         SuperscriptBox["mueff", "2"], " ", "Powr"}], "-", 
+        RowBox[{"BB", " ", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{
+           RowBox[{"BB", " ", "r1"}], "+", 
+           RowBox[{"mueff", " ", "r2"}]}]], " ", 
+         SuperscriptBox["mueff", "2"], " ", "Powr", " ", "r2"}], "+", 
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{
+           RowBox[{"mueff", " ", "r1"}], "+", 
+           RowBox[{"BB", " ", "r2"}]}]], " ", 
+         SuperscriptBox["mueff", "3"], " ", "Powr", " ", "r2"}], "+", 
+        RowBox[{"4", " ", "CC", " ", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{
+           RowBox[{"BB", " ", "r1"}], "+", 
+           RowBox[{"mueff", " ", "r1"}], "+", 
+           RowBox[{"mueff", " ", "r2"}]}]], " ", "\[Pi]", " ", "r1", " ", 
+         "u0"}], "+", 
+        RowBox[{"4", " ", "BB", " ", "CC", " ", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{
+           RowBox[{"BB", " ", "r1"}], "+", 
+           RowBox[{"mueff", " ", "r1"}], "+", 
+           RowBox[{"mueff", " ", "r2"}]}]], " ", "\[Pi]", " ", "r1", " ", 
+         "r2", " ", "u0"}], "-", 
+        RowBox[{"4", " ", "CC", " ", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{
+           RowBox[{"BB", " ", "r1"}], "+", 
+           RowBox[{"mueff", " ", "r1"}], "+", 
+           RowBox[{"mueff", " ", "r2"}]}]], " ", "\[Pi]", " ", "r1", " ", 
+         "ua"}], "-", 
+        RowBox[{"4", " ", "BB", " ", "CC", " ", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{
+           RowBox[{"BB", " ", "r1"}], "+", 
+           RowBox[{"mueff", " ", "r1"}], "+", 
+           RowBox[{"mueff", " ", "r2"}]}]], " ", "\[Pi]", " ", "r1", " ", 
+         "r2", " ", "ua"}]}], ")"}]}], ")"}], "/", 
+    RowBox[{"(", 
+     RowBox[{"4", " ", "CC", " ", "\[Pi]", " ", 
+      RowBox[{"(", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"2", " ", "BB", " ", "r1"}]], "-", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"2", " ", "BB", " ", "r2"}]], "+", 
+        RowBox[{"BB", " ", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"2", " ", "BB", " ", "r1"}]], " ", "r2"}], "+", 
+        RowBox[{"BB", " ", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"2", " ", "BB", " ", "r2"}]], " ", "r2"}]}], ")"}], " ", 
+      "rVar"}], ")"}]}], "-", 
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{
+      SuperscriptBox["\[ExponentialE]", 
+       RowBox[{
+        RowBox[{"-", "BB"}], " ", "rVar"}]], " ", 
+      RowBox[{"(", 
+       RowBox[{
+        FractionBox[
+         RowBox[{
+          SuperscriptBox["\[ExponentialE]", 
+           RowBox[{"BB", " ", "r1"}]], " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", 
+             FractionBox[
+              RowBox[{
+               SuperscriptBox["\[ExponentialE]", 
+                RowBox[{
+                 RowBox[{"-", "mueff"}], " ", "r2"}]], " ", 
+               SuperscriptBox["mueff", "2"], " ", "Powr"}], 
+              RowBox[{"4", " ", "CC", " ", "\[Pi]", " ", 
+               SuperscriptBox["r2", "2"]}]]}], "-", 
+            FractionBox[
+             RowBox[{
+              SuperscriptBox["\[ExponentialE]", 
+               RowBox[{
+                RowBox[{"-", "mueff"}], " ", "r2"}]], " ", 
+              SuperscriptBox["mueff", "3"], " ", "Powr"}], 
+             RowBox[{"4", " ", "CC", " ", "\[Pi]", " ", "r2"}]]}], ")"}]}], 
+         "r1"], "-", 
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{"-", 
+            FractionBox[
+             SuperscriptBox["\[ExponentialE]", 
+              RowBox[{"BB", " ", "r2"}]], 
+             SuperscriptBox["r2", "2"]]}], "+", 
+           FractionBox[
+            RowBox[{"BB", " ", 
+             SuperscriptBox["\[ExponentialE]", 
+              RowBox[{"BB", " ", "r2"}]]}], "r2"]}], ")"}], " ", 
+         RowBox[{"(", 
+          RowBox[{
+           FractionBox[
+            RowBox[{
+             SuperscriptBox["\[ExponentialE]", 
+              RowBox[{
+               RowBox[{"-", "mueff"}], " ", "r1"}]], " ", 
+             SuperscriptBox["mueff", "2"], " ", "Powr"}], 
+            RowBox[{"4", " ", "CC", " ", "\[Pi]", " ", "r1"}]], "-", "u0", 
+           "+", "ua"}], ")"}]}]}], ")"}]}], ")"}], "/", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        FractionBox[
+         RowBox[{
+          SuperscriptBox["\[ExponentialE]", 
+           RowBox[{"BB", " ", "r1"}]], " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", 
+             FractionBox[
+              SuperscriptBox["\[ExponentialE]", 
+               RowBox[{
+                RowBox[{"-", "BB"}], " ", "r2"}]], 
+              SuperscriptBox["r2", "2"]]}], "-", 
+            FractionBox[
+             RowBox[{"BB", " ", 
+              SuperscriptBox["\[ExponentialE]", 
+               RowBox[{
+                RowBox[{"-", "BB"}], " ", "r2"}]]}], "r2"]}], ")"}]}], "r1"], 
+        "-", 
+        FractionBox[
+         RowBox[{
+          SuperscriptBox["\[ExponentialE]", 
+           RowBox[{
+            RowBox[{"-", "BB"}], " ", "r1"}]], " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"-", 
+             FractionBox[
+              SuperscriptBox["\[ExponentialE]", 
+               RowBox[{"BB", " ", "r2"}]], 
+              SuperscriptBox["r2", "2"]]}], "+", 
+            FractionBox[
+             RowBox[{"BB", " ", 
+              SuperscriptBox["\[ExponentialE]", 
+               RowBox[{"BB", " ", "r2"}]]}], "r2"]}], ")"}]}], "r1"]}], ")"}],
+       " ", "rVar"}], ")"}]}]}], "}"}]], "Output",
+ CellChangeTimes->{
+  3.6152936879270744`*^9, 3.6152937613694177`*^9, 3.6153190583329077`*^9, 
+   3.6155458233164587`*^9, {3.6155478711582227`*^9, 3.615547888539961*^9}, {
+   3.6155481808151855`*^9, 3.6155482031224155`*^9}, 3.615548397702872*^9, 
+   3.615548529918092*^9, 3.638795732658558*^9}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "BB"}], " ", "rVar"}], "-", 
+       RowBox[{"mueff", " ", 
+        RowBox[{"(", 
+         RowBox[{"r1", "+", "r2", "+", "rVar"}], ")"}]}]}]], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{
+           RowBox[{"BB", " ", 
+            RowBox[{"(", 
+             RowBox[{"r1", "+", 
+              RowBox[{"2", " ", "r2"}]}], ")"}]}], "+", 
+           RowBox[{"mueff", " ", 
+            RowBox[{"(", 
+             RowBox[{"r2", "+", "rVar"}], ")"}]}]}]]}], " ", 
+        SuperscriptBox["mueff", "2"], " ", "Powr", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "1"}], "+", 
+          RowBox[{"BB", " ", "r2"}]}], ")"}]}], "+", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"mueff", " ", 
+           RowBox[{"(", 
+            RowBox[{"r1", "+", "r2"}], ")"}]}], "+", 
+          RowBox[{"BB", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"2", " ", "r2"}], "+", "rVar"}], ")"}]}]}]], " ", 
+        SuperscriptBox["mueff", "2"], " ", "Powr", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "1"}], "+", 
+          RowBox[{"BB", " ", "r2"}]}], ")"}]}], "+", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"mueff", " ", 
+           RowBox[{"(", 
+            RowBox[{"r1", "+", "r2"}], ")"}]}], "+", 
+          RowBox[{"BB", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"2", " ", "r1"}], "+", "rVar"}], ")"}]}]}]], " ", 
+        SuperscriptBox["mueff", "2"], " ", "Powr", " ", 
+        RowBox[{"(", 
+         RowBox[{"1", "+", 
+          RowBox[{"BB", " ", "r2"}]}], ")"}]}], "-", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"mueff", " ", 
+           RowBox[{"(", 
+            RowBox[{"r2", "+", "rVar"}], ")"}]}], "+", 
+          RowBox[{"BB", " ", 
+           RowBox[{"(", 
+            RowBox[{"r1", "+", 
+             RowBox[{"2", " ", "rVar"}]}], ")"}]}]}]], " ", 
+        SuperscriptBox["mueff", "2"], " ", "Powr", " ", 
+        RowBox[{"(", 
+         RowBox[{"1", "+", 
+          RowBox[{"BB", " ", "r2"}]}], ")"}]}], "-", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"BB", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"2", " ", "r1"}], "+", "r2"}], ")"}]}], "+", 
+          RowBox[{"mueff", " ", 
+           RowBox[{"(", 
+            RowBox[{"r1", "+", "rVar"}], ")"}]}]}]], " ", 
+        SuperscriptBox["mueff", "2"], " ", "Powr", " ", 
+        RowBox[{"(", 
+         RowBox[{"1", "+", 
+          RowBox[{"mueff", " ", "r2"}]}], ")"}]}], "+", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"mueff", " ", 
+           RowBox[{"(", 
+            RowBox[{"r1", "+", "rVar"}], ")"}]}], "+", 
+          RowBox[{"BB", " ", 
+           RowBox[{"(", 
+            RowBox[{"r2", "+", 
+             RowBox[{"2", " ", "rVar"}]}], ")"}]}]}]], " ", 
+        SuperscriptBox["mueff", "2"], " ", "Powr", " ", 
+        RowBox[{"(", 
+         RowBox[{"1", "+", 
+          RowBox[{"mueff", " ", "r2"}]}], ")"}]}], "+", 
+       RowBox[{"4", " ", "CC", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"BB", " ", 
+           RowBox[{"(", 
+            RowBox[{"r1", "+", 
+             RowBox[{"2", " ", "r2"}]}], ")"}]}], "+", 
+          RowBox[{"mueff", " ", 
+           RowBox[{"(", 
+            RowBox[{"r1", "+", "r2", "+", "rVar"}], ")"}]}]}]], " ", "\[Pi]", 
+        " ", "r1", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "1"}], "+", 
+          RowBox[{"BB", " ", "r2"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"u0", "-", "ua"}], ")"}]}], "+", 
+       RowBox[{"4", " ", "CC", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"mueff", " ", 
+           RowBox[{"(", 
+            RowBox[{"r1", "+", "r2", "+", "rVar"}], ")"}]}], "+", 
+          RowBox[{"BB", " ", 
+           RowBox[{"(", 
+            RowBox[{"r1", "+", 
+             RowBox[{"2", " ", "rVar"}]}], ")"}]}]}]], " ", "\[Pi]", " ", 
+        "r1", " ", 
+        RowBox[{"(", 
+         RowBox[{"1", "+", 
+          RowBox[{"BB", " ", "r2"}]}], ")"}], " ", 
+        RowBox[{"(", 
+         RowBox[{"u0", "-", "ua"}], ")"}]}], "+", 
+       RowBox[{"4", " ", "CC", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"mueff", " ", 
+           RowBox[{"(", 
+            RowBox[{"r1", "+", "r2", "+", "rVar"}], ")"}]}], "+", 
+          RowBox[{"BB", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"2", " ", "r2"}], "+", "rVar"}], ")"}]}]}]], " ", 
+        "\[Pi]", " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "1"}], "+", 
+          RowBox[{"BB", " ", "r2"}]}], ")"}], " ", "rVar", " ", "ua"}], "+", 
+       RowBox[{"4", " ", "CC", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{
+          RowBox[{"BB", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"2", " ", "r1"}], "+", "rVar"}], ")"}]}], "+", 
+          RowBox[{"mueff", " ", 
+           RowBox[{"(", 
+            RowBox[{"r1", "+", "r2", "+", "rVar"}], ")"}]}]}]], " ", "\[Pi]", 
+        " ", 
+        RowBox[{"(", 
+         RowBox[{"1", "+", 
+          RowBox[{"BB", " ", "r2"}]}], ")"}], " ", "rVar", " ", "ua"}]}], 
+      ")"}]}], ")"}], "/", 
+   RowBox[{"(", 
+    RowBox[{"4", " ", "CC", " ", "\[Pi]", " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"2", " ", "BB", " ", "r2"}]], " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"-", "1"}], "+", 
+          RowBox[{"BB", " ", "r2"}]}], ")"}]}], "+", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"2", " ", "BB", " ", "r1"}]], " ", 
+        RowBox[{"(", 
+         RowBox[{"1", "+", 
+          RowBox[{"BB", " ", "r2"}]}], ")"}]}]}], ")"}], " ", "rVar"}], 
+    ")"}]}], "}"}]], "Output",
+ CellChangeTimes->{
+  3.6152936879270744`*^9, 3.6152937613694177`*^9, 3.6153190583329077`*^9, 
+   3.6155458233164587`*^9, {3.6155478711582227`*^9, 3.615547888539961*^9}, {
+   3.6155481808151855`*^9, 3.6155482031224155`*^9}, 3.615548397702872*^9, 
+   3.615548529918092*^9, 3.6387957371906166`*^9}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Constant parameter values", "Section",
+ CellChangeTimes->{{3.6152903900093155`*^9, 3.6152904134416585`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"cblood", "=", "3840"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kCond", "=", "0.527"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"r1", " ", "=", " ", "0.00075"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"r2", "=", "1"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"u0", "=", 
+   RowBox[{"-", "16"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"ua", "=", "0"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"wPerf", " ", "=", " ", "6"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Powr", " ", "=", " ", "12"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"BB", "=", 
+   SqrtBox[
+    FractionBox[
+     RowBox[{"cblood", " ", "wPerf"}], "kCond"]]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"CC", "=", 
+   RowBox[{
+    RowBox[{"wPerf", " ", "cblood"}], "-", 
+    RowBox[{"kCond", " ", 
+     SuperscriptBox["mueff", "2"]}]}]}], 
+  ";"}], "\[IndentingNewLine]"}], "Input",
+ CellChangeTimes->{{3.6152904168309975`*^9, 3.615290425029817*^9}, {
+  3.6152930564179296`*^9, 3.615293056532941*^9}, {3.615293577816064*^9, 
+  3.6152936048217645`*^9}, {3.6155484376598673`*^9, 3.615548449437045*^9}, {
+  3.6155485390640063`*^9, 3.6155485400871086`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ "Plotting at different ",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["\[Mu]", "eff"], TraditionalForm]], "None"],
+ " values (sensitivity study; agrees with MATLAB, which is good) (watch out \
+for some stupid error where you have to run the cell twice to update the plot \
+with the proper data)"
+}], "Section",
+ CellChangeTimes->{{3.6152903900093155`*^9, 3.6152904496272764`*^9}, {
+  3.6152904984441576`*^9, 3.6152905027655897`*^9}, {3.6152909143637457`*^9, 
+  3.615290928636173*^9}, {3.615291641622464*^9, 3.615291670863388*^9}, {
+  3.615319190355109*^9, 3.615319204675541*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp180", "=", "temperature1"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mueff", " ", "=", " ", "180"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{"temp180", ",", 
+   RowBox[{"{", 
+    RowBox[{"rVar", ",", "0.00075", ",", "0.01"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.61519715722171*^9, 3.61519717787271*^9}, {
+   3.61519723839771*^9, 3.61519724006171*^9}, {3.6151973795567102`*^9, 
+   3.61519756489671*^9}, {3.61519763863671*^9, 3.6151977140428247`*^9}, {
+   3.6151977957903414`*^9, 3.6151978433466043`*^9}, {3.615197923333593*^9, 
+   3.6151979390092945`*^9}, {3.6151982597692356`*^9, 3.6151983194089317`*^9}, 
+   3.615198596369625*^9, 3.61528954106843*^9, {3.615292896044894*^9, 
+   3.615292896420932*^9}, {3.615293248114097*^9, 3.615293248289115*^9}, {
+   3.615293711698451*^9, 3.615293711817463*^9}, {3.615293750149296*^9, 
+   3.615293750259307*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp200", "=", "temperature1"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mueff", " ", "=", " ", "200"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{"temp200", ",", 
+   RowBox[{"{", 
+    RowBox[{"rVar", ",", "0.00075", ",", "0.01"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.61519715722171*^9, 3.61519717787271*^9}, {
+   3.61519723839771*^9, 3.61519724006171*^9}, {3.6151973795567102`*^9, 
+   3.61519756489671*^9}, {3.61519763863671*^9, 3.6151977140428247`*^9}, {
+   3.6151977957903414`*^9, 3.6151978433466043`*^9}, {3.615197923333593*^9, 
+   3.6151979390092945`*^9}, {3.6151982597692356`*^9, 3.6151983194089317`*^9}, 
+   3.615198596369625*^9, 3.61528954106843*^9, {3.615290530232336*^9, 
+   3.6152905376160746`*^9}, {3.615293015945883*^9, 3.6152930160808964`*^9}, {
+   3.615293250625348*^9, 3.6152932507693624`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp220", "=", "temperature1"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mueff", " ", "=", " ", "220"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{"temp220", ",", 
+   RowBox[{"{", 
+    RowBox[{"rVar", ",", "0.00075", ",", "0.01"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.61519715722171*^9, 3.61519717787271*^9}, {
+   3.61519723839771*^9, 3.61519724006171*^9}, {3.6151973795567102`*^9, 
+   3.61519756489671*^9}, {3.61519763863671*^9, 3.6151977140428247`*^9}, {
+   3.6151977957903414`*^9, 3.6151978433466043`*^9}, {3.615197923333593*^9, 
+   3.6151979390092945`*^9}, {3.6151982597692356`*^9, 3.6151983194089317`*^9}, 
+   3.615198596369625*^9, 3.61528954106843*^9, {3.6152905457768908`*^9, 
+   3.6152905564329557`*^9}, {3.6152930201533036`*^9, 3.615293021033392*^9}, {
+   3.615293253185604*^9, 3.6152932532976155`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp240", "=", "temperature1"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mueff", " ", "=", " ", "240"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{"temp240", ",", 
+   RowBox[{"{", 
+    RowBox[{"rVar", ",", "0.00075", ",", "0.01"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.61519715722171*^9, 3.61519717787271*^9}, {
+   3.61519723839771*^9, 3.61519724006171*^9}, {3.6151973795567102`*^9, 
+   3.61519756489671*^9}, {3.61519763863671*^9, 3.6151977140428247`*^9}, {
+   3.6151977957903414`*^9, 3.6151978433466043`*^9}, {3.615197923333593*^9, 
+   3.6151979390092945`*^9}, {3.6151982597692356`*^9, 3.6151983194089317`*^9}, 
+   3.615198596369625*^9, 3.61528954106843*^9, {3.6152908375960693`*^9, 
+   3.615290846819992*^9}, {3.615293026737962*^9, 3.6152930268569736`*^9}, {
+   3.615293255800866*^9, 3.6152932559298787`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp500", "=", "temperature1"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mueff", " ", "=", " ", "500"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{"temp500", ",", 
+   RowBox[{"{", 
+    RowBox[{"rVar", ",", "0.00075", ",", "0.01"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.61519715722171*^9, 3.61519717787271*^9}, {
+   3.61519723839771*^9, 3.61519724006171*^9}, {3.6151973795567102`*^9, 
+   3.61519756489671*^9}, {3.61519763863671*^9, 3.6151977140428247`*^9}, {
+   3.6151977957903414`*^9, 3.6151978433466043`*^9}, {3.615197923333593*^9, 
+   3.6151979390092945`*^9}, {3.6151982597692356`*^9, 3.6151983194089317`*^9}, 
+   3.615198596369625*^9, 3.61528954106843*^9, {3.6152908559959097`*^9, 
+   3.615290861916501*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp1000", "=", "temperature1"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mueff", " ", "=", " ", "1000"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{"temp1000", ",", 
+   RowBox[{"{", 
+    RowBox[{"rVar", ",", "0.00075", ",", "0.01"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.61519715722171*^9, 3.61519717787271*^9}, {
+   3.61519723839771*^9, 3.61519724006171*^9}, {3.6151973795567102`*^9, 
+   3.61519756489671*^9}, {3.61519763863671*^9, 3.6151977140428247`*^9}, {
+   3.6151977957903414`*^9, 3.6151978433466043`*^9}, {3.615197923333593*^9, 
+   3.6151979390092945`*^9}, {3.6151982597692356`*^9, 3.6151983194089317`*^9}, 
+   3.615198596369625*^9, 3.61528954106843*^9, {3.6152908731086206`*^9, 
+   3.615290881125422*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp3170", " ", "=", " ", "temperature1"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mueff", " ", "=", " ", "3170"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{"temp3170", ",", 
+   RowBox[{"{", 
+    RowBox[{"rVar", ",", "0.00075", ",", "0.01"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.6153190167627516`*^9, 3.6153190450075755`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp5000", "=", "temperature1"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mueff", " ", "=", " ", "5000"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{"temp5000", ",", 
+   RowBox[{"{", 
+    RowBox[{"rVar", ",", "0.00075", ",", "0.01"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.61519715722171*^9, 3.61519717787271*^9}, {
+   3.61519723839771*^9, 3.61519724006171*^9}, {3.6151973795567102`*^9, 
+   3.61519756489671*^9}, {3.61519763863671*^9, 3.6151977140428247`*^9}, {
+   3.6151977957903414`*^9, 3.6151978433466043`*^9}, {3.615197923333593*^9, 
+   3.6151979390092945`*^9}, {3.6151982597692356`*^9, 3.6151983194089317`*^9}, 
+   3.615198596369625*^9, 3.61528954106843*^9, {3.6152908885171614`*^9, 
+   3.6152908999413033`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+This section solves for the temperature and only leaves the radius, rVar, and \
+effective optical coefficient, \[Mu]eff, as variables. It's much faster when \
+used in MATLAB because MATLAB doesn't need to use the Symbolic Toolbox.\
+\>", "Section",
+ CellChangeTimes->{{3.6152903900093155`*^9, 3.6152904496272764`*^9}, {
+  3.6152904984441576`*^9, 3.6152905027655897`*^9}, {3.6152909143637457`*^9, 
+  3.615290928636173*^9}, {3.615291641622464*^9, 3.615291670863388*^9}, {
+  3.615319190355109*^9, 3.615319204675541*^9}, {3.6153193749395657`*^9, 
+  3.6153194651885896`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ClearAll", "[", "\"\<Global`*\>\"", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"up", "[", "rVar_", "]"}], " ", ":=", " ", 
+   FractionBox[
+    RowBox[{
+     SuperscriptBox["mueff", "2"], " ", "Powr", " ", 
+     RowBox[{"Exp", "[", 
+      RowBox[{
+       RowBox[{"-", "mueff"}], " ", "rVar"}], "]"}]}], 
+    RowBox[{"4", " ", "\[Pi]", " ", "rVar", " ", 
+     RowBox[{"(", 
+      RowBox[{"CC", " ", "-", " ", "DD"}], ")"}]}]]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"uh", "=", 
+   RowBox[{
+    RowBox[{"CC1", 
+     FractionBox[
+      RowBox[{"Exp", "[", 
+       RowBox[{"BB", " ", "rVar"}], "]"}], "rVar"]}], "+", 
+    RowBox[{"CC2", 
+     FractionBox[
+      RowBox[{"Exp", "[", 
+       RowBox[{
+        RowBox[{"-", "BB"}], " ", "rVar"}], "]"}], "rVar"]}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"f3", "[", "rVar_", "]"}], ":=", 
+   RowBox[{"-", 
+    RowBox[{
+     RowBox[{"up", "'"}], "[", "rVar", "]"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"f1", "[", "rVar_", "]"}], ":=", 
+   FractionBox[
+    RowBox[{"Exp", "[", "\[VeryThinSpace]", 
+     RowBox[{"BB", " ", "rVar"}], "]"}], "rVar"]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"f2", "[", "rVar_", "]"}], ":=", 
+   FractionBox[
+    RowBox[{"Exp", "[", 
+     RowBox[{
+      RowBox[{"-", "BB"}], " ", "rVar"}], "]"}], "rVar"]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"solveSys", "=", 
+   RowBox[{"Solve", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{
+       RowBox[{"(", GridBox[{
+          {
+           FractionBox[
+            RowBox[{"Exp", "[", 
+             RowBox[{"BB", " ", "r1"}], "]"}], "r1"], 
+           FractionBox[
+            RowBox[{"Exp", "[", 
+             RowBox[{
+              RowBox[{"-", "BB"}], " ", "r1"}], "]"}], "r1"]},
+          {
+           RowBox[{
+            RowBox[{"f1", "'"}], "[", "r2", "]"}], 
+           RowBox[{
+            RowBox[{"f2", "'"}], "[", "r2", "]"}]}
+         }], ")"}], ".", 
+       RowBox[{"(", GridBox[{
+          {"CCoef1"},
+          {"CCoef2"}
+         }], ")"}]}], "==", 
+      RowBox[{"(", GridBox[{
+         {
+          RowBox[{"u0", "-", 
+           RowBox[{"up", "[", "r1", "]"}]}]},
+         {
+          RowBox[{"f3", "[", "r2", "]"}]}
+        }], ")"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{"CCoef1", ",", "CCoef2"}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"u", "=", 
+   RowBox[{"uh", "+", 
+    RowBox[{"up", "[", "rVar", "]"}], "+", "ua"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"CC1", "=", 
+   RowBox[{"solveSys", "[", 
+    RowBox[{"[", 
+     RowBox[{"All", ",", "1", ",", "2"}], "]"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"CC2", "=", 
+   RowBox[{"solveSys", "[", 
+    RowBox[{"[", 
+     RowBox[{"All", ",", "2", ",", "2"}], "]"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"cblood", "=", "3840"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kCond", "=", "0.527"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"r1", " ", "=", " ", "0.00075"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"r2", "=", "1"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"u0", "=", 
+   RowBox[{"-", "16"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"ua", "=", "0"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"wPerf", " ", "=", " ", "6"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Powr", " ", "=", " ", "12"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"BB", "=", 
+   SqrtBox[
+    FractionBox[
+     RowBox[{"cblood", " ", "wPerf"}], "kCond"]]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"CC", "=", 
+   RowBox[{"wPerf", " ", "cblood"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"DD", "=", 
+    RowBox[{"kCond", " ", 
+     SuperscriptBox["mueff", "2"]}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"temperature2", " ", "=", 
+  RowBox[{"FullSimplify", "[", "u", "]"}]}]}], "Input",
+ CellChangeTimes->{{3.6152025380957627`*^9, 3.6152025386808214`*^9}, {
+   3.6152026316611185`*^9, 3.615202637196672*^9}, 3.615202677297682*^9, {
+   3.615289165014828*^9, 3.615289200217348*^9}, {3.615289235575884*^9, 
+   3.615289239010227*^9}, {3.6152892914404697`*^9, 3.615289292896615*^9}, {
+   3.6152893311624413`*^9, 3.6152893361939445`*^9}, 3.6152894475020742`*^9, 
+   3.6152910222845364`*^9, {3.615291330470352*^9, 3.615291350023307*^9}, {
+   3.6152914695932627`*^9, 3.6152916075430565`*^9}, {3.615291699359237*^9, 
+   3.615291739503251*^9}, {3.615291803146615*^9, 3.615291806374938*^9}, {
+   3.61529248946624*^9, 3.6152925535656495`*^9}, {3.615292592723565*^9, 
+   3.6152927261549063`*^9}, 3.6152930800422916`*^9, 3.615293241327419*^9, {
+   3.615293430277312*^9, 3.615293445948879*^9}, {3.6152936271439962`*^9, 
+   3.6152936834126225`*^9}, {3.615293747332014*^9, 3.6152937474170227`*^9}, {
+   3.6153193199940715`*^9, 3.6153193271417866`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "209.09128409713543`"}], " ", "rVar"}], "-", 
+       RowBox[{"1.`", " ", "mueff", " ", 
+        RowBox[{"(", 
+         RowBox[{"2.0015`", "\[InvisibleSpace]", "+", "rVar"}], ")"}]}]}]], 
+     " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "3.5093497073106263`"}], " ", 
+           SuperscriptBox["\[ExponentialE]", 
+            RowBox[{"mueff", " ", 
+             RowBox[{"(", 
+              RowBox[{"2.00075`", "\[InvisibleSpace]", "+", "rVar"}], 
+              ")"}]}]]}], "+", 
+          RowBox[{"3.`", " ", 
+           SuperscriptBox["\[ExponentialE]", 
+            RowBox[{
+             RowBox[{"2.0015`", " ", "mueff"}], "+", 
+             RowBox[{"209.09128409713543`", " ", "rVar"}]}]]}], "-", 
+          RowBox[{"8.609917663936078`*^-182", " ", 
+           SuperscriptBox["\[ExponentialE]", 
+            RowBox[{
+             RowBox[{"418.18256819427086`", " ", "rVar"}], "+", 
+             RowBox[{"mueff", " ", 
+              RowBox[{"(", 
+               RowBox[{"2.00075`", "\[InvisibleSpace]", "+", "rVar"}], 
+               ")"}]}]}]]}], "+", 
+          RowBox[{
+           SuperscriptBox["\[ExponentialE]", 
+            RowBox[{"mueff", " ", 
+             RowBox[{"(", 
+              RowBox[{"1.0015`", "\[InvisibleSpace]", "+", "rVar"}], ")"}]}]],
+            " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "3.0752983374004734`*^-93"}], "-", 
+             RowBox[{"3.0752983374004734`*^-93", " ", "mueff"}]}], ")"}]}], 
+          "+", 
+          RowBox[{
+           SuperscriptBox["\[ExponentialE]", 
+            RowBox[{
+             RowBox[{"418.18256819427086`", " ", "rVar"}], "+", 
+             RowBox[{"mueff", " ", 
+              RowBox[{"(", 
+               RowBox[{"1.0015`", "\[InvisibleSpace]", "+", "rVar"}], 
+               ")"}]}]}]], " ", 
+           RowBox[{"(", 
+            RowBox[{"2.2473797694632334`*^-93", "+", 
+             RowBox[{"2.2473797694632334`*^-93", " ", "mueff"}]}], ")"}]}]}], 
+         ")"}], " ", 
+        SuperscriptBox["mueff", "2"]}], "+", 
+       RowBox[{
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"mueff", " ", 
+          RowBox[{"(", 
+           RowBox[{"2.0015`", "\[InvisibleSpace]", "+", "rVar"}], ")"}]}]], 
+        " ", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"5.701898440282088`*^-184", " ", 
+           SuperscriptBox["\[ExponentialE]", 
+            RowBox[{"418.18256819427086`", " ", "rVar"}]], " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "209.09128409713537`"}], "+", "mueff"}], ")"}], " ", 
+           RowBox[{"(", 
+            RowBox[{
+            "209.09128409713537`", "\[InvisibleSpace]", "+", "mueff"}], 
+            ")"}]}], "+", 
+          RowBox[{"0.02324058882274048`", " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "209.09128409713543`"}], "+", "mueff"}], ")"}], " ", 
+           RowBox[{"(", 
+            RowBox[{
+            "209.09128409713543`", "\[InvisibleSpace]", "+", "mueff"}], 
+            ")"}]}]}], ")"}]}]}], ")"}]}], ")"}], "/", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{"72382.29473870884`", "\[InvisibleSpace]", "-", 
+       RowBox[{"1.655619328441821`", " ", 
+        SuperscriptBox["mueff", "2"]}]}], ")"}], " ", "rVar"}], ")"}]}], 
+  "}"}]], "Output",
+ CellChangeTimes->{3.615319330996172*^9}]
+}, Open  ]],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp180", "=", "temperature2"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mueff", " ", "=", " ", "180"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{"temp180", ",", 
+   RowBox[{"{", 
+    RowBox[{"rVar", ",", "0.00075", ",", "0.01"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.61519715722171*^9, 3.61519717787271*^9}, {
+   3.61519723839771*^9, 3.61519724006171*^9}, {3.6151973795567102`*^9, 
+   3.61519756489671*^9}, {3.61519763863671*^9, 3.6151977140428247`*^9}, {
+   3.6151977957903414`*^9, 3.6151978433466043`*^9}, {3.615197923333593*^9, 
+   3.6151979390092945`*^9}, {3.6151982597692356`*^9, 3.6151983194089317`*^9}, 
+   3.615198596369625*^9, 3.61528954106843*^9, {3.615292896044894*^9, 
+   3.615292896420932*^9}, {3.615293248114097*^9, 3.615293248289115*^9}, {
+   3.615293711698451*^9, 3.615293711817463*^9}, {3.615293750149296*^9, 
+   3.615293750259307*^9}, {3.61531925507058*^9, 3.615319255198593*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp200", "=", "temperature2"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mueff", " ", "=", " ", "200"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{"temp200", ",", 
+   RowBox[{"{", 
+    RowBox[{"rVar", ",", "0.00075", ",", "0.01"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.61519715722171*^9, 3.61519717787271*^9}, {
+   3.61519723839771*^9, 3.61519724006171*^9}, {3.6151973795567102`*^9, 
+   3.61519756489671*^9}, {3.61519763863671*^9, 3.6151977140428247`*^9}, {
+   3.6151977957903414`*^9, 3.6151978433466043`*^9}, {3.615197923333593*^9, 
+   3.6151979390092945`*^9}, {3.6151982597692356`*^9, 3.6151983194089317`*^9}, 
+   3.615198596369625*^9, 3.61528954106843*^9, {3.615290530232336*^9, 
+   3.6152905376160746`*^9}, {3.615293015945883*^9, 3.6152930160808964`*^9}, {
+   3.615293250625348*^9, 3.6152932507693624`*^9}, {3.615319258702943*^9, 
+   3.615319258830956*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp220", "=", "temperature2"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mueff", " ", "=", " ", "220"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{"temp220", ",", 
+   RowBox[{"{", 
+    RowBox[{"rVar", ",", "0.00075", ",", "0.01"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.61519715722171*^9, 3.61519717787271*^9}, {
+   3.61519723839771*^9, 3.61519724006171*^9}, {3.6151973795567102`*^9, 
+   3.61519756489671*^9}, {3.61519763863671*^9, 3.6151977140428247`*^9}, {
+   3.6151977957903414`*^9, 3.6151978433466043`*^9}, {3.615197923333593*^9, 
+   3.6151979390092945`*^9}, {3.6151982597692356`*^9, 3.6151983194089317`*^9}, 
+   3.615198596369625*^9, 3.61528954106843*^9, {3.6152905457768908`*^9, 
+   3.6152905564329557`*^9}, {3.6152930201533036`*^9, 3.615293021033392*^9}, {
+   3.615293253185604*^9, 3.6152932532976155`*^9}, {3.615319261478221*^9, 
+   3.6153192616302357`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp240", "=", "temperature2"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mueff", " ", "=", " ", "240"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{"temp240", ",", 
+   RowBox[{"{", 
+    RowBox[{"rVar", ",", "0.00075", ",", "0.01"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.61519715722171*^9, 3.61519717787271*^9}, {
+   3.61519723839771*^9, 3.61519724006171*^9}, {3.6151973795567102`*^9, 
+   3.61519756489671*^9}, {3.61519763863671*^9, 3.6151977140428247`*^9}, {
+   3.6151977957903414`*^9, 3.6151978433466043`*^9}, {3.615197923333593*^9, 
+   3.6151979390092945`*^9}, {3.6151982597692356`*^9, 3.6151983194089317`*^9}, 
+   3.615198596369625*^9, 3.61528954106843*^9, {3.6152908375960693`*^9, 
+   3.615290846819992*^9}, {3.615293026737962*^9, 3.6152930268569736`*^9}, {
+   3.615293255800866*^9, 3.6152932559298787`*^9}, {3.6153192639114637`*^9, 
+   3.615319264119485*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp500", "=", "temperature2"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mueff", " ", "=", " ", "500"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{"temp500", ",", 
+   RowBox[{"{", 
+    RowBox[{"rVar", ",", "0.00075", ",", "0.01"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.61519715722171*^9, 3.61519717787271*^9}, {
+   3.61519723839771*^9, 3.61519724006171*^9}, {3.6151973795567102`*^9, 
+   3.61519756489671*^9}, {3.61519763863671*^9, 3.6151977140428247`*^9}, {
+   3.6151977957903414`*^9, 3.6151978433466043`*^9}, {3.615197923333593*^9, 
+   3.6151979390092945`*^9}, {3.6151982597692356`*^9, 3.6151983194089317`*^9}, 
+   3.615198596369625*^9, 3.61528954106843*^9, {3.6152908559959097`*^9, 
+   3.615290861916501*^9}, {3.6153192676558385`*^9, 3.6153192678788605`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp1000", "=", "temperature2"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mueff", " ", "=", " ", "1000"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{"temp1000", ",", 
+   RowBox[{"{", 
+    RowBox[{"rVar", ",", "0.00075", ",", "0.01"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.61519715722171*^9, 3.61519717787271*^9}, {
+   3.61519723839771*^9, 3.61519724006171*^9}, {3.6151973795567102`*^9, 
+   3.61519756489671*^9}, {3.61519763863671*^9, 3.6151977140428247`*^9}, {
+   3.6151977957903414`*^9, 3.6151978433466043`*^9}, {3.615197923333593*^9, 
+   3.6151979390092945`*^9}, {3.6151982597692356`*^9, 3.6151983194089317`*^9}, 
+   3.615198596369625*^9, 3.61528954106843*^9, {3.6152908731086206`*^9, 
+   3.615290881125422*^9}, {3.6153192702470975`*^9, 3.6153192703511076`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp3170", " ", "=", " ", "temperature2"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mueff", " ", "=", " ", "3170"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{"temp3170", ",", 
+   RowBox[{"{", 
+    RowBox[{"rVar", ",", "0.00075", ",", "0.01"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.6153190167627516`*^9, 3.6153190450075755`*^9}, {
+  3.6153192731023827`*^9, 3.615319273215394*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"temp5000", "=", "temperature2"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"mueff", " ", "=", " ", "5000"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{"temp5000", ",", 
+   RowBox[{"{", 
+    RowBox[{"rVar", ",", "0.00075", ",", "0.01"}], "}"}]}], "]"}]}], "Input",
+ CellChangeTimes->{{3.61519715722171*^9, 3.61519717787271*^9}, {
+   3.61519723839771*^9, 3.61519724006171*^9}, {3.6151973795567102`*^9, 
+   3.61519756489671*^9}, {3.61519763863671*^9, 3.6151977140428247`*^9}, {
+   3.6151977957903414`*^9, 3.6151978433466043`*^9}, {3.615197923333593*^9, 
+   3.6151979390092945`*^9}, {3.6151982597692356`*^9, 3.6151983194089317`*^9}, 
+   3.615198596369625*^9, 3.61528954106843*^9, {3.6152908885171614`*^9, 
+   3.6152908999413033`*^9}, {3.6153192757916517`*^9, 3.615319275943667*^9}}]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{873, 697},
+WindowMargins->{{80, Automatic}, {Automatic, 32}},
+Magnification->1.3000000715255737`,
+FrontEndVersion->"7.0 for Microsoft Windows (32-bit) (February 18, 2009)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[567, 22, 216, 3, 107, "Title"],
+Cell[786, 27, 779, 20, 84, "Input"],
+Cell[CellGroupData[{
+Cell[1590, 51, 223, 3, 91, "Section"],
+Cell[1816, 56, 1087, 35, 96, "Input"],
+Cell[2906, 93, 273, 9, 7, "Text"],
+Cell[3182, 104, 271, 9, 13, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3490, 118, 231, 5, 124, "Section"],
+Cell[CellGroupData[{
+Cell[3746, 127, 3966, 113, 428, "Input"],
+Cell[7715, 242, 6933, 184, 440, "Output"],
+Cell[14651, 428, 6609, 186, 290, "Output"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[21309, 620, 114, 1, 91, "Section"],
+Cell[21426, 623, 1260, 34, 307, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[22723, 662, 594, 12, 189, "Section"],
+Cell[23320, 676, 977, 19, 107, "Input"],
+Cell[24300, 697, 933, 18, 107, "Input"],
+Cell[25236, 717, 935, 18, 107, "Input"],
+Cell[26174, 737, 933, 18, 107, "Input"],
+Cell[27110, 757, 833, 17, 107, "Input"],
+Cell[27946, 776, 836, 17, 107, "Input"],
+Cell[28785, 795, 454, 12, 107, "Input"],
+Cell[29242, 809, 838, 17, 107, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[30117, 831, 579, 9, 189, "Section"],
+Cell[CellGroupData[{
+Cell[30721, 844, 5049, 150, 739, "Input"],
+Cell[35773, 996, 3602, 95, 226, "Output"]
+}, Open  ]],
+Cell[39390, 1094, 1022, 19, 107, "Input"],
+Cell[40415, 1115, 983, 19, 107, "Input"],
+Cell[41401, 1136, 987, 19, 107, "Input"],
+Cell[42391, 1157, 985, 19, 107, "Input"],
+Cell[43379, 1178, 883, 17, 107, "Input"],
+Cell[44265, 1197, 886, 17, 107, "Input"],
+Cell[45154, 1216, 505, 13, 107, "Input"],
+Cell[45662, 1231, 886, 17, 107, "Input"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
