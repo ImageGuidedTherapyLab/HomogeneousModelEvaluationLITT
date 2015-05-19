@@ -1,0 +1,23 @@
+# vtk DataFile Version 3.0
+vtk output
+ASCII
+DATASET STRUCTURED_POINTS
+DIMENSIONS 3 3 3
+SPACING 1.0 1.0 1.0
+ORIGIN 0 0 0
+POINT_DATA 27
+COLOR_SCALARS scalars 1
+0 0 0 
+0 0 
+0 0 
+0 0 
+0 0 
+0 0 
+0 0 
+0 0 
+0 0 
+0 0 
+0 0 
+0 0 
+0 0 
+

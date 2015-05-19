@@ -1,0 +1,177 @@
+all registration parameters are WRT workdir/meshTemplateFull1.e
+
+------------------------- accumulate stats ---------------------------------------
+
+# run analysis
+make -f exe.makefile -j 6 &
+
+# decide at run time which run to accumulate stats
+python brainsearch.py --accum_history=heating
+python brainsearch.py --accum_history=[opttype]
+
+------------------------- Running LOOCV and naive data ---------------------------
+
+In MATLAB...
+master_naive_script
+[save workspace]
+
+master_LOOCV_script
+[save workspace]
+
+
+------------------------- Running with MATLAB ------------------------------------
+
+1. Make sure 'brainsearch.py' has MATLAB = True . Make sure DAKMATLAB isn't running and the pipes are absent.  pkill -9 dakmatlab
+2. ./analytic/dakmatlab setup workspace
+3. ./exe.heating.txt           Or whatever script you want to run
+
+----------------------------------------------------------------------------------
+parallel direct search in Dakota
+http://dakota.sandia.gov/docs/dakota/5.2/html-ref/MethodCommands.html#MethodOPTPP
+
+
+Example usage:
+
+$ dakota workdir/Patient0006/007/opt/dakota_opt.in
+.
+.
+.
+
+python ./brainsearch.py --param_file  ./workdir/Patient0006/007/opt/optpp_pds.in.117 ./workdir/Patient0006/007/opt/optpp_pds.out.117
+
+>>>>> optpp_pds: post-run phase.
+********************************************************
+             OPT++ TERMINATION CRITERION
+          FAILURE - optpp_pdsterminated
+pdsdone: Function tolerance test passed
+********************************************************
+<<<<< Function evaluation summary: 129 total (129 new, 0 duplicate)
+         obj_fn: 129 val (129 n, 0 d), 0 grad (0 n, 0 d), 0 Hess (0 n, 0 d)
+<<<<< Best parameters          =
+                      1.8559756376e-01 robin_coeff
+                      2.1075112129e+01 probe_init
+                      9.7511212920e-01 anfact_healthy
+                      5.0207694651e+01 mu_a_healthy
+                      8.0000000000e+03 mu_s_healthy
+                      5.0000000000e-01 k_0_healthy
+                      6.0000000000e+00 w_0_healthy
+                      1.1135000000e-01 x_displace
+                      1.3872000000e-01 y_displace
+                      0.0000000000e+00 z_displace
+                      0.0000000000e+00 x_rotate
+                      9.0000000000e+01 y_rotate
+                      0.0000000000e+00 z_rotate
+<<<<< Best objective function  =
+                      9.2298168750e+05
+<<<<< Best data captured at function evaluation 117
+
+
+-------------------------------------------------------------------------------------------
+$ cat ./workdir/Patient0006/007/opt/optpp_pds.in.1                            $ cat ./workdir/Patient0006/007/opt/optpp_pds.in.117
+                                         13 variables                                                                  13 variables
+                      0.000000000000000e+00 robin_coeff                                             1.855975637625393e-01 robin_coeff
+                      2.100000000000000e+01 probe_init                                              2.107511212920215e+01 probe_init
+                      9.000000000000000e-01 anfact_healthy                                          9.751121292021412e-01 anfact_healthy
+                      5.000000000000000e+01 mu_a_healthy                                            5.020769465067461e+01 mu_a_healthy
+                      8.000000000000000e+03 mu_s_healthy                                            8.000000000000000e+03 mu_s_healthy
+                      5.000000000000000e-01 k_0_healthy                                             5.000000000000000e-01 k_0_healthy
+                      6.000000000000000e+00 w_0_healthy                                             6.000000000000000e+00 w_0_healthy
+                      1.113500000000000e-01 x_displace                                              1.113500000000000e-01 x_displace
+                      1.387200000000000e-01 y_displace                                              1.387200000000000e-01 y_displace
+                      0.000000000000000e+00 z_displace                                              0.000000000000000e+00 z_displace
+                      0.000000000000000e+00 x_rotate                                                0.000000000000000e+00 x_rotate
+                      9.000000000000000e+01 y_rotate                                                9.000000000000000e+01 y_rotate
+                      0.000000000000000e+00 z_rotate                                                0.000000000000000e+00 z_rotate
+                                          1 functions                                                                   1 functions
+                                          1 ASV_1:obj_fn                                                                1 ASV_1:obj_fn
+                                          4 derivative_variables                                                        4 derivative_variables
+                                          1 DVV_1:robin_coeff                                                           1 DVV_1:robin_coeff
+                                          2 DVV_2:probe_init                                                            2 DVV_2:probe_init
+                                          3 DVV_3:anfact_healthy                                                        3 DVV_3:anfact_healthy
+                                          4 DVV_4:mu_a_healthy                                                          4 DVV_4:mu_a_healthy
+                                          0 analysis_components                                                         0 analysis_components
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+README: This readme outlines critical tasks within the optpp_pds repo. The ###### statements are section headers or commands that should be executed
+
+#########1. Optimization: This section optimizes one or more data sets for mu_eff / mu_a. Then it can make the summary text file (step 9)
+
+
+
+Steps:
+1. Initialize DAKMATLAB:
+###### ./analytic/dakmatlab setup workspace
+
+2. Run a single data set or Bash script for multiple:
+./exe.fit50.txt
+
+3. dakota_sanity_1D.in analysis driver points to brainsearch.py
+
+4. brainsearch.py points to analytic/f.m if MATLAB flag is true
+
+5. f.m points to fast_temperature_obj_fxn_sanity.m:
+
+6. fast_temperature_obj_fxn_sanity.m returns 2-D temperature images for the model and MRTI; fast_temperature_obj_fxn_sanity.m contains many MATLAB scripts
+
+7. f.m computes the DSC; (1 - DSC) is the objective function that is returned to brainsearch.py
+
+8. brainsearch.py interacts with DAKOTA through sanity_1D.in.* and sanity_1D.out.* files
+
+9. Run alt_accumulatehistory.py to get alt_datasummary.txt
+###### python alt_accumulatehistory.py
+
+
+
+
+########2. Threshold by DSC to identify the best data sets, remove mu_eff outliers, do LOOCV t-test
+
+0. path(path('DakotaApplications/PlanningValidation/analytic/unused'))
+
+1. The primary script is ./analytic/unused/master_LOOCV_script.m .
+
+2. Modify the script to your specifications. I.e., mu_eff thresholds, DSC thresholds,
+datasummary filename, opttype, and Matlab_flag.
+
+3. There are comments for guidance.
+
+4. In the MATLAB command line:
+###### master_LOOCV_script
+	
+#######3. Guts of LOOCV t-test file LOOCV_t_test_DiceTemp.m ; This section outlines how the LOOCV and t-test
+1. Receive:
+Paths: Study_paths
+mu_eff values corresponding to Study_paths : variable name: mu_eff_DpassT
+opt_type string: opt_type
+
+2. Lines 33-35: Make a new TmpDataInput.mat file for the correct Study_paths data set
+
+3. Lines 39 - 45: This is the LOOCV section:
+Remove one mu_eff value (line 40)
+Average the remaining mu_eff values (line 41)
+Compute mu_a_iter as a function of mu_s, mu_eff, g (lines 42 and 43)
+Plug in the mu_a and mu_eff values for the particular LOOCV iteration (lines 44 and 45)
+
+4. Lines 48-60 compute the DSC for the particular LOOCV iteration
+
+5. Line 62 uses MATLABs built-in t-test
+

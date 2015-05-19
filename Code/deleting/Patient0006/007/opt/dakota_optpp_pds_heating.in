@@ -1,0 +1,59 @@
+
+# DAKOTA INPUT FILE - dakota_opt.in
+strategy,
+        single_method
+          graphics,tabular_graphics_data
+
+method,
+        output verbose
+        optpp_q_newton
+        #optpp_pds
+          max_iterations = 1000
+          #max_step = 12345.
+          max_function_evaluations = 2000
+          convergence_tolerance = 1.e-12
+##           linear_inequality_lower_bounds = 0.2 0.7 5.e1 0.0
+##           linear_inequality_upper_bounds = 1.9 1.0 6.e2 3.e-3
+##           linear_inequality_constraint_matrix = 1.0 0.0 0.0 0.0
+##                                                 0.0 1.0 0.0 0.0
+##                                                 0.0 0.0 1.0 0.0
+##                                                 0.0 0.0 0.0 1.0
+## 
+#         solution_accuracy = 1e-4
+#         initial_delta = 0.5
+#         threshold_delta = 1e-4
+#         exploratory_moves basic_pattern
+#         contraction_factor = 0.75
+
+model,
+        single
+
+variables,
+        continuous_design = 3
+          initial_point    0.7492996933       177.777634         0.001400  
+          lower_bounds       0.2              8.e-1              0.000000  
+          upper_bounds       1.1              5.3e3             0.003000   
+          descriptors      'k_0_healthy'     'mu_eff_healthy'  'z_displace'
+        continuous_state = 9
+          initial_state         0.0            37.0         21.0         6.0         0.111350 0.138720        0.000000 90.000000 0.000000 
+          #lower_bounds         0.0            34.0         20.0         3.0         0.110350 0.137720       -5.000000 85.000000 -5.000000 
+          #upper_bounds         1.e4           40.0        40.0         9.0         0.112350 0.139720        5.000000 95.000000 5.000000 
+          descriptors        'robin_coeff' 'body_temp' 'probe_init' 'w_0_healthy' 'x_displace' 'y_displace'  'x_rotate' 'y_rotate' 'z_rotate'
+#        discrete_state_range = 1
+#          initial_state    0
+#          descriptors      'powerhistory:[[36, 42, 49, 142, 160], [0.0, 3.0, 0.0, 12.0, 0.0], 5.0, 138]'
+
+interface,
+        fork                                    #1,#4,#5,#7,#8,#11,#16,#19
+          file_save file_tag
+          analysis_driver = 'python ./brainsearch.py --param_file '
+          parameters_file = './workdir/Patient0006/007/opt/optpp_pds.in'
+          results_file    = './workdir/Patient0006/007/opt/optpp_pds.out'
+
+# data quality   1
+
+responses,
+        objective_functions = 1
+        numerical_gradients
+        #no_gradients
+        no_hessians

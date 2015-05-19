@@ -1,0 +1,71 @@
+
+# DAKOTA INPUT FILE - dakota_opt.in
+strategy,
+        single_method
+          tabular_graphics_data
+          tabular_graphics_file = './workdir/Study0026/0451/opt/dakota_bestfit1.in.tabular.dat'
+
+method,
+
+        asynch_pattern_search
+        #optpp_pds
+        #output verbose
+        scaling
+        output debug
+        #  initial_delta = 1.0e+03
+          threshold_delta = 4.0e-7
+        
+       # optpp_q_newton
+        #optpp_pds
+        #output verbose
+       # scaling				
+       # output debug
+       #   max_iterations = 1000
+       #   max_function_evaluations = 2000
+        # gradient_tolerance = 1.e-6
+        # convergence_tolerance = 1.e-6
+        # solution_accuracy = 1e-4
+        # initial_delta = 0.5
+        # threshold_delta = 1e-4
+        # exploratory_moves basic_pattern
+        # contraction_factor = 0.75
+
+model,
+        single
+
+
+interface,
+        fork                                    #1,#4,#5,#7,#8,#11,#16,#19
+          file_save file_tag
+          analysis_driver = 'python ./brainsearch.py --param_file '
+          parameters_file = './workdir/Study0026/0451/opt/optpp_pds.bestfit1.in'
+          results_file    = './workdir/Study0026/0451/opt/optpp_pds.bestfit1.out'
+
+#        discrete_state_range = 1
+#          initial_state    0
+#          descriptors      'powerhistory:[[4, 17, 59], [0.0, 8.0, 0.0], 5.0, [19, 59], [0, 18]]'
+
+responses,
+        objective_functions = 2
+#        multi_objective_weights  = 1. 0.
+        multi_objective_weights  = 1. 0.
+        numerical_gradients
+        fd_gradient_step_size 1.
+        # no_gradients
+        no_hessians
+
+variables,
+        continuous_design = 1
+          initial_point  =  1.80000e+02   
+          lower_bounds  =   8.00000e-01   
+          upper_bounds  =   5.30000e+03   
+          descriptors  =  'mu_eff_healthy' 
+          scale_types  =  'auto' 
+        continuous_state = 16
+          initial_state  =  1.38546e-07  9.121000e-02  1.211200e-01     0   270   1.04500e+03   8.80000e-01   6.00000e+00   3.70000e+01     0   345   2.10000e+01   8.00000e+03   3.64000e+03   0.00000e+00   3.84000e+03
+          #lower_bounds  =  -9.50000e+01   9.92750e+02   7.00000e-01   3.00000e+00   3.40000e+01  -5.00000e+00  -5.00000e+00   2.00000e+01   8.00000e+02   3.45800e+03   0.00000e+00   3.64800e+03 
+          #upper_bounds  =  -8.50000e+01   1.09725e+03   1.00000e+00   9.00000e+00   4.00000e+01   5.00000e+00   5.00000e+00   4.00000e+01   5.00000e+04   3.82200e+03   1.00000e+04   4.03200e+03 
+          descriptors  =  'alpha_healthy'  'x_displace'  'y_displace'  'z_displace'  'y_rotate'  'rho_healthy'  'anfact_healthy'  'w_0_healthy'  'body_temp'  'x_rotate'  'z_rotate'  'probe_init'  'mu_s_healthy'  'c_p_healthy'  'robin_coeff'  'c_blood_healthy' 
+        discrete_state_set_integer = 3
+          set_values  = 26 451 0 
+          descriptors  = 'study' 'series' 'quality'

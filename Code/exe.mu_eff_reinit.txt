@@ -1,0 +1,130 @@
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 530; dakota ./workdir/Study0035/0530/opt/dakota_mu_eff_pattern.in > ./workdir/Study0035/0530/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+# echo 433; dakota ./workdir/Study0023/0433/opt/dakota_mu_eff_pattern.in > ./workdir/Study0023/0433/opt/dakota_mu_eff_pattern.in.log 2>&1 
+echo 495; dakota ./workdir/Study0030/0495/opt/dakota_mu_eff_pattern.in > ./workdir/Study0030/0495/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 497; dakota ./workdir/Study0030/0497/opt/dakota_mu_eff_pattern.in > ./workdir/Study0030/0497/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 491; dakota ./workdir/Study0030/0491/opt/dakota_mu_eff_pattern.in > ./workdir/Study0030/0491/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 496; dakota ./workdir/Study0030/0496/opt/dakota_mu_eff_pattern.in > ./workdir/Study0030/0496/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 490; dakota ./workdir/Study0030/0490/opt/dakota_mu_eff_pattern.in > ./workdir/Study0030/0490/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+# echo 377; dakota ./workdir/Study0017/0377/opt/dakota_mu_eff_pattern.in > ./workdir/Study0017/0377/opt/dakota_mu_eff_pattern.in.log 2>&1 
+echo 378; dakota ./workdir/Study0017/0378/opt/dakota_mu_eff_pattern.in > ./workdir/Study0017/0378/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 438; dakota ./workdir/Study0025/0438/opt/dakota_mu_eff_pattern.in > ./workdir/Study0025/0438/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 435; dakota ./workdir/Study0025/0435/opt/dakota_mu_eff_pattern.in > ./workdir/Study0025/0435/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 440; dakota ./workdir/Study0025/0440/opt/dakota_mu_eff_pattern.in > ./workdir/Study0025/0440/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 436; dakota ./workdir/Study0025/0436/opt/dakota_mu_eff_pattern.in > ./workdir/Study0025/0436/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 466; dakota ./workdir/Study0028/0466/opt/dakota_mu_eff_pattern.in > ./workdir/Study0028/0466/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 468; dakota ./workdir/Study0028/0468/opt/dakota_mu_eff_pattern.in > ./workdir/Study0028/0468/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 471; dakota ./workdir/Study0028/0471/opt/dakota_mu_eff_pattern.in > ./workdir/Study0028/0471/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 447; dakota ./workdir/Study0026/0447/opt/dakota_mu_eff_pattern.in > ./workdir/Study0026/0447/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 457; dakota ./workdir/Study0026/0457/opt/dakota_mu_eff_pattern.in > ./workdir/Study0026/0457/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 455; dakota ./workdir/Study0026/0455/opt/dakota_mu_eff_pattern.in > ./workdir/Study0026/0455/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 453; dakota ./workdir/Study0026/0453/opt/dakota_mu_eff_pattern.in > ./workdir/Study0026/0453/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 450; dakota ./workdir/Study0026/0450/opt/dakota_mu_eff_pattern.in > ./workdir/Study0026/0450/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 451; dakota ./workdir/Study0026/0451/opt/dakota_mu_eff_pattern.in > ./workdir/Study0026/0451/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 418; dakota ./workdir/Study0022/0418/opt/dakota_mu_eff_pattern.in > ./workdir/Study0022/0418/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 417; dakota ./workdir/Study0022/0417/opt/dakota_mu_eff_pattern.in > ./workdir/Study0022/0417/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 409; dakota ./workdir/Study0021/0409/opt/dakota_mu_eff_pattern.in > ./workdir/Study0021/0409/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 414; dakota ./workdir/Study0021/0414/opt/dakota_mu_eff_pattern.in > ./workdir/Study0021/0414/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+./analytic/dakmatlab setup workspace
+echo 415; dakota ./workdir/Study0021/0415/opt/dakota_mu_eff_pattern.in > ./workdir/Study0021/0415/opt/dakota_mu_eff_pattern.in.log 2>&1 
+
+pkill -9 dakmatlab
+rm dakmatlab_pipe?
+# echo 183; dakota ./workdir/Study0006/0183/opt/dakota_mu_eff_pattern.in > ./workdir/Study0006/0183/opt/dakota_mu_eff_pattern.in.log 2>&1 
