@@ -1,4 +1,4 @@
-IRE Spine Project
+LITT Model Selection Project
 ----------------------
 
 Code, notes, and writeup 
